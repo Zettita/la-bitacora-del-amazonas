@@ -7,7 +7,21 @@ Crónica de las partidas de LoL de la banda: quién sale mejor, quién se la car
 - **El Salón de la Fama**: ranking histórico de MVPs, cargadas, trolleos, anclas y mejor winrate.
 - **La Crónica**: línea de tiempo de "capítulos" (días de juego), cada uno con sus partidas, campeones, KDA, premios y comentarios.
 
-## Cómo agregar una nueva sesión
+## Cómo agregar una nueva sesión (con el formulario)
+
+La forma más fácil es con el formulario incluido, que escribe el JSON por vos:
+
+1. Arrancá el servidor local (doble click en `cargar-partidas.bat`, o corré `python herramientas/servidor.py` desde la carpeta del proyecto).
+2. Abrí `http://localhost:8420/herramientas/cargar.html`.
+3. Completá la fecha, cargá una o más partidas (podés destildar a alguien si no jugó esa partida, o agregar un invitado suelto), y tocá **Guardar sesión**.
+4. Eso escribe directo `data/sessions/<fecha>.json` y actualiza `data/manifest.json`. Refrescá `index.html` (o el link "Volver a la crónica") para verlo.
+5. Commiteá y pusheá los cambios (ver abajo) para que se reflejen en el sitio publicado.
+
+El servidor solo corre en tu máquina — es una herramienta de carga, no hace falta para que la web publicada funcione.
+
+## Cómo agregar una nueva sesión (a mano)
+
+También podés saltear el formulario y editar el JSON directamente:
 
 1. Creá un archivo nuevo en `data/sessions/`, con el nombre de la fecha, por ejemplo `2026-09-06.json`.
 2. Completalo siguiendo este esquema:
@@ -92,10 +106,15 @@ De ahí en adelante, cada vez que agregues una sesión y hagas `git push`, GitHu
 ## Estructura del proyecto
 
 ```
-index.html          página principal
-css/style.css        estilos (tema crónica/diario)
-js/app.js             carga los datos y arma el salón de la fama + la línea de tiempo
-data/players.json     roster de jugadores
-data/manifest.json    lista de sesiones a cargar
-data/sessions/*.json  una sesión (día de juego) por archivo
+index.html                página principal
+css/style.css              estilos (tema crónica/diario)
+js/app.js                   carga los datos y arma el salón de la fama + la línea de tiempo
+data/players.json           roster de jugadores
+data/manifest.json          lista de sesiones a cargar
+data/sessions/*.json        una sesión (día de juego) por archivo
+herramientas/cargar.html    formulario para cargar una sesión
+herramientas/cargar.js       lógica del formulario (arma el JSON y lo manda al servidor)
+herramientas/cargar.css      estilos del formulario
+herramientas/servidor.py     servidor local: sirve el sitio y guarda lo que llega del formulario
+cargar-partidas.bat          atajo para Windows: arranca el servidor con doble click
 ```

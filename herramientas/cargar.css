@@ -1,0 +1,188 @@
+.portada-chica{padding:3rem 1.5rem 2.5rem;}
+.volver-link{
+  display:inline-block;
+  margin-top:1rem;
+  color:var(--oro-claro);
+  text-decoration:none;
+  font-size:.9rem;
+  border-bottom:1px solid transparent;
+}
+.volver-link:hover{border-color:var(--oro-claro);}
+
+.form-main{
+  max-width:900px;
+  margin:0 auto;
+  padding:2rem 1.5rem 5rem;
+}
+
+.mensaje{
+  padding:.9rem 1.2rem;
+  border-radius:8px;
+  margin-bottom:1.5rem;
+  font-family:'Cinzel', serif;
+  font-size:.95rem;
+}
+.mensaje.ok{background:rgba(63,125,79,.2); border:1px solid var(--victoria); color:#bfe6c8;}
+.mensaje.error{background:rgba(140,58,58,.2); border:1px solid var(--derrota); color:#f0c6c6;}
+
+.bloque{
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:1.4rem 1.4rem 1.2rem;
+  margin-bottom:1.4rem;
+  background:var(--noche-panel);
+}
+.bloque legend{
+  font-family:'Cinzel', serif;
+  color:var(--oro-claro);
+  padding:0 .5rem;
+  font-size:1rem;
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+}
+
+.fila-campos{
+  display:flex;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin-bottom:.9rem;
+}
+.campo{
+  display:flex;
+  flex-direction:column;
+  gap:.35rem;
+  flex:1 1 160px;
+}
+.campo-grande{flex:2 1 260px;}
+.campo-ancho{width:100%; display:flex; flex-direction:column; gap:.35rem;}
+.campo span{
+  font-size:.8rem;
+  color:var(--pergamino-osc);
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+
+input, select, textarea{
+  font-family:'EB Garamond', Georgia, serif;
+  font-size:1rem;
+  background:var(--noche);
+  color:var(--pergamino);
+  border:1px solid var(--borde);
+  border-radius:6px;
+  padding:.5rem .6rem;
+}
+input:focus, select:focus, textarea:focus{
+  outline:none;
+  border-color:var(--oro);
+}
+textarea{resize:vertical; width:100%;}
+
+.bloque-partida{border-color:var(--oro); background:rgba(201,162,39,.05);}
+.num-partida{color:var(--pergamino);}
+.btn-quitar-partida{
+  margin-left:auto;
+  background:none;
+  border:1px solid var(--derrota);
+  color:#f0c6c6;
+  border-radius:5px;
+  cursor:pointer;
+  padding:.1rem .5rem;
+  font-size:.85rem;
+}
+
+.jugadores-form{
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+  margin-top:1rem;
+}
+
+.jugador-form-fila{
+  display:grid;
+  grid-template-columns:150px 130px 110px 150px auto;
+  gap:.5rem .7rem;
+  align-items:center;
+  background:rgba(0,0,0,.2);
+  padding:.6rem .7rem;
+  border-radius:6px;
+}
+.jugador-form-fila.jugador-invitado{background:rgba(0,0,0,.32); border:1px dashed var(--borde);}
+
+.jf-check{
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  font-weight:600;
+}
+.jf-check .inv-nombre{
+  padding:.3rem .4rem;
+  font-size:.9rem;
+  width:100%;
+}
+.j-nombre-roster{white-space:nowrap;}
+
+.kda-inputs{
+  display:flex;
+  align-items:center;
+  gap:.25rem;
+}
+.kda-inputs input{width:2.6rem; text-align:center; padding:.4rem .3rem;}
+
+.premios-checks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem .7rem;
+  font-size:.8rem;
+}
+.premio-check{display:flex; align-items:center; gap:.3rem; white-space:nowrap; cursor:pointer;}
+
+.campo-comentario{
+  grid-column:1 / -1;
+  width:100%;
+}
+
+.jugador-form-fila.desactivado{opacity:.4;}
+.jugador-form-fila.desactivado input:not(.j-participo):not(.inv-participo),
+.jugador-form-fila.desactivado select{
+  pointer-events:none;
+}
+
+.btn{
+  font-family:'Cinzel', serif;
+  border-radius:6px;
+  padding:.65rem 1.3rem;
+  cursor:pointer;
+  font-size:.95rem;
+  border:1px solid var(--oro);
+}
+.btn-principal{
+  background:var(--oro);
+  color:var(--tinta);
+  font-weight:700;
+}
+.btn-principal:hover{background:var(--oro-claro);}
+.btn-secundario{
+  background:transparent;
+  color:var(--oro-claro);
+  margin-bottom:1.4rem;
+}
+.btn-secundario:hover{background:rgba(201,162,39,.1);}
+
+.acciones-finales{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+.estado-guardado{
+  font-style:italic;
+  color:var(--pergamino-osc);
+  font-size:.9rem;
+}
+
+@media (max-width:760px){
+  .jugador-form-fila{grid-template-columns:1fr 1fr; grid-auto-rows:auto;}
+  .premios-checks{grid-column:1/-1;}
+  .kda-inputs{grid-column:1/-1;}
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cargar partidas — La Bitácora del Amazonas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="cargar.css">
+</head>
+<body class="pagina-carga">
+
+<header class="portada portada-chica">
+  <div class="portada-orla">
+    <p class="portada-eyebrow">La Bitácora del Amazonas</p>
+    <h1>Cargar una sesión</h1>
+    <p class="portada-sub">Completá el formulario y se guarda directo en <code>data/sessions/</code>.</p>
+    <a class="volver-link" href="../index.html">← Volver a la crónica</a>
+  </div>
+</header>
+
+<main class="form-main">
+
+  <div id="mensaje" class="mensaje" hidden></div>
+
+  <form id="form-sesion">
+    <fieldset class="bloque">
+      <legend>Datos del día</legend>
+      <div class="fila-campos">
+        <label class="campo">
+          <span>Fecha *</span>
+          <input type="date" id="fecha" required>
+        </label>
+        <label class="campo campo-grande">
+          <span>Título de la noche</span>
+          <input type="text" id="titulo" placeholder="Ej: Noche de remontadas imposibles">
+        </label>
+      </div>
+      <label class="campo campo-ancho">
+        <span>Notas del día (opcional)</span>
+        <textarea id="notas" rows="2" placeholder="Algo para recordar de la sesión en general..."></textarea>
+      </label>
+    </fieldset>
+
+    <div id="partidas-contenedor"></div>
+
+    <button type="button" id="btn-agregar-partida" class="btn btn-secundario">+ Agregar otra partida</button>
+
+    <div class="acciones-finales">
+      <button type="submit" class="btn btn-principal">Guardar sesión</button>
+      <span id="estado-guardado" class="estado-guardado"></span>
+    </div>
+  </form>
+</main>
+
+<template id="tpl-partida">
+  <fieldset class="bloque bloque-partida">
+    <legend>Partida <span class="num-partida"></span> <button type="button" class="btn-quitar-partida" title="Quitar esta partida">✕</button></legend>
+    <div class="fila-campos">
+      <label class="campo">
+        <span>Resultado *</span>
+        <select class="p-resultado" required>
+          <option value="Victoria">Victoria</option>
+          <option value="Derrota">Derrota</option>
+        </select>
+      </label>
+      <label class="campo">
+        <span>Duración</span>
+        <input type="text" class="p-duracion" placeholder="mm:ss">
+      </label>
+      <label class="campo">
+        <span>Modo</span>
+        <input type="text" class="p-modo" list="modos-sugeridos" value="Ranked Solo/Duo">
+      </label>
+    </div>
+
+    <div class="jugadores-form"></div>
+  </fieldset>
+</template>
+
+<template id="tpl-jugador">
+  <div class="jugador-form-fila">
+    <label class="jf-check">
+      <input type="checkbox" class="j-participo" checked>
+      <span class="j-nombre-roster"></span>
+    </label>
+    <input type="text" class="j-campeon" placeholder="Campeón">
+    <select class="j-rol">
+      <option value="">Rol</option>
+      <option value="TOP">TOP</option>
+      <option value="JUNGLE">JUNGLE</option>
+      <option value="MID">MID</option>
+      <option value="ADC">ADC</option>
+      <option value="SUPPORT">SUPPORT</option>
+    </select>
+    <div class="kda-inputs">
+      <input type="number" min="0" class="j-k" placeholder="K">
+      <span>/</span>
+      <input type="number" min="0" class="j-d" placeholder="D">
+      <span>/</span>
+      <input type="number" min="0" class="j-a" placeholder="A">
+    </div>
+    <div class="premios-checks">
+      <label class="premio-check pc-mvp"><input type="checkbox" value="mvp"> 🏆 MVP</label>
+      <label class="premio-check pc-carry"><input type="checkbox" value="carry"> 💪 Carry</label>
+      <label class="premio-check pc-troll"><input type="checkbox" value="troll"> 🤡 Troll</label>
+      <label class="premio-check pc-ancla"><input type="checkbox" value="ancla"> ⚓ Ancla</label>
+    </div>
+    <input type="text" class="j-comentario campo-comentario" placeholder="Comentario (opcional)">
+  </div>
+</template>
+
+<template id="tpl-invitado">
+  <div class="jugador-form-fila jugador-invitado">
+    <label class="jf-check">
+      <input type="checkbox" class="inv-participo">
+      <input type="text" class="inv-nombre" placeholder="Nombre invitado">
+    </label>
+    <input type="text" class="j-campeon" placeholder="Campeón">
+    <select class="j-rol">
+      <option value="">Rol</option>
+      <option value="TOP">TOP</option>
+      <option value="JUNGLE">JUNGLE</option>
+      <option value="MID">MID</option>
+      <option value="ADC">ADC</option>
+      <option value="SUPPORT">SUPPORT</option>
+    </select>
+    <div class="kda-inputs">
+      <input type="number" min="0" class="j-k" placeholder="K">
+      <span>/</span>
+      <input type="number" min="0" class="j-d" placeholder="D">
+      <span>/</span>
+      <input type="number" min="0" class="j-a" placeholder="A">
+    </div>
+    <div class="premios-checks">
+      <label class="premio-check pc-mvp"><input type="checkbox" value="mvp"> 🏆 MVP</label>
+      <label class="premio-check pc-carry"><input type="checkbox" value="carry"> 💪 Carry</label>
+      <label class="premio-check pc-troll"><input type="checkbox" value="troll"> 🤡 Troll</label>
+      <label class="premio-check pc-ancla"><input type="checkbox" value="ancla"> ⚓ Ancla</label>
+    </div>
+    <input type="text" class="j-comentario campo-comentario" placeholder="Comentario (opcional)">
+  </div>
+</template>
+
+<datalist id="modos-sugeridos">
+  <option value="Ranked Solo/Duo">
+  <option value="Ranked Flex">
+  <option value="Normal">
+  <option value="ARAM">
+</datalist>
+
+<script src="cargar.js"></script>
+</body>
+</html>
