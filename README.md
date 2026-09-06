@@ -21,18 +21,39 @@ El servidor solo corre en tu máquina — es una herramienta de carga, no hace f
 
 ## Cómo agregar una sesión desde la web publicada (sin servidor local)
 
-`herramientas/cargar.html` también funciona abierto directo desde GitHub Pages (por ejemplo `https://tu-usuario.github.io/tu-repo/herramientas/cargar.html`). Ahí no hay ningún servidor propio corriendo, así que en vez de eso el formulario commitea directo al repo usando la API de GitHub. La página detecta sola en qué modo está (mira si el link es `localhost` o no).
+`herramientas/cargar.html` también funciona abierto directo desde GitHub Pages (por ejemplo `https://zettita.github.io/la-bitacora-del-amazonas/herramientas/cargar.html`). Ahí no hay ningún servidor propio corriendo, así que en vez de eso el formulario le manda los datos a un **Worker de Cloudflare** (un pequeño servidor gratuito) que es el único lugar que conoce el token real de GitHub y hace el commit por vos. La página detecta sola en qué modo está (mira si el link es `localhost` o no).
 
-Para usar este modo, cada persona que vaya a cargar partidas necesita su propio token:
+Con este esquema, tus amigos **no necesitan cuenta de GitHub ni ningún token** — solo una clave de grupo simple, como una contraseña de wifi.
 
-1. Andá a [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new) (mientras estés logueado en GitHub).
-2. Creá un **fine-grained personal access token**: en "Repository access" elegí "Only select repositories" y seleccioná únicamente este repo. En "Permissions" → "Repository permissions" → poné **Contents: Read and write** (nada más). Ponele una expiración corta.
-3. Copiá el token generado (empieza con `github_pat_...`).
-4. En `herramientas/cargar.html`, abrí "⚙️ Conexión con GitHub", completá usuario, repositorio, rama (`main`) y pegá el token ahí. Tocá "Guardar conexión".
+### Desplegar el Worker (lo hacés una sola vez, vos)
 
-El token queda guardado solo en el `localStorage` de ese navegador — nunca se manda a ningún lado que no sea `api.github.com`, y ni yo ni nadie más lo ve. Cada partida guardada desde ahí genera uno o más commits directo en el repo, y GitHub Pages actualiza el sitio publicado en un minuto.
+1. Creá una cuenta gratis en [dash.cloudflare.com](https://dash.cloudflare.com) si no tenés.
+2. **Workers & Pages → Create → Create Worker**. Ponele un nombre (ej. `bitacora-proxy`) y tocá **Deploy** (te crea un worker de ejemplo).
+3. **Edit code**: borrá todo y pegá el contenido completo de [`herramientas/cloudflare-worker.js`](herramientas/cloudflare-worker.js) de este repo. **Save and deploy**.
+4. En la página del Worker, andá a **Settings → Variables and Secrets** y agregá:
 
-**Nota de seguridad:** cualquiera que tenga acceso a ese navegador (o a ese perfil de Chrome) podría usar el token guardado para escribir en el repo mientras no haya expirado. Por eso conviene el token acotado solo a "Contents" de este repo y con expiración corta — así el riesgo si se filtra es mínimo (en el peor caso, alguien podría escribir sesiones falsas en esta bitácora, nada más).
+   | Nombre | Tipo | Valor |
+   |---|---|---|
+   | `GITHUB_OWNER` | Texto | `Zettita` |
+   | `GITHUB_REPO` | Texto | `la-bitacora-del-amazonas` |
+   | `GITHUB_BRANCH` | Texto | `main` |
+   | `ALLOWED_ORIGIN` | Texto | `https://zettita.github.io` |
+   | `CLAVE_GRUPO` | **Secret** | La clave que van a usar tus amigos (elegila vos, tipo contraseña) |
+   | `GITHUB_TOKEN` | **Secret** | Un fine-grained PAT tuyo (ver abajo) |
+
+5. Para el `GITHUB_TOKEN`: generalo en [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new) — "Repository access" → "Only select repositories" → elegí solo este repo; "Permissions" → "Contents" → **Read and write**. Este es el **único** token que existe, y vive solo acá, cifrado en Cloudflare — ni tus amigos ni yo lo vemos nunca.
+6. Copiá la URL del Worker (algo como `https://bitacora-proxy.tu-cuenta.workers.dev`), que aparece arriba de todo en la página del Worker.
+
+### Configurar el formulario (vos y cada amigo, una vez por navegador)
+
+1. Abrí `herramientas/cargar.html` en el sitio publicado.
+2. Desplegá "⚙️ Conexión para guardar".
+3. Pegá la **URL del Worker** y la **clave del grupo** (la misma que pusiste como `CLAVE_GRUPO`). Opcionalmente tu nombre, para que quede en el mensaje del commit.
+4. Guardar conexión.
+
+Compartile a tus amigos únicamente la URL del sitio, la URL del Worker y la clave del grupo (por WhatsApp/Discord, como quieran) — nada de tokens ni cuentas de GitHub.
+
+**Nota de seguridad:** quien tenga la clave del grupo puede cargar (o falsear) sesiones en esta bitácora, nada más — no tiene acceso al repo en sí ni a nada fuera de lo que este Worker expone. Si alguna vez querés invalidar el acceso de todos de una, basta con cambiar `CLAVE_GRUPO` en Cloudflare y volver a compartir la nueva clave.
 
 ## Cómo agregar una nueva sesión (a mano)
 
@@ -130,7 +151,8 @@ data/sessions/*.json        una sesión (día de juego) por archivo
 herramientas/cargar.html    formulario para cargar una sesión
 herramientas/cargar.js       lógica del formulario (arma el JSON y decide a qué backend mandarlo)
 herramientas/cargar.css      estilos del formulario
-herramientas/github-api.js   guarda sesiones commiteando directo vía la API de GitHub (modo publicado)
+herramientas/proxy-remoto.js  cliente: le manda la sesión al Worker de Cloudflare (modo publicado)
+herramientas/cloudflare-worker.js  código del Worker: intermediario seguro que hace el commit en GitHub
 herramientas/servidor.py     servidor local: sirve el sitio y guarda lo que llega del formulario
 cargar-partidas.bat          atajo para Windows: arranca el servidor con doble click
 ```

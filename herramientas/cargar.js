@@ -124,41 +124,37 @@ function actualizarIndicadorModo(){
     el.textContent = '(modo local: servidor Python)';
     el.className = 'modo-actual local';
   }else{
-    const cfg = ghCargarConfig();
-    el.textContent = ghConfigCompleta(cfg) ? '(modo GitHub: conectado)' : '(modo GitHub: falta configurar el token)';
+    const cfg = proxyCargarConfig();
+    el.textContent = proxyConfigCompleta(cfg) ? '(conectado)' : '(falta configurar la URL y la clave)';
     el.className = 'modo-actual github';
   }
 }
 
-const GH_DEFAULTS = { owner: 'Zettita', repo: 'la-bitacora-del-amazonas', branch: 'main' };
+function initConfigProxy(){
+  const cfg = proxyCargarConfig();
+  document.getElementById('proxy-url').value = cfg.url || '';
+  document.getElementById('proxy-clave').value = cfg.clave || '';
+  document.getElementById('proxy-autor').value = cfg.autor || '';
 
-function initConfigGithub(){
-  const cfg = ghCargarConfig();
-  document.getElementById('gh-owner').value = cfg.owner || GH_DEFAULTS.owner;
-  document.getElementById('gh-repo').value = cfg.repo || GH_DEFAULTS.repo;
-  document.getElementById('gh-branch').value = cfg.branch || GH_DEFAULTS.branch;
-  document.getElementById('gh-token').value = cfg.token || '';
-
-  if(!esModoLocal() && !ghConfigCompleta(cfg)){
+  if(!esModoLocal() && !proxyConfigCompleta(cfg)){
     document.getElementById('config-github').open = true;
   }
 
   document.getElementById('btn-guardar-config').addEventListener('click', () => {
     const nuevaCfg = {
-      owner: document.getElementById('gh-owner').value.trim(),
-      repo: document.getElementById('gh-repo').value.trim(),
-      branch: document.getElementById('gh-branch').value.trim() || 'main',
-      token: document.getElementById('gh-token').value.trim(),
+      url: document.getElementById('proxy-url').value.trim(),
+      clave: document.getElementById('proxy-clave').value,
+      autor: document.getElementById('proxy-autor').value.trim(),
     };
-    ghGuardarConfig(nuevaCfg);
+    proxyGuardarConfig(nuevaCfg);
     document.getElementById('config-estado').textContent = 'Conexión guardada en este navegador.';
     actualizarIndicadorModo();
   });
 
   document.getElementById('btn-borrar-config').addEventListener('click', () => {
-    ghBorrarConfig();
-    document.getElementById('gh-token').value = '';
-    document.getElementById('config-estado').textContent = 'Token borrado.';
+    proxyBorrarConfig();
+    document.getElementById('proxy-clave').value = '';
+    document.getElementById('config-estado').textContent = 'Clave borrada.';
     actualizarIndicadorModo();
   });
 }
@@ -212,12 +208,12 @@ async function manejarSubmit(ev){
       data = await resp.json();
       if(!resp.ok) throw new Error(data.error || 'Error desconocido');
     }else{
-      const cfg = ghCargarConfig();
-      if(!ghConfigCompleta(cfg)){
+      const cfg = proxyCargarConfig();
+      if(!proxyConfigCompleta(cfg)){
         document.getElementById('config-github').open = true;
-        throw new Error('Falta configurar la conexión con GitHub (usuario, repo y token) más arriba.');
+        throw new Error('Falta configurar la URL del servidor y la clave del grupo más arriba.');
       }
-      data = await guardarSesionGithub(cfg, payload);
+      data = await guardarSesionProxy(cfg, payload);
     }
 
     estado.textContent = '';
@@ -241,7 +237,7 @@ async function manejarSubmit(ev){
 (async function init(){
   await cargarRoster();
   agregarBloquePartida();
-  initConfigGithub();
+  initConfigProxy();
   actualizarIndicadorModo();
 
   document.getElementById('btn-agregar-partida').addEventListener('click', agregarBloquePartida);

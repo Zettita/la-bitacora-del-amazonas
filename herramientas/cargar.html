@@ -24,41 +24,32 @@
 <main class="form-main">
 
   <details class="bloque bloque-config" id="config-github">
-    <summary>⚙️ Conexión con GitHub <span id="modo-actual" class="modo-actual"></span></summary>
+    <summary>⚙️ Conexión para guardar <span id="modo-actual" class="modo-actual"></span></summary>
     <div class="config-cuerpo">
       <p class="config-ayuda">
         Esta página no tiene backend propio cuando está publicada en GitHub Pages, así que para guardar
-        una sesión directo en el repo hace falta un <strong>token de acceso personal</strong> con permiso
-        de escritura sobre este repo únicamente. El token queda guardado solo en <em>este navegador</em>
-        (localStorage) — nunca se envía a ningún lado más que a <code>api.github.com</code>.
-      </p>
-      <p class="config-ayuda">
-        Generalo en
-        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>
-        como <strong>fine-grained token</strong>: "Repository access" → "Only select repositories" → elegí este repo;
-        "Permissions" → "Contents" → "Read and write". Ponele una expiración corta (ej. 90 días).
+        una sesión usa un pequeño servidor intermediario (un Worker de Cloudflare) que es el único lugar
+        que conoce el token real de GitHub. Vos solo necesitás la <strong>URL de ese servidor</strong> y la
+        <strong>clave del grupo</strong> — ninguna cuenta de GitHub. Guardá lo que pegues acá y compartí con
+        tus amigos únicamente la URL y la clave (nunca por acá, por chat/WhatsApp entre ustedes).
       </p>
       <div class="fila-campos">
-        <label class="campo">
-          <span>Usuario/organización</span>
-          <input type="text" id="gh-owner" placeholder="tu-usuario">
+        <label class="campo campo-grande">
+          <span>URL del servidor</span>
+          <input type="text" id="proxy-url" placeholder="https://tu-worker.tu-cuenta.workers.dev">
         </label>
         <label class="campo">
-          <span>Repositorio</span>
-          <input type="text" id="gh-repo" placeholder="la-bitacora-del-amazonas">
-        </label>
-        <label class="campo">
-          <span>Rama</span>
-          <input type="text" id="gh-branch" placeholder="main" value="main">
+          <span>Clave del grupo</span>
+          <input type="password" id="proxy-clave" placeholder="••••••••">
         </label>
       </div>
       <label class="campo campo-ancho">
-        <span>Token de acceso personal</span>
-        <input type="password" id="gh-token" placeholder="github_pat_...">
+        <span>Tu nombre (queda en el mensaje del commit, opcional)</span>
+        <input type="text" id="proxy-autor" placeholder="Ej: Xero">
       </label>
       <div class="acciones-finales">
         <button type="button" id="btn-guardar-config" class="btn btn-secundario">Guardar conexión</button>
-        <button type="button" id="btn-borrar-config" class="btn btn-secundario">Borrar token guardado</button>
+        <button type="button" id="btn-borrar-config" class="btn btn-secundario">Borrar clave guardada</button>
         <span id="config-estado" class="estado-guardado"></span>
       </div>
     </div>
@@ -192,7 +183,7 @@
   <option value="ARAM">
 </datalist>
 
-<script src="github-api.js"></script>
+<script src="proxy-remoto.js"></script>
 <script src="cargar.js"></script>
 </body>
 </html>
