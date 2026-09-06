@@ -78,6 +78,37 @@ input:focus, select:focus, textarea:focus{
 }
 textarea{resize:vertical; width:100%;}
 
+.bloque-config{padding:.9rem 1.4rem;}
+.bloque-config summary{
+  cursor:pointer;
+  font-family:'Cinzel', serif;
+  color:var(--oro-claro);
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+}
+.modo-actual{
+  font-family:'EB Garamond', serif;
+  font-style:italic;
+  font-size:.85rem;
+  color:var(--pergamino-osc);
+}
+.modo-actual.local{color:#bfe6c8;}
+.modo-actual.github{color:#8fc7e8;}
+.config-cuerpo{margin-top:1rem;}
+.config-ayuda{
+  font-size:.9rem;
+  color:var(--pergamino-osc);
+  line-height:1.5;
+  margin:0 0 .9rem;
+}
+.config-ayuda code{
+  background:rgba(0,0,0,.35);
+  padding:.05rem .35rem;
+  border-radius:4px;
+}
+.config-ayuda a{color:var(--oro-claro);}
+
 .bloque-partida{border-color:var(--oro); background:rgba(201,162,39,.05);}
 .num-partida{color:var(--pergamino);}
 .btn-quitar-partida{

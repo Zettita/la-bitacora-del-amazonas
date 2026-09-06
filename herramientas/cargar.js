@@ -114,6 +114,53 @@ function leerPartidas(){
   }));
 }
 
+function esModoLocal(){
+  return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+}
+
+function actualizarIndicadorModo(){
+  const el = document.getElementById('modo-actual');
+  if(esModoLocal()){
+    el.textContent = '(modo local: servidor Python)';
+    el.className = 'modo-actual local';
+  }else{
+    const cfg = ghCargarConfig();
+    el.textContent = ghConfigCompleta(cfg) ? '(modo GitHub: conectado)' : '(modo GitHub: falta configurar el token)';
+    el.className = 'modo-actual github';
+  }
+}
+
+function initConfigGithub(){
+  const cfg = ghCargarConfig();
+  document.getElementById('gh-owner').value = cfg.owner || '';
+  document.getElementById('gh-repo').value = cfg.repo || '';
+  document.getElementById('gh-branch').value = cfg.branch || 'main';
+  document.getElementById('gh-token').value = cfg.token || '';
+
+  if(!esModoLocal() && !ghConfigCompleta(cfg)){
+    document.getElementById('config-github').open = true;
+  }
+
+  document.getElementById('btn-guardar-config').addEventListener('click', () => {
+    const nuevaCfg = {
+      owner: document.getElementById('gh-owner').value.trim(),
+      repo: document.getElementById('gh-repo').value.trim(),
+      branch: document.getElementById('gh-branch').value.trim() || 'main',
+      token: document.getElementById('gh-token').value.trim(),
+    };
+    ghGuardarConfig(nuevaCfg);
+    document.getElementById('config-estado').textContent = 'Conexión guardada en este navegador.';
+    actualizarIndicadorModo();
+  });
+
+  document.getElementById('btn-borrar-config').addEventListener('click', () => {
+    ghBorrarConfig();
+    document.getElementById('gh-token').value = '';
+    document.getElementById('config-estado').textContent = 'Token borrado.';
+    actualizarIndicadorModo();
+  });
+}
+
 function mostrarMensaje(texto, tipo){
   const el = document.getElementById('mensaje');
   el.textContent = texto;
@@ -153,17 +200,29 @@ async function manejarSubmit(ev){
   estado.textContent = 'Guardando...';
 
   try{
-    const resp = await fetch('/api/guardar-sesion', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const data = await resp.json();
-    if(!resp.ok){
-      throw new Error(data.error || 'Error desconocido');
+    let data;
+    if(esModoLocal()){
+      const resp = await fetch('/api/guardar-sesion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      data = await resp.json();
+      if(!resp.ok) throw new Error(data.error || 'Error desconocido');
+    }else{
+      const cfg = ghCargarConfig();
+      if(!ghConfigCompleta(cfg)){
+        document.getElementById('config-github').open = true;
+        throw new Error('Falta configurar la conexión con GitHub (usuario, repo y token) más arriba.');
+      }
+      data = await guardarSesionGithub(cfg, payload);
     }
+
     estado.textContent = '';
-    mostrarMensaje(`Guardado en data/sessions/${data.archivo} (${data.partidas_en_la_sesion} partida(s) en total ese día). Ahora podés hacer git add / commit / push. También podés ver el resultado en la crónica.`, 'ok');
+    const notaCommit = esModoLocal()
+      ? 'Ahora podés hacer git add / commit / push.'
+      : 'Se subió como commit directo al repo — en un minuto lo va a reflejar el sitio publicado.';
+    mostrarMensaje(`Guardado en data/sessions/${data.archivo} (${data.partidas_en_la_sesion} partida(s) en total ese día). ${notaCommit}`, 'ok');
 
     contenedorPartidas.innerHTML = '';
     contadorPartidas = 0;
@@ -172,13 +231,16 @@ async function manejarSubmit(ev){
     document.getElementById('notas').value = '';
   }catch(err){
     estado.textContent = '';
-    mostrarMensaje(`No se pudo guardar: ${err.message}. ¿Está corriendo herramientas/servidor.py?`, 'error');
+    const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
+    mostrarMensaje(`No se pudo guardar: ${err.message}.${pista}`, 'error');
   }
 }
 
 (async function init(){
   await cargarRoster();
   agregarBloquePartida();
+  initConfigGithub();
+  actualizarIndicadorModo();
 
   document.getElementById('btn-agregar-partida').addEventListener('click', agregarBloquePartida);
   document.getElementById('form-sesion').addEventListener('submit', manejarSubmit);

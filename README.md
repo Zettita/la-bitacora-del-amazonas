@@ -19,6 +19,21 @@ La forma más fácil es con el formulario incluido, que escribe el JSON por vos:
 
 El servidor solo corre en tu máquina — es una herramienta de carga, no hace falta para que la web publicada funcione.
 
+## Cómo agregar una sesión desde la web publicada (sin servidor local)
+
+`herramientas/cargar.html` también funciona abierto directo desde GitHub Pages (por ejemplo `https://tu-usuario.github.io/tu-repo/herramientas/cargar.html`). Ahí no hay ningún servidor propio corriendo, así que en vez de eso el formulario commitea directo al repo usando la API de GitHub. La página detecta sola en qué modo está (mira si el link es `localhost` o no).
+
+Para usar este modo, cada persona que vaya a cargar partidas necesita su propio token:
+
+1. Andá a [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new) (mientras estés logueado en GitHub).
+2. Creá un **fine-grained personal access token**: en "Repository access" elegí "Only select repositories" y seleccioná únicamente este repo. En "Permissions" → "Repository permissions" → poné **Contents: Read and write** (nada más). Ponele una expiración corta.
+3. Copiá el token generado (empieza con `github_pat_...`).
+4. En `herramientas/cargar.html`, abrí "⚙️ Conexión con GitHub", completá usuario, repositorio, rama (`main`) y pegá el token ahí. Tocá "Guardar conexión".
+
+El token queda guardado solo en el `localStorage` de ese navegador — nunca se manda a ningún lado que no sea `api.github.com`, y ni yo ni nadie más lo ve. Cada partida guardada desde ahí genera uno o más commits directo en el repo, y GitHub Pages actualiza el sitio publicado en un minuto.
+
+**Nota de seguridad:** cualquiera que tenga acceso a ese navegador (o a ese perfil de Chrome) podría usar el token guardado para escribir en el repo mientras no haya expirado. Por eso conviene el token acotado solo a "Contents" de este repo y con expiración corta — así el riesgo si se filtra es mínimo (en el peor caso, alguien podría escribir sesiones falsas en esta bitácora, nada más).
+
 ## Cómo agregar una nueva sesión (a mano)
 
 También podés saltear el formulario y editar el JSON directamente:
@@ -113,8 +128,9 @@ data/players.json           roster de jugadores
 data/manifest.json          lista de sesiones a cargar
 data/sessions/*.json        una sesión (día de juego) por archivo
 herramientas/cargar.html    formulario para cargar una sesión
-herramientas/cargar.js       lógica del formulario (arma el JSON y lo manda al servidor)
+herramientas/cargar.js       lógica del formulario (arma el JSON y decide a qué backend mandarlo)
 herramientas/cargar.css      estilos del formulario
+herramientas/github-api.js   guarda sesiones commiteando directo vía la API de GitHub (modo publicado)
 herramientas/servidor.py     servidor local: sirve el sitio y guarda lo que llega del formulario
 cargar-partidas.bat          atajo para Windows: arranca el servidor con doble click
 ```
