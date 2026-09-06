@@ -42,7 +42,7 @@ export default {
       return jsonResp({ error: 'El cuerpo no es JSON valido' }, 400, cors);
     }
 
-    if (!env.CLAVE_GRUPO || body.clave !== env.CLAVE_GRUPO) {
+    if (!env.CLAVE_GRUPO || String(body.clave || '').trim() !== env.CLAVE_GRUPO.trim()) {
       return jsonResp({ error: 'Clave incorrecta' }, 401, cors);
     }
 

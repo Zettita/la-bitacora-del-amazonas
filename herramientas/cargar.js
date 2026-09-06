@@ -143,7 +143,7 @@ function initConfigProxy(){
   document.getElementById('btn-guardar-config').addEventListener('click', () => {
     const nuevaCfg = {
       url: document.getElementById('proxy-url').value.trim(),
-      clave: document.getElementById('proxy-clave').value,
+      clave: document.getElementById('proxy-clave').value.trim(),
       autor: document.getElementById('proxy-autor').value.trim(),
     };
     proxyGuardarConfig(nuevaCfg);
