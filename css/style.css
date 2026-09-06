@@ -1,0 +1,379 @@
+:root{
+  --tinta:#2b1d0e;
+  --tinta-suave:#4a3520;
+  --pergamino:#f3e6c8;
+  --pergamino-osc:#e6d3a3;
+  --noche:#12100e;
+  --noche-suave:#1c1712;
+  --noche-panel:#221c15;
+  --oro:#c9a227;
+  --oro-claro:#e8c766;
+  --borde:#5a4a2a;
+  --victoria:#3f7d4f;
+  --derrota:#8c3a3a;
+  --mvp:#c9a227;
+  --carry:#3a7ca5;
+  --troll:#a45bb0;
+  --ancla:#7a7a7a;
+  --sombra: 0 8px 24px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box;}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:
+    radial-gradient(ellipse at top, #241d14 0%, var(--noche) 60%);
+  color:var(--pergamino);
+  font-family:'EB Garamond', Georgia, serif;
+  font-size:18px;
+  line-height:1.5;
+}
+
+h1,h2,h3,.cinzel{
+  font-family:'Cinzel', serif;
+}
+
+/* ---------- Portada ---------- */
+.portada{
+  padding:5rem 1.5rem 3.5rem;
+  text-align:center;
+  border-bottom:2px solid var(--borde);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.35), transparent 70%);
+}
+.portada-orla{
+  max-width:780px;
+  margin:0 auto;
+  padding:2.5rem 2rem;
+  border:1px solid var(--borde);
+  border-radius:6px;
+  background:rgba(18,15,11,.4);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.4);
+}
+.portada-eyebrow{
+  font-family:'Cinzel', serif;
+  letter-spacing:.35em;
+  text-transform:uppercase;
+  font-size:.8rem;
+  color:var(--oro-claro);
+  margin:0 0 .75rem;
+}
+.portada h1{
+  font-family:'Cinzel Decorative', serif;
+  font-size:clamp(2rem, 5vw, 3.4rem);
+  margin:0 0 1rem;
+  color:var(--oro-claro);
+  text-shadow:0 2px 12px rgba(201,162,39,.25);
+}
+.portada-sub{
+  margin:0;
+  color:var(--pergamino-osc);
+  font-style:italic;
+  font-size:1.15rem;
+}
+
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:3rem 1.5rem 5rem;
+}
+
+.seccion{margin-bottom:4rem;}
+
+.titulo-seccion{
+  font-size:1.6rem;
+  color:var(--oro-claro);
+  border-bottom:1px solid var(--borde);
+  padding-bottom:.6rem;
+  margin-bottom:1.5rem;
+  letter-spacing:.03em;
+}
+
+/* ---------- Salon de la fama ---------- */
+.fama-resumen{
+  display:flex;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin-bottom:1.5rem;
+}
+.fama-resumen .stat{
+  flex:1 1 140px;
+  background:var(--noche-panel);
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:1rem 1.2rem;
+  text-align:center;
+}
+.fama-resumen .stat .num{
+  display:block;
+  font-family:'Cinzel', serif;
+  font-size:1.8rem;
+  color:var(--oro-claro);
+}
+.fama-resumen .stat .lbl{
+  font-size:.85rem;
+  color:var(--pergamino-osc);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.fama-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:1rem;
+}
+.fama-card{
+  background:var(--noche-panel);
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:1.1rem 1.2rem;
+}
+.fama-card h3{
+  margin:0 0 .8rem;
+  font-size:1rem;
+  color:var(--oro-claro);
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+}
+.fama-card ol{
+  margin:0;
+  padding-left:1.3rem;
+}
+.fama-card li{
+  margin-bottom:.35rem;
+  display:flex;
+  justify-content:space-between;
+  gap:.5rem;
+}
+.fama-card li .cnt{color:var(--pergamino-osc); font-variant-numeric:tabular-nums;}
+.fama-card.vacio{
+  color:var(--pergamino-osc);
+  font-style:italic;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+/* ---------- Timeline ---------- */
+#timeline{
+  position:relative;
+  padding-left:2.2rem;
+}
+#timeline::before{
+  content:"";
+  position:absolute;
+  left:.55rem;
+  top:.4rem;
+  bottom:.4rem;
+  width:2px;
+  background:linear-gradient(180deg, var(--oro), var(--borde) 90%);
+}
+
+.capitulo{
+  position:relative;
+  margin-bottom:1.4rem;
+}
+.capitulo::before{
+  content:"";
+  position:absolute;
+  left:-2.2rem;
+  top:.45rem;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--oro);
+  border:2px solid var(--noche);
+  box-shadow:0 0 0 2px var(--oro);
+}
+
+.capitulo-header{
+  cursor:pointer;
+  background:var(--noche-panel);
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:.9rem 1.2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+.capitulo-header:hover{border-color:var(--oro);}
+.capitulo-titulo{
+  font-family:'Cinzel', serif;
+  color:var(--oro-claro);
+  font-size:1.15rem;
+}
+.capitulo-fecha{
+  color:var(--pergamino-osc);
+  font-size:.9rem;
+  font-style:italic;
+}
+.capitulo-resumen{
+  font-size:.85rem;
+  color:var(--pergamino-osc);
+}
+.capitulo-flecha{
+  transition:transform .2s ease;
+  color:var(--oro-claro);
+}
+.capitulo.abierto .capitulo-flecha{transform:rotate(90deg);}
+
+.capitulo-cuerpo{
+  padding:1.2rem .2rem .4rem;
+}
+.capitulo-notas{
+  font-style:italic;
+  color:var(--pergamino-osc);
+  margin:0 0 1rem;
+  padding-left:.2rem;
+}
+
+/* ---------- Partidas ---------- */
+.partida{
+  background:var(--pergamino);
+  color:var(--tinta);
+  border-radius:8px;
+  padding:1.1rem 1.3rem;
+  margin-bottom:1.1rem;
+  box-shadow:var(--sombra);
+}
+.partida-header{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  flex-wrap:wrap;
+  margin-bottom:.9rem;
+  padding-bottom:.6rem;
+  border-bottom:1px solid var(--tinta-suave);
+}
+.partida-numero{
+  font-family:'Cinzel', serif;
+  font-weight:700;
+  color:var(--tinta-suave);
+}
+.badge-resultado{
+  font-family:'Cinzel', serif;
+  font-size:.75rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  padding:.25rem .6rem;
+  border-radius:4px;
+  color:#fff;
+}
+.badge-resultado.victoria{background:var(--victoria);}
+.badge-resultado.derrota{background:var(--derrota);}
+.partida-meta{
+  font-size:.85rem;
+  color:var(--tinta-suave);
+  margin-left:auto;
+}
+
+.jugadores-tabla{
+  display:grid;
+  gap:.6rem;
+}
+.jugador-fila{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:.6rem 1rem;
+  align-items:center;
+  padding:.5rem .6rem;
+  background:rgba(43,29,14,.05);
+  border-radius:6px;
+}
+.jugador-avatar{
+  width:40px;
+  height:40px;
+  border-radius:6px;
+  object-fit:cover;
+  border:1px solid var(--tinta-suave);
+  background:var(--pergamino-osc);
+}
+.jugador-avatar-fallback{
+  width:40px;
+  height:40px;
+  border-radius:6px;
+  border:1px solid var(--tinta-suave);
+  background:var(--tinta-suave);
+  color:var(--pergamino);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Cinzel', serif;
+  font-weight:700;
+}
+.jugador-info{min-width:0;}
+.jugador-nombre{
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  flex-wrap:wrap;
+}
+.jugador-rol{
+  font-size:.75rem;
+  color:var(--tinta-suave);
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.jugador-campeon{font-style:italic;}
+.jugador-comentario{
+  grid-column:1 / -1;
+  font-size:.9rem;
+  font-style:italic;
+  color:var(--tinta-suave);
+  padding-left:.6rem;
+  border-left:2px solid var(--tinta-suave);
+}
+.jugador-kda{
+  font-variant-numeric:tabular-nums;
+  font-size:.9rem;
+  white-space:nowrap;
+}
+.jugador-premios{
+  display:flex;
+  gap:.3rem;
+  flex-wrap:wrap;
+}
+.premio{
+  font-size:.7rem;
+  font-family:'Cinzel', serif;
+  padding:.15rem .5rem;
+  border-radius:10px;
+  color:#fff;
+  white-space:nowrap;
+}
+.premio.mvp{background:var(--mvp); color:#2b1d0e;}
+.premio.carry{background:var(--carry);}
+.premio.troll{background:var(--troll);}
+.premio.ancla{background:var(--ancla);}
+
+.vacio-timeline{
+  color:var(--pergamino-osc);
+  font-style:italic;
+  padding:2rem;
+  text-align:center;
+  border:1px dashed var(--borde);
+  border-radius:8px;
+}
+
+footer{
+  text-align:center;
+  padding:2rem 1rem 3rem;
+  color:var(--tinta-suave);
+  font-style:italic;
+  font-size:.9rem;
+}
+
+@media (max-width:600px){
+  body{font-size:16px;}
+  .jugador-fila{grid-template-columns:auto 1fr; grid-template-areas:"avatar info" "kda kda" "premios premios";}
+  .jugador-kda{grid-column:1/-1;}
+  .jugador-premios{grid-column:1/-1;}
+  .partida-meta{margin-left:0;}
+}

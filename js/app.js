@@ -1,0 +1,278 @@
+// ---------- Config ----------
+const PREMIOS_INFO = {
+  mvp:   { label: 'MVP',              icono: '🏆' },
+  carry: { label: 'Se la cargó',      icono: '💪' },
+  troll: { label: 'Trolleo',          icono: '🤡' },
+  ancla: { label: 'Ancla',            icono: '⚓' },
+};
+
+const CAMPEON_ESPECIALES = {
+  "wukong": "MonkeyKing", "kaisa": "Kaisa", "kai'sa": "Kaisa",
+  "khazix": "Khazix", "kha'zix": "Khazix",
+  "velkoz": "Velkoz", "vel'koz": "Velkoz",
+  "chogath": "Chogath", "cho'gath": "Chogath",
+  "reksai": "RekSai", "rek'sai": "RekSai",
+  "kogmaw": "KogMaw", "kog'maw": "KogMaw",
+  "belveth": "Belveth", "bel'veth": "Belveth",
+  "ksante": "KSante", "k'sante": "KSante",
+  "leblanc": "Leblanc",
+  "dr. mundo": "DrMundo", "dr mundo": "DrMundo",
+  "master yi": "MasterYi",
+  "miss fortune": "MissFortune",
+  "twisted fate": "TwistedFate",
+  "tahm kench": "TahmKench",
+  "jarvan iv": "JarvanIV",
+  "xin zhao": "XinZhao",
+  "renata glasc": "Renata", "renata": "Renata",
+  "nunu & willump": "Nunu", "nunu": "Nunu",
+  "lee sin": "LeeSin",
+  "aurelion sol": "AurelionSol",
+};
+
+let DDRAGON_VERSION = '14.23.1';
+
+function champKey(nombre){
+  if(!nombre) return null;
+  const limpio = nombre.trim().toLowerCase();
+  if(CAMPEON_ESPECIALES[limpio]) return CAMPEON_ESPECIALES[limpio];
+  return nombre.trim().split(/[\s'".]+/).filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join('');
+}
+
+function champIconUrl(nombre){
+  const key = champKey(nombre);
+  if(!key) return null;
+  return `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/champion/${key}.png`;
+}
+
+function iniciales(nombre){
+  return (nombre || '?').trim().slice(0,2).toUpperCase();
+}
+
+function formatFecha(iso){
+  try{
+    const [y,m,d] = iso.split('-').map(Number);
+    const fecha = new Date(y, m-1, d);
+    return fecha.toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' });
+  }catch(e){ return iso; }
+}
+
+// ---------- Carga de datos ----------
+async function cargarDatos(){
+  const [manifest, jugadoresArr] = await Promise.all([
+    fetch('data/manifest.json').then(r => r.json()).catch(() => []),
+    fetch('data/players.json').then(r => r.json()).catch(() => []),
+  ]);
+
+  const jugadores = {};
+  jugadoresArr.forEach(j => jugadores[j.id] = j.nombre);
+
+  const sesiones = [];
+  for(const archivo of manifest){
+    try{
+      const s = await fetch(`data/sessions/${archivo}`).then(r => r.json());
+      sesiones.push(s);
+    }catch(e){
+      console.warn('No se pudo cargar la sesión', archivo, e);
+    }
+  }
+  sesiones.sort((a,b) => a.fecha.localeCompare(b.fecha));
+
+  return { jugadores, sesiones };
+}
+
+// ---------- Salón de la fama ----------
+function calcularEstadisticas(sesiones, jugadores){
+  const stats = {};
+  const asegurar = (id) => {
+    if(!stats[id]) stats[id] = {
+      id, nombre: jugadores[id] || id,
+      partidas:0, victorias:0, derrotas:0,
+      premios: { mvp:0, carry:0, troll:0, ancla:0 },
+    };
+    return stats[id];
+  };
+
+  let totalPartidas = 0;
+
+  sesiones.forEach(s => (s.partidas || []).forEach(p => {
+    totalPartidas++;
+    (p.jugadores || []).forEach(j => {
+      const st = asegurar(j.jugador);
+      st.partidas++;
+      if(p.resultado === 'Victoria') st.victorias++;
+      else if(p.resultado === 'Derrota') st.derrotas++;
+      (j.premios || []).forEach(pr => { if(st.premios[pr] !== undefined) st.premios[pr]++; });
+    });
+  }));
+
+  return { stats: Object.values(stats), totalPartidas, totalSesiones: sesiones.length };
+}
+
+function renderResumen(totalPartidas, totalSesiones, cantJugadores){
+  const el = document.getElementById('fama-resumen');
+  el.innerHTML = `
+    <div class="stat"><span class="num">${totalSesiones}</span><span class="lbl">Días jugados</span></div>
+    <div class="stat"><span class="num">${totalPartidas}</span><span class="lbl">Partidas</span></div>
+    <div class="stat"><span class="num">${cantJugadores}</span><span class="lbl">Invocadores</span></div>
+  `;
+}
+
+function topPor(stats, key, minimo=1){
+  return stats
+    .filter(s => s.premios[key] >= minimo)
+    .sort((a,b) => b.premios[key] - a.premios[key])
+    .slice(0,5);
+}
+
+function renderSalonDeLaFama(stats, totalPartidas, totalSesiones){
+  renderResumen(totalPartidas, totalSesiones, stats.length);
+
+  const grid = document.getElementById('fama-grid');
+  grid.innerHTML = '';
+
+  if(stats.length === 0){
+    grid.innerHTML = `<div class="fama-card vacio">Todavía no hay partidas cargadas.<br>¡La primera página está en blanco!</div>`;
+    return;
+  }
+
+  ['mvp','carry','troll','ancla'].forEach(key => {
+    const info = PREMIOS_INFO[key];
+    const top = topPor(stats, key);
+    const card = document.createElement('div');
+    card.className = 'fama-card';
+    const filas = top.length
+      ? top.map(s => `<li><span>${s.nombre}</span><span class="cnt">${s.premios[key]}</span></li>`).join('')
+      : `<li style="opacity:.6; font-style:italic;">Nadie todavía</li>`;
+    card.innerHTML = `<h3>${info.icono} ${info.label}</h3><ol>${filas}</ol>`;
+    grid.appendChild(card);
+  });
+
+  // Mejor winrate (mínimo 3 partidas para contar)
+  const conWinrate = stats
+    .filter(s => s.partidas >= 3)
+    .map(s => ({...s, winrate: s.victorias / s.partidas}))
+    .sort((a,b) => b.winrate - a.winrate)
+    .slice(0,5);
+  const cardWr = document.createElement('div');
+  cardWr.className = 'fama-card';
+  const filasWr = conWinrate.length
+    ? conWinrate.map(s => `<li><span>${s.nombre}</span><span class="cnt">${Math.round(s.winrate*100)}%</span></li>`).join('')
+    : `<li style="opacity:.6; font-style:italic;">Faltan partidas (mín. 3)</li>`;
+  cardWr.innerHTML = `<h3>📈 Mejor Winrate</h3><ol>${filasWr}</ol>`;
+  grid.appendChild(cardWr);
+}
+
+// ---------- Timeline ----------
+function renderJugadorFila(j, jugadores){
+  const nombre = jugadores[j.jugador] || j.jugador;
+  const iconUrl = champIconUrl(j.campeon);
+  const kda = j.kda ? `${j.kda.k ?? 0}/${j.kda.d ?? 0}/${j.kda.a ?? 0}` : '';
+  const premiosHtml = (j.premios || []).map(p => {
+    const info = PREMIOS_INFO[p];
+    if(!info) return '';
+    return `<span class="premio ${p}">${info.icono} ${info.label}</span>`;
+  }).join('');
+
+  const avatarHtml = iconUrl
+    ? `<img class="jugador-avatar" src="${iconUrl}" alt="${j.campeon || ''}" onerror="this.outerHTML='<div class=&quot;jugador-avatar-fallback&quot;>${iniciales(nombre)}</div>'">`
+    : `<div class="jugador-avatar-fallback">${iniciales(nombre)}</div>`;
+
+  const comentarioHtml = j.comentario
+    ? `<div class="jugador-comentario">"${j.comentario}"</div>`
+    : '';
+
+  return `
+    <div class="jugador-fila">
+      ${avatarHtml}
+      <div class="jugador-info">
+        <div class="jugador-nombre">${nombre} ${premiosHtml ? `<span class="jugador-premios">${premiosHtml}</span>` : ''}</div>
+        <div class="jugador-rol">${j.rol || ''}${j.rol && j.campeon ? ' · ' : ''}<span class="jugador-campeon">${j.campeon || ''}</span></div>
+      </div>
+      <div class="jugador-kda">${kda}</div>
+      ${comentarioHtml}
+    </div>
+  `;
+}
+
+function renderPartida(p, index, jugadores){
+  const resultadoClase = p.resultado === 'Victoria' ? 'victoria' : 'derrota';
+  const meta = [p.modo, p.duracion].filter(Boolean).join(' · ');
+  const filas = (p.jugadores || []).map(j => renderJugadorFila(j, jugadores)).join('');
+
+  return `
+    <div class="partida">
+      <div class="partida-header">
+        <span class="partida-numero">Partida ${p.numero ?? index + 1}</span>
+        <span class="badge-resultado ${resultadoClase}">${p.resultado || '?'}</span>
+        ${meta ? `<span class="partida-meta">${meta}</span>` : ''}
+      </div>
+      <div class="jugadores-tabla">${filas}</div>
+    </div>
+  `;
+}
+
+function renderCapitulo(sesion, numero, jugadores){
+  const cantPartidas = (sesion.partidas || []).length;
+  const victorias = (sesion.partidas || []).filter(p => p.resultado === 'Victoria').length;
+
+  const div = document.createElement('div');
+  div.className = 'capitulo';
+  div.innerHTML = `
+    <div class="capitulo-header">
+      <div>
+        <div class="capitulo-titulo">Capítulo ${numero} — ${sesion.titulo || 'Noche de juego'}</div>
+        <div class="capitulo-fecha">${formatFecha(sesion.fecha)}</div>
+      </div>
+      <div class="capitulo-resumen">${cantPartidas} partida${cantPartidas === 1 ? '' : 's'} · ${victorias}V ${cantPartidas - victorias}D</div>
+      <span class="capitulo-flecha">▶</span>
+    </div>
+    <div class="capitulo-cuerpo" hidden>
+      ${sesion.notas ? `<p class="capitulo-notas">${sesion.notas}</p>` : ''}
+      ${(sesion.partidas || []).map((p,i) => renderPartida(p,i,jugadores)).join('')}
+    </div>
+  `;
+
+  const header = div.querySelector('.capitulo-header');
+  const cuerpo = div.querySelector('.capitulo-cuerpo');
+  header.addEventListener('click', () => {
+    cuerpo.hidden = !cuerpo.hidden;
+    div.classList.toggle('abierto', !cuerpo.hidden);
+  });
+
+  return div;
+}
+
+function renderTimeline(sesiones, jugadores){
+  const el = document.getElementById('timeline');
+  el.innerHTML = '';
+
+  if(sesiones.length === 0){
+    el.innerHTML = `<div class="vacio-timeline">Todavía no se escribió ningún capítulo.<br>La próxima noche de juego será la primera página.</div>`;
+    return;
+  }
+
+  sesiones.forEach((s, i) => {
+    const capitulo = renderCapitulo(s, i + 1, jugadores);
+    if(i === sesiones.length - 1){
+      capitulo.classList.add('abierto');
+      capitulo.querySelector('.capitulo-cuerpo').hidden = false;
+    }
+    el.appendChild(capitulo);
+  });
+}
+
+// ---------- Init ----------
+(async function init(){
+  fetch('https://ddragon.leagueoflegends.com/api/versions.json')
+    .then(r => r.json())
+    .then(v => { if(Array.isArray(v) && v[0]) DDRAGON_VERSION = v[0]; })
+    .catch(() => {});
+
+  const { jugadores, sesiones } = await cargarDatos();
+  const { stats, totalPartidas, totalSesiones } = calcularEstadisticas(sesiones, jugadores);
+
+  renderSalonDeLaFama(stats, totalPartidas, totalSesiones);
+  renderTimeline(sesiones, jugadores);
+})();
