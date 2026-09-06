@@ -130,11 +130,13 @@ function actualizarIndicadorModo(){
   }
 }
 
+const GH_DEFAULTS = { owner: 'Zettita', repo: 'la-bitacora-del-amazonas', branch: 'main' };
+
 function initConfigGithub(){
   const cfg = ghCargarConfig();
-  document.getElementById('gh-owner').value = cfg.owner || '';
-  document.getElementById('gh-repo').value = cfg.repo || '';
-  document.getElementById('gh-branch').value = cfg.branch || 'main';
+  document.getElementById('gh-owner').value = cfg.owner || GH_DEFAULTS.owner;
+  document.getElementById('gh-repo').value = cfg.repo || GH_DEFAULTS.repo;
+  document.getElementById('gh-branch').value = cfg.branch || GH_DEFAULTS.branch;
   document.getElementById('gh-token').value = cfg.token || '';
 
   if(!esModoLocal() && !ghConfigCompleta(cfg)){
