@@ -1,0 +1,48 @@
+{
+  "fecha": "2026-09-07",
+  "titulo": "Dia 2",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "modo": "Ranked Solo/Duo",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Nasus",
+          "rol": "TOP",
+          "kda": {
+            "k": 17,
+            "d": 5,
+            "a": 5
+          },
+          "premios": []
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Jax",
+          "rol": "JUNGLE",
+          "kda": {
+            "k": 11,
+            "d": 7,
+            "a": 6
+          },
+          "premios": []
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Sona",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 2,
+            "d": 9,
+            "a": 17
+          },
+          "premios": []
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
