@@ -62,13 +62,53 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_json(400, {"error": "Fecha invalida, se espera AAAA-MM-DD"})
             return
 
+        accion = cuerpo.get("accion", "agregar")
         partidas_nuevas = cuerpo.get("partidas") or []
-        if not partidas_nuevas:
+        if accion == "agregar" and not partidas_nuevas:
             self.send_json(400, {"error": "La sesion no tiene partidas"})
             return
 
         titulo = str(cuerpo.get("titulo", "")).strip()
         notas = str(cuerpo.get("notas", "")).strip()
+
+        os.makedirs(SESSIONS_DIR, exist_ok=True)
+        archivo = f"{fecha}.json"
+        ruta_sesion = os.path.join(SESSIONS_DIR, archivo)
+
+        if accion == "reemplazar":
+            if not partidas_nuevas:
+                if os.path.exists(ruta_sesion):
+                    os.remove(ruta_sesion)
+                manifest = leer_json(MANIFEST_PATH, [])
+                if archivo in manifest:
+                    manifest.remove(archivo)
+                    escribir_json(MANIFEST_PATH, manifest)
+                self.send_json(200, {
+                    "ok": True,
+                    "archivo": archivo,
+                    "partidas_en_la_sesion": 0,
+                    "eliminada": True,
+                })
+                return
+
+            for i, p in enumerate(partidas_nuevas):
+                p["numero"] = i + 1
+            sesion = {
+                "fecha": fecha,
+                "titulo": titulo or "Noche de juego",
+                "notas": notas,
+                "partidas": partidas_nuevas,
+            }
+            escribir_json(ruta_sesion, sesion)
+            self.send_json(200, {
+                "ok": True,
+                "archivo": archivo,
+                "partidas_en_la_sesion": len(partidas_nuevas),
+                "eliminada": False,
+            })
+            return
+
+        # accion == "agregar" (comportamiento por defecto)
 
         # Da de alta jugadores invitados que todavia no esten en el roster
         players = leer_json(PLAYERS_PATH, [])
@@ -85,10 +125,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 j.pop("nombre_invitado", None)
         if cambio_roster:
             escribir_json(PLAYERS_PATH, players)
-
-        os.makedirs(SESSIONS_DIR, exist_ok=True)
-        archivo = f"{fecha}.json"
-        ruta_sesion = os.path.join(SESSIONS_DIR, archivo)
 
         if os.path.exists(ruta_sesion):
             sesion = leer_json(ruta_sesion, {})
@@ -123,6 +159,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             "ok": True,
             "archivo": archivo,
             "partidas_en_la_sesion": len(sesion["partidas"]),
+            "eliminada": False,
         })
 
     def send_json(self, status, obj):

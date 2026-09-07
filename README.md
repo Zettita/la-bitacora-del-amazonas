@@ -7,6 +7,19 @@ Crónica de las partidas de LoL de la banda: quién sale mejor, quién se la car
 - **El Salón de la Fama**: ranking histórico de MVPs, cargadas, trolleos, anclas y mejor winrate.
 - **La Crónica**: línea de tiempo de "capítulos" (días de juego), cada uno con sus partidas, campeones, KDA, premios y comentarios.
 
+## Cómo eliminar una partida (si algo se cargó mal)
+
+Adrede **no existe** una forma de editar una partida ya cargada — es fácil que eso termine pisando el dato real por error. Si algo salió mal, se elimina y se vuelve a cargar bien desde `cargar.html`.
+
+Para eso está `herramientas/eliminar.html` (link "🗑️ Eliminar una partida" desde la crónica o el formulario de carga):
+
+1. Elegís la sesión (día) de una lista desplegable.
+2. Ves sus partidas, cada una con un botón **"✕ Eliminar esta partida"**.
+3. También hay un botón para **"🗑️ Eliminar toda la sesión"** de una.
+4. Usa la misma conexión (servidor local, o URL + clave del Worker) que `cargar.html` — si ya la configuraste ahí en ese navegador, en `eliminar.html` ya está lista.
+
+Funciona en los dos modos (local y publicado) igual que la carga.
+
 ## Cómo agregar una nueva sesión (con el formulario)
 
 La forma más fácil es con el formulario incluido, que escribe el JSON por vos:
@@ -24,6 +37,8 @@ El servidor solo corre en tu máquina — es una herramienta de carga, no hace f
 `herramientas/cargar.html` también funciona abierto directo desde GitHub Pages (por ejemplo `https://zettita.github.io/la-bitacora-del-amazonas/herramientas/cargar.html`). Ahí no hay ningún servidor propio corriendo, así que en vez de eso el formulario le manda los datos a un **Worker de Cloudflare** (un pequeño servidor gratuito) que es el único lugar que conoce el token real de GitHub y hace el commit por vos. La página detecta sola en qué modo está (mira si el link es `localhost` o no).
 
 Con este esquema, tus amigos **no necesitan cuenta de GitHub ni ningún token** — solo una clave de grupo simple, como una contraseña de wifi.
+
+> **Importante:** el código del Worker (`herramientas/cloudflare-worker.js`) vive pegado a mano en el dashboard de Cloudflare — no se auto-despliega desde este repo. Cada vez que ese archivo cambie acá (por ejemplo, cuando se agregó soporte para eliminar partidas), hay que volver a copiarlo entero y pegarlo en **Edit code → Save and deploy** en el Worker para que el cambio se aplique.
 
 ### Desplegar el Worker (lo hacés una sola vez, vos)
 
@@ -146,17 +161,22 @@ Los archivos de datos (`data/*.json`) siempre se piden sin caché, así que un F
 ## Estructura del proyecto
 
 ```
-index.html                página principal
-css/style.css              estilos (tema crónica/diario)
-js/app.js                   carga los datos y arma el salón de la fama + la línea de tiempo
-data/players.json           roster de jugadores
-data/manifest.json          lista de sesiones a cargar
-data/sessions/*.json        una sesión (día de juego) por archivo
-herramientas/cargar.html    formulario para cargar una sesión
-herramientas/cargar.js       lógica del formulario (arma el JSON y decide a qué backend mandarlo)
-herramientas/cargar.css      estilos del formulario
-herramientas/proxy-remoto.js  cliente: le manda la sesión al Worker de Cloudflare (modo publicado)
+index.html                    página principal
+css/style.css                  estilos (tema crónica/diario)
+js/comunes.js                   catálogo de premios, iconos de campeón, formato de fecha (compartido)
+js/app.js                        carga los datos y arma el salón de la fama + la línea de tiempo
+data/players.json               roster de jugadores
+data/manifest.json              lista de sesiones a cargar
+data/sessions/*.json            una sesión (día de juego) por archivo
+herramientas/cargar.html        formulario para cargar una sesión
+herramientas/cargar.js           lógica propia del formulario de carga
+herramientas/eliminar.html      elegir una sesión y borrar una partida (o el día entero)
+herramientas/eliminar.js         lógica propia del formulario de eliminación
+herramientas/cargar.css         estilos compartidos por cargar.html y eliminar.html
+herramientas/eliminar.css        estilos propios de eliminar.html
+herramientas/conexion.js        compartido: decide servidor local vs Worker, panel de "Conexión"
+herramientas/proxy-remoto.js     cliente: le manda la sesión al Worker de Cloudflare (modo publicado)
 herramientas/cloudflare-worker.js  código del Worker: intermediario seguro que hace el commit en GitHub
-herramientas/servidor.py     servidor local: sirve el sitio y guarda lo que llega del formulario
-cargar-partidas.bat          atajo para Windows: arranca el servidor con doble click
+herramientas/servidor.py        servidor local: sirve el sitio y guarda/edita lo que llega del formulario
+cargar-partidas.bat             atajo para Windows: arranca el servidor con doble click
 ```

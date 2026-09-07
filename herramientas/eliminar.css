@@ -1,0 +1,61 @@
+.sesion-header-eliminar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin-bottom:1.5rem;
+}
+.sesion-header-eliminar h2{
+  margin:0 0 .2rem;
+  color:var(--oro-claro);
+  font-size:1.3rem;
+}
+
+.btn-peligro{
+  background:transparent;
+  border:1px solid var(--derrota);
+  color:#f0c6c6;
+}
+.btn-peligro:hover{background:rgba(140,58,58,.15);}
+
+.partida-eliminar{
+  background:var(--pergamino);
+  color:var(--tinta);
+  border-radius:8px;
+  padding:1.1rem 1.3rem;
+  margin-bottom:1.1rem;
+  box-shadow:var(--sombra);
+}
+.partida-eliminar-header{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  flex-wrap:wrap;
+  margin-bottom:.9rem;
+  padding-bottom:.6rem;
+  border-bottom:1px solid var(--tinta-suave);
+}
+.partida-eliminar-meta{
+  font-size:.85rem;
+  color:var(--tinta-suave);
+  margin-left:auto;
+}
+.btn-quitar-partida-mostrada{
+  background:none;
+  border:1px solid var(--derrota);
+  color:#8c3a3a;
+  border-radius:5px;
+  cursor:pointer;
+  padding:.3rem .7rem;
+  font-family:'Cinzel', serif;
+  font-size:.8rem;
+}
+.btn-quitar-partida-mostrada:hover{background:rgba(140,58,58,.12);}
+
+.vacio-selector{
+  color:var(--pergamino-osc);
+  font-style:italic;
+  padding:1.5rem;
+  text-align:center;
+}

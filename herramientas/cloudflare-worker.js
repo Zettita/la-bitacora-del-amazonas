@@ -50,8 +50,9 @@ export default {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       return jsonResp({ error: 'Fecha invalida, se espera AAAA-MM-DD' }, 400, cors);
     }
-    const partidasNuevas = Array.isArray(body.partidas) ? body.partidas : [];
-    if (partidasNuevas.length === 0) {
+    const accion = body.accion === 'reemplazar' ? 'reemplazar' : 'agregar';
+    const partidas = Array.isArray(body.partidas) ? body.partidas : [];
+    if (accion === 'agregar' && partidas.length === 0) {
       return jsonResp({ error: 'La sesion no tiene partidas' }, 400, cors);
     }
 
@@ -61,15 +62,18 @@ export default {
       branch: env.GITHUB_BRANCH || 'main',
       token: env.GITHUB_TOKEN,
     };
+    const payload = {
+      fecha,
+      titulo: String(body.titulo || '').trim(),
+      notas: String(body.notas || '').trim(),
+      partidas,
+      autor: String(body.autor || '').trim(),
+    };
 
     try {
-      const resultado = await guardarSesion(cfg, {
-        fecha,
-        titulo: String(body.titulo || '').trim(),
-        notas: String(body.notas || '').trim(),
-        partidas: partidasNuevas,
-        autor: String(body.autor || '').trim(),
-      });
+      const resultado = accion === 'reemplazar'
+        ? await reemplazarSesion(cfg, payload)
+        : await guardarSesion(cfg, payload);
       return jsonResp(resultado, 200, cors);
     } catch (err) {
       return jsonResp({ error: err.message }, 500, cors);
@@ -145,6 +149,56 @@ async function ghGuardarArchivo(cfg, path, datosObjeto, shaPrevia, mensaje) {
     throw new Error(detalle.message || `GitHub devolvio ${resp.status} al guardar ${path}`);
   }
   return resp.json();
+}
+
+async function ghEliminarArchivo(cfg, path, sha, mensaje) {
+  const resp = await ghFetch(cfg, path, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: mensaje, sha, branch: cfg.branch }),
+  });
+  if (!resp.ok) {
+    const detalle = await resp.json().catch(() => ({}));
+    throw new Error(detalle.message || `GitHub devolvio ${resp.status} al eliminar ${path}`);
+  }
+  return resp.json();
+}
+
+// Sobrescribe la sesion de un dia con la lista de partidas recibida (por
+// ejemplo, la misma lista menos una que se quiso borrar). Si la lista viene
+// vacia, borra el archivo entero y lo saca del manifest.
+async function reemplazarSesion(cfg, payload) {
+  const archivo = `${payload.fecha}.json`;
+  const rutaSesion = `data/sessions/${archivo}`;
+  const firma = payload.autor ? ` (por ${payload.autor})` : '';
+
+  const existente = await ghObtenerArchivo(cfg, rutaSesion);
+
+  if (payload.partidas.length === 0) {
+    if (existente) {
+      await ghEliminarArchivo(cfg, rutaSesion, existente.sha, `Elimina sesion ${payload.fecha}${firma}`);
+    }
+    const manifestFile = await ghObtenerArchivo(cfg, 'data/manifest.json');
+    const manifest = manifestFile ? manifestFile.datos : [];
+    const idx = manifest.indexOf(archivo);
+    if (idx !== -1) {
+      manifest.splice(idx, 1);
+      await ghGuardarArchivo(cfg, 'data/manifest.json', manifest, manifestFile.sha, `Quita ${archivo} del manifest${firma}`);
+    }
+    return { ok: true, archivo, partidas_en_la_sesion: 0, eliminada: true };
+  }
+
+  payload.partidas.forEach((p, i) => { p.numero = i + 1; });
+  const sesion = {
+    fecha: payload.fecha,
+    titulo: payload.titulo || 'Noche de juego',
+    notas: payload.notas || '',
+    partidas: payload.partidas,
+  };
+
+  await ghGuardarArchivo(cfg, rutaSesion, sesion, existente ? existente.sha : undefined, `Elimina una partida de ${payload.fecha}${firma}`);
+
+  return { ok: true, archivo, partidas_en_la_sesion: sesion.partidas.length, eliminada: false };
 }
 
 async function guardarSesion(cfg, payload) {
