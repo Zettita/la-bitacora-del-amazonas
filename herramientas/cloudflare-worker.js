@@ -151,6 +151,48 @@ async function ghGuardarArchivo(cfg, path, datosObjeto, shaPrevia, mensaje) {
   return resp.json();
 }
 
+// sha del archivo en `path` si existe, o null (no intenta parsear el
+// contenido como JSON, a diferencia de ghObtenerArchivo - sirve para
+// binarios como las fotos de jugador).
+async function ghShaSiExiste(cfg, path) {
+  const resp = await ghFetch(cfg, `${path}?ref=${encodeURIComponent(cfg.branch)}`);
+  if (resp.status === 404) return null;
+  if (!resp.ok) return null;
+  const json = await resp.json();
+  return json.sha;
+}
+
+async function ghGuardarBinario(cfg, path, base64Content, shaPrevia, mensaje) {
+  const body = { message: mensaje, content: base64Content, branch: cfg.branch };
+  if (shaPrevia) body.sha = shaPrevia;
+
+  const resp = await ghFetch(cfg, path, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok) {
+    const detalle = await resp.json().catch(() => ({}));
+    throw new Error(detalle.message || `GitHub devolvio ${resp.status} al guardar ${path}`);
+  }
+  return resp.json();
+}
+
+const EXT_POR_MIME = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
+
+// Decodifica un data:URL (ya viene comprimido del lado del navegador) y lo
+// sube como img/jugadores/<id>.<ext>. Devuelve la ruta relativa, o null si
+// el data URL no tiene el formato esperado.
+async function guardarImagenJugador(cfg, jugadorId, dataUrl, firma) {
+  const match = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl || '');
+  if (!match) return null;
+  const ext = EXT_POR_MIME[match[1]] || 'jpg';
+  const ruta = `img/jugadores/${jugadorId}.${ext}`;
+  const shaPrevia = await ghShaSiExiste(cfg, ruta);
+  await ghGuardarBinario(cfg, ruta, match[2], shaPrevia, `Sube foto de jugador${firma}`);
+  return ruta;
+}
+
 async function ghEliminarArchivo(cfg, path, sha, mensaje) {
   const resp = await ghFetch(cfg, path, {
     method: 'DELETE',
@@ -238,16 +280,18 @@ async function guardarSesion(cfg, payload) {
     const players = playersFile ? playersFile.datos : [];
     const idsExistentes = new Set(players.map((p) => p.id));
     let cambio = false;
-    nuevos.forEach((n) => {
-      if (!idsExistentes.has(n.id)) {
-        const entrada = { id: n.id, nombre: n.datos.nombre };
-        if (n.datos.rolPreferido) entrada.rolPreferido = n.datos.rolPreferido;
-        if (n.datos.imagen) entrada.imagen = n.datos.imagen;
-        players.push(entrada);
-        idsExistentes.add(n.id);
-        cambio = true;
+    for (const n of nuevos) {
+      if (idsExistentes.has(n.id)) continue;
+      const entrada = { id: n.id, nombre: n.datos.nombre };
+      if (n.datos.rolPreferido) entrada.rolPreferido = n.datos.rolPreferido;
+      if (n.datos.imagenDatos) {
+        const rutaImagen = await guardarImagenJugador(cfg, n.id, n.datos.imagenDatos, firma);
+        if (rutaImagen) entrada.imagen = rutaImagen;
       }
-    });
+      players.push(entrada);
+      idsExistentes.add(n.id);
+      cambio = true;
+    }
     if (cambio) {
       await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Suma jugador nuevo a la bitacora${firma}`);
     }

@@ -7,6 +7,7 @@ Uso:
 
 Despues abrir http://localhost:8420/herramientas/cargar.html
 """
+import base64
 import http.server
 import json
 import os
@@ -18,8 +19,25 @@ DATA_DIR = os.path.join(RAIZ, "data")
 SESSIONS_DIR = os.path.join(DATA_DIR, "sessions")
 MANIFEST_PATH = os.path.join(DATA_DIR, "manifest.json")
 PLAYERS_PATH = os.path.join(DATA_DIR, "players.json")
+IMG_JUGADORES_DIR = os.path.join(RAIZ, "img", "jugadores")
 
 FECHA_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+DATA_URL_RE = re.compile(r"^data:([^;]+);base64,(.+)$", re.DOTALL)
+EXT_POR_MIME = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif"}
+
+
+def guardar_imagen_jugador(jugador_id, data_url):
+    """Decodifica una imagen data:URL (ya comprimida del lado del navegador)
+    y la guarda como img/jugadores/<id>.<ext>. Devuelve la ruta relativa, o
+    None si el data URL no tiene el formato esperado."""
+    m = DATA_URL_RE.match(data_url or "")
+    if not m:
+        return None
+    ext = EXT_POR_MIME.get(m.group(1), "jpg")
+    os.makedirs(IMG_JUGADORES_DIR, exist_ok=True)
+    with open(os.path.join(IMG_JUGADORES_DIR, f"{jugador_id}.{ext}"), "wb") as f:
+        f.write(base64.b64decode(m.group(2)))
+    return f"img/jugadores/{jugador_id}.{ext}"
 
 
 def leer_json(ruta, default):
@@ -116,8 +134,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     entrada = {"id": jid, "nombre": nuevo["nombre"]}
                     if nuevo.get("rolPreferido"):
                         entrada["rolPreferido"] = nuevo["rolPreferido"]
-                    if nuevo.get("imagen"):
-                        entrada["imagen"] = nuevo["imagen"]
+                    if nuevo.get("imagenDatos"):
+                        ruta_imagen = guardar_imagen_jugador(jid, nuevo["imagenDatos"])
+                        if ruta_imagen:
+                            entrada["imagen"] = ruta_imagen
                     players.append(entrada)
                     ids_existentes.add(jid)
                     cambio_roster = True

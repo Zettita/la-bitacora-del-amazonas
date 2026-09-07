@@ -78,6 +78,35 @@ function initCampeonPicker(raiz){
   });
 }
 
+// Redimensiona/comprime una foto elegida del disco a un JPEG chico (lado
+// mayor = maxDim) antes de mandarla, para no pesar el repo aunque suban una
+// foto de varios MB de un celular.
+function comprimirImagen(archivo, maxDim = 200, calidad = 0.82){
+  return new Promise((resolve, reject) => {
+    const lector = new FileReader();
+    lector.onerror = () => reject(new Error('No se pudo leer el archivo'));
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('No se pudo procesar la imagen'));
+      img.onload = () => {
+        let { width, height } = img;
+        if(width >= height){
+          if(width > maxDim){ height = Math.round(height * maxDim / width); width = maxDim; }
+        }else{
+          if(height > maxDim){ width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', calidad));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(archivo);
+  });
+}
+
 async function cargarRoster(){
   try{
     jugadoresRoster = await fetch('../data/players.json', { cache: 'no-store' }).then(r => r.json());
@@ -145,6 +174,24 @@ function crearTarjetaJugador(bloque){
   poblarSelectJugador(select, idsUsadosEnPartida(bloque, null));
   initCampeonPicker(tarjeta);
 
+  const inputImagen = tarjeta.querySelector('.nj-imagen');
+  const previewImagen = tarjeta.querySelector('.nj-imagen-preview');
+  inputImagen.addEventListener('change', async () => {
+    const archivo = inputImagen.files[0];
+    delete inputImagen.dataset.dataurl;
+    previewImagen.hidden = true;
+    if(!archivo) return;
+    try{
+      const dataUrl = await comprimirImagen(archivo);
+      inputImagen.dataset.dataurl = dataUrl;
+      previewImagen.src = dataUrl;
+      previewImagen.hidden = false;
+    }catch(e){
+      mostrarMensaje('No se pudo procesar esa imagen, probá con otra.', 'error');
+      inputImagen.value = '';
+    }
+  });
+
   select.addEventListener('change', () => {
     zonaNuevo.hidden = select.value !== '__nuevo__';
     if(select.value && select.value !== '__nuevo__'){
@@ -207,8 +254,8 @@ function leerJugadoresDePartida(bloque){
       nuevoJugador = { nombre };
       const rolPreferido = tarjeta.querySelector('.nj-rol-preferido').value;
       if(rolPreferido) nuevoJugador.rolPreferido = rolPreferido;
-      const imagen = tarjeta.querySelector('.nj-imagen').value.trim();
-      if(imagen) nuevoJugador.imagen = imagen;
+      const imagenDatos = tarjeta.querySelector('.nj-imagen').dataset.dataurl;
+      if(imagenDatos) nuevoJugador.imagenDatos = imagenDatos;
     }else if(select.value){
       jugadorId = select.value;
     }else{

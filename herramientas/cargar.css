@@ -159,6 +159,25 @@ textarea{resize:vertical; width:100%;}
   background:rgba(201,162,39,.06);
 }
 .jc-nuevo-jugador input, .jc-nuevo-jugador select{flex:1 1 160px;}
+.nj-imagen-label{
+  display:flex;
+  flex-direction:column;
+  gap:.25rem;
+  font-size:.8rem;
+  color:var(--pergamino-osc);
+}
+.nj-imagen-label input[type="file"]{
+  padding:.35rem .4rem;
+  font-size:.85rem;
+}
+.nj-imagen-preview{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--oro);
+  align-self:center;
+}
 
 .jc-datos-partida{
   display:grid;

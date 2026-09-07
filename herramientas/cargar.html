@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css?v=4">
-<link rel="stylesheet" href="cargar.css?v=5">
+<link rel="stylesheet" href="cargar.css?v=6">
 </head>
 <body class="pagina-carga">
 
@@ -129,7 +129,11 @@
         <option value="ADC">ADC</option>
         <option value="SUPPORT">SUPPORT</option>
       </select>
-      <input type="text" class="nj-imagen" placeholder="URL de imagen (opcional)">
+      <label class="nj-imagen-label">
+        <span>Foto (opcional)</span>
+        <input type="file" class="nj-imagen" accept="image/*">
+      </label>
+      <img class="nj-imagen-preview" alt="Vista previa" hidden>
     </div>
 
     <div class="jc-datos-partida">
@@ -166,6 +170,6 @@
 <script src="../js/comunes.js?v=3"></script>
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="cargar.js?v=5"></script>
+<script src="cargar.js?v=6"></script>
 </body>
 </html>
