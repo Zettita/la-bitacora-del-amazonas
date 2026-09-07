@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css?v=5">
+<link rel="stylesheet" href="../css/style.css?v=6">
 <link rel="stylesheet" href="cargar.css?v=8">
 </head>
 <body class="pagina-carga">
@@ -179,14 +179,39 @@
       </select>
       <button type="button" class="btn-quitar-jugador" title="Quitar">✕</button>
     </div>
-    <input type="text" class="nd-nombre" placeholder="Nombre del personaje" hidden>
-    <input type="text" class="d-comentario" placeholder="¿Qué hizo? (opcional, ej: nos trolleó toda la partida)">
+
+    <div class="jc-nuevo-jugador" hidden>
+      <input type="text" class="nd-nombre" placeholder="Nombre del personaje">
+    </div>
+
+    <div class="jc-datos-partida">
+      <div class="campeon-picker">
+        <input type="text" class="d-campeon" placeholder="Campeón" autocomplete="off">
+        <div class="campeon-opciones" hidden></div>
+      </div>
+      <select class="d-rol">
+        <option value="">Rol</option>
+        <option value="TOP">TOP</option>
+        <option value="JUNGLE">JUNGLE</option>
+        <option value="MID">MID</option>
+        <option value="ADC">ADC</option>
+        <option value="SUPPORT">SUPPORT</option>
+      </select>
+      <div class="kda-inputs">
+        <input type="number" min="0" class="d-k" placeholder="K">
+        <span>/</span>
+        <input type="number" min="0" class="d-d" placeholder="D">
+        <span>/</span>
+        <input type="number" min="0" class="d-a" placeholder="A">
+      </div>
+      <input type="text" class="d-comentario campo-comentario" placeholder="¿Qué hizo? (opcional, ej: nos trolleó toda la partida)">
+    </div>
   </div>
 </template>
 
 <script src="../js/comunes.js?v=3"></script>
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="cargar.js?v=7"></script>
+<script src="cargar.js?v=8"></script>
 </body>
 </html>

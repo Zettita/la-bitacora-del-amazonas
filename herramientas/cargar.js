@@ -17,8 +17,8 @@ function normalizarTexto(s){
 // Buscador de campeón: al enfocar o escribir muestra los 60 campeones de
 // LoL Classic (con su ícono) filtrados por lo tipeado; un click en una
 // opción completa el campo.
-function initCampeonPicker(raiz){
-  const input = raiz.querySelector('.j-campeon');
+function initCampeonPicker(raiz, claseInput = 'j-campeon'){
+  const input = raiz.querySelector(`.${claseInput}`);
   const picker = input.closest('.campeon-picker');
   const opciones = picker.querySelector('.campeon-opciones');
   let resaltado = -1;
@@ -268,12 +268,13 @@ function crearTarjetaDestacado(bloque){
   const nodo = tplDestacadoCard.content.cloneNode(true);
   const tarjeta = nodo.querySelector('.destacado-card');
   const select = tarjeta.querySelector('.d-select');
-  const inputNombre = tarjeta.querySelector('.nd-nombre');
+  const zonaNuevo = tarjeta.querySelector('.jc-nuevo-jugador');
 
   poblarSelectDestacado(select, idsDestacadosUsados(bloque, null));
+  initCampeonPicker(tarjeta, 'd-campeon');
 
   select.addEventListener('change', () => {
-    inputNombre.hidden = select.value !== '__nuevo__';
+    zonaNuevo.hidden = select.value !== '__nuevo__';
     refrescarSelectsDeDestacados(bloque);
   });
 
@@ -374,7 +375,16 @@ function leerDestacadosDePartida(bloque){
       return;
     }
 
-    const destacado = { destacado: destacadoId };
+    const k = tarjeta.querySelector('.d-k').value;
+    const d = tarjeta.querySelector('.d-d').value;
+    const a = tarjeta.querySelector('.d-a').value;
+
+    const destacado = {
+      destacado: destacadoId,
+      campeon: tarjeta.querySelector('.d-campeon').value.trim(),
+      rol: tarjeta.querySelector('.d-rol').value,
+      kda: { k: Number(k)||0, d: Number(d)||0, a: Number(a)||0 },
+    };
     const comentario = tarjeta.querySelector('.d-comentario').value.trim();
     if(comentario) destacado.comentario = comentario;
     if(nuevoDestacado) destacado.nuevo_destacado = nuevoDestacado;

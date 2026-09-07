@@ -145,7 +145,7 @@ Un jugador puede tener ninguno, uno, o varios premios en la misma partida (ej: `
 
 ### 🎭 Personajes destacados (gente ajena al grupo)
 
-A veces se cruzan rivales o randoms memorables — un troll ajeno, alguien muy malo, o algún crack — que valen la pena registrar aunque no sean del grupo. Desde `cargar.html`, cada partida tiene su propio bloque "+ Agregar personaje destacado": elegís a alguien ya visto antes (para reconocerlo si se repite) o cargás uno nuevo con nombre libre, más un comentario corto de qué hizo.
+A veces se cruzan rivales o randoms memorables — un troll ajeno, alguien muy malo, o algún crack — que valen la pena registrar aunque no sean del grupo. Desde `cargar.html`, cada partida tiene su propio bloque "+ Agregar personaje destacado": elegís a alguien ya visto antes (para reconocerlo si se repite) o cargás uno nuevo con nombre libre, y cargás su campeón (con el mismo buscador con ícono), línea y KDA de esa partida, más un comentario corto de qué hizo.
 
 Viven en `data/destacados.json` (mismo esquema chico que `players.json`: `{id, nombre}`), separado del roster del grupo — no cuentan para el Salón de la Fama ni el winrate de nadie, es puramente registro/anecdotario. Se ven en la crónica como un bloque aparte (borde punteado violeta) dentro de la partida, para diferenciarlos claramente del equipo. La idea a futuro es armarles su propio "salón de la fama" de villanos.
 

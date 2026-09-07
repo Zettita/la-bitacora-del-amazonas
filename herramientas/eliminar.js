@@ -20,17 +20,32 @@ async function cargarJugadores(){
   }
 }
 
+function renderDestacadoFilaEliminar(d){
+  const nombre = destacadosPorId[d.destacado] || d.destacado;
+  const kda = d.kda ? `${d.kda.k ?? 0}/${d.kda.d ?? 0}/${d.kda.a ?? 0}` : '';
+  const avatarMarkup = avatarHtml(nombre, d.campeon);
+  const comentarioHtml = d.comentario ? `<div class="jugador-comentario">"${d.comentario}"</div>` : '';
+
+  return `
+    <div class="jugador-fila">
+      ${avatarMarkup}
+      <div class="jugador-info">
+        <div class="jugador-nombre">🎭 ${nombre}</div>
+        <div class="jugador-rol">${d.rol || ''}${d.rol && d.campeon ? ' · ' : ''}<span class="jugador-campeon">${d.campeon || ''}</span></div>
+      </div>
+      <div class="jugador-kda">${kda}</div>
+      ${comentarioHtml}
+    </div>
+  `;
+}
+
 function renderDestacadosEliminar(destacadosPartida){
   if(!destacadosPartida || !destacadosPartida.length) return '';
-  const chips = destacadosPartida.map(d => {
-    const nombre = destacadosPorId[d.destacado] || d.destacado;
-    const comentario = d.comentario ? `<span class="destacado-comentario">"${d.comentario}"</span>` : '';
-    return `<div class="destacado-chip"><span class="destacado-nombre">🎭 ${nombre}</span>${comentario}</div>`;
-  }).join('');
+  const filas = destacadosPartida.map(renderDestacadoFilaEliminar).join('');
   return `
     <div class="destacados-partida">
       <div class="destacados-titulo">Personajes destacados</div>
-      ${chips}
+      <div class="jugadores-tabla">${filas}</div>
     </div>
   `;
 }
