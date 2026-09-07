@@ -3,5 +3,15 @@
     "id": "zetta",
     "nombre": "Zetta",
     "rolPreferido": "MID"
+  },
+  {
+    "id": "xero",
+    "nombre": "Xero",
+    "rolPreferido": "TOP"
+  },
+  {
+    "id": "tutte",
+    "nombre": "Tutte",
+    "rolPreferido": "JUNGLE"
   }
 ]
