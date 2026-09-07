@@ -43,6 +43,36 @@
         }
       ],
       "numero": 1
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 15,
+            "d": 9,
+            "a": 9
+          },
+          "premios": []
+        }
+      ],
+      "destacados": [
+        {
+          "destacado": "speeding",
+          "campeon": "Singed",
+          "rol": "ADC",
+          "kda": {
+            "k": 0,
+            "d": 24,
+            "a": 2
+          }
+        }
+      ],
+      "numero": 2
     }
   ]
 }
