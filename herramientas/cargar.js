@@ -6,6 +6,77 @@ const tplPartida = document.getElementById('tpl-partida');
 const tplJugador = document.getElementById('tpl-jugador');
 const tplInvitado = document.getElementById('tpl-invitado');
 
+function normalizarTexto(s){
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/gi, '').toLowerCase();
+}
+
+// Buscador de campeón: al enfocar o escribir muestra los 60 campeones de
+// LoL Classic (con su ícono) filtrados por lo tipeado; un click en una
+// opción completa el campo.
+function initCampeonPicker(fila){
+  const input = fila.querySelector('.j-campeon');
+  const picker = input.closest('.campeon-picker');
+  const opciones = picker.querySelector('.campeon-opciones');
+  let resaltado = -1;
+
+  function pintar(filtro){
+    const norm = normalizarTexto(filtro);
+    const coincidencias = CAMPEONES_CLASICOS.filter(c => normalizarTexto(c).includes(norm));
+    resaltado = coincidencias.length ? 0 : -1;
+    opciones.innerHTML = coincidencias.length
+      ? coincidencias.map((c, i) => `
+          <div class="campeon-opcion${i === 0 ? ' resaltada' : ''}" data-nombre="${c}">
+            <img src="${classicTileUrl(c) || ''}" alt="" loading="lazy">
+            <span>${c}</span>
+          </div>
+        `).join('')
+      : '<div class="campeon-sin-resultados">Sin resultados</div>';
+  }
+
+  function abrir(){
+    pintar(input.value);
+    opciones.hidden = false;
+  }
+  function cerrar(){
+    opciones.hidden = true;
+  }
+  function marcarResaltado(nuevoIndice){
+    const items = opciones.querySelectorAll('.campeon-opcion');
+    if(!items.length) return;
+    resaltado = (nuevoIndice + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle('resaltada', i === resaltado));
+    items[resaltado].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('focus', abrir);
+  input.addEventListener('input', abrir);
+  input.addEventListener('blur', () => setTimeout(cerrar, 150));
+
+  input.addEventListener('keydown', (ev) => {
+    if(opciones.hidden && (ev.key === 'ArrowDown' || ev.key === 'ArrowUp')){
+      abrir();
+      return;
+    }
+    if(ev.key === 'ArrowDown'){ ev.preventDefault(); marcarResaltado(resaltado + 1); }
+    else if(ev.key === 'ArrowUp'){ ev.preventDefault(); marcarResaltado(resaltado - 1); }
+    else if(ev.key === 'Enter'){
+      const item = opciones.querySelectorAll('.campeon-opcion')[resaltado];
+      if(item){ ev.preventDefault(); input.value = item.dataset.nombre; cerrar(); }
+    }else if(ev.key === 'Escape'){
+      cerrar();
+    }
+  });
+
+  opciones.addEventListener('mousedown', (ev) => {
+    const opt = ev.target.closest('.campeon-opcion');
+    if(!opt) return;
+    input.value = opt.dataset.nombre;
+    cerrar();
+    input.focus();
+  });
+}
+
 async function cargarRoster(){
   try{
     jugadoresRoster = await fetch('../data/players.json', { cache: 'no-store' }).then(r => r.json());
@@ -22,6 +93,7 @@ function crearFilaJugador(jugador){
 
   const check = fila.querySelector('.j-participo');
   check.addEventListener('change', () => fila.classList.toggle('desactivado', !check.checked));
+  initCampeonPicker(fila);
 
   return fila;
 }
@@ -35,6 +107,7 @@ function crearFilaInvitado(){
   check.addEventListener('change', actualizar);
   nombre.addEventListener('input', () => { if(nombre.value.trim()) check.checked = true; actualizar(); });
   actualizar();
+  initCampeonPicker(fila);
   return fila;
 }
 

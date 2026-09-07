@@ -20,14 +20,14 @@ const CAMPEON_ESPECIALES = {
   "ksante": "KSante", "k'sante": "KSante",
   "leblanc": "Leblanc",
   "dr. mundo": "DrMundo", "dr mundo": "DrMundo",
-  "master yi": "MasterYi",
+  "master yi": "MasterYi", "maestro yi": "MasterYi",
   "miss fortune": "MissFortune",
   "twisted fate": "TwistedFate",
   "tahm kench": "TahmKench",
   "jarvan iv": "JarvanIV",
   "xin zhao": "XinZhao",
   "renata glasc": "Renata", "renata": "Renata",
-  "nunu & willump": "Nunu", "nunu": "Nunu",
+  "nunu & willump": "Nunu", "nunu y willump": "Nunu", "nunu": "Nunu",
   "lee sin": "LeeSin",
   "aurelion sol": "AurelionSol",
 };
@@ -56,6 +56,21 @@ const JADE_CLASSIC_TILE = {
 // resuelve a "MonkeyKing" (la clave real que usa Data Dragon para ese
 // campeón en todos los demás endpoints).
 const JADE_CLASSIC_ARCHIVO = { MonkeyKing: 'Wukong' };
+
+// Nombres "lindos" (como se escriben en el juego, en español) de los mismos
+// 60 campeones de JADE_CLASSIC_TILE — para armar el buscador de campeón en
+// el formulario de carga (ver herramientas/cargar.js).
+const CAMPEONES_CLASICOS = [
+  'Ahri', 'Alistar', 'Amumu', 'Anivia', 'Annie', 'Ashe', 'Blitzcrank',
+  'Brand', "Cho'Gath", 'Corki', 'Dr. Mundo', 'Evelynn', 'Ezreal',
+  'Fiddlesticks', 'Gangplank', 'Garen', 'Gragas', 'Heimerdinger', 'Janna',
+  'Jarvan IV', 'Jax', 'Karthus', 'Kassadin', 'Katarina', 'Kayle', "Kog'Maw",
+  'Lee Sin', 'Leona', 'Lulu', 'Lux', 'Maestro Yi', 'Malphite', 'Malzahar',
+  'Miss Fortune', 'Morgana', 'Nasus', 'Nidalee', 'Nunu y Willump', 'Olaf',
+  'Pantheon', 'Rammus', 'Ryze', 'Shaco', 'Singed', 'Sion', 'Sivir',
+  'Skarner', 'Sona', 'Soraka', 'Taric', 'Teemo', 'Tristana', 'Tryndamere',
+  'Twisted Fate', 'Twitch', 'Vayne', 'Veigar', 'Warwick', 'Wukong', 'Zilean',
+];
 
 let DDRAGON_VERSION_ACTUAL = '14.23.1';
 fetch('https://ddragon.leagueoflegends.com/api/versions.json')
