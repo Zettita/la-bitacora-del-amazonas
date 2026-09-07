@@ -43,6 +43,24 @@
         }
       ],
       "numero": 1
+    },
+    {
+      "resultado": "Derrota",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 15,
+            "d": 9,
+            "a": 9
+          },
+          "premios": []
+        }
+      ],
+      "numero": 2
     }
   ]
 }
