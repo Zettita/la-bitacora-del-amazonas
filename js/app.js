@@ -138,7 +138,7 @@ function renderJugadorFila(j, jugadores){
 
 function renderPartida(p, index, jugadores){
   const resultadoClase = p.resultado === 'Victoria' ? 'victoria' : 'derrota';
-  const meta = [p.modo, p.duracion].filter(Boolean).join(' · ');
+  const meta = [p.duracion].filter(Boolean).join(' · ');
   const filas = (p.jugadores || []).map(j => renderJugadorFila(j, jugadores)).join('');
 
   return `
