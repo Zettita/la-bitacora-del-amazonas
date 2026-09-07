@@ -1,6 +1,7 @@
 let sesionActual = null;
 let archivoActual = null;
 let jugadoresPorId = {};
+let destacadosPorId = {};
 
 async function cargarJugadores(){
   try{
@@ -10,6 +11,28 @@ async function cargarJugadores(){
   }catch(e){
     jugadoresPorId = {};
   }
+  try{
+    const arr = await fetch('../data/destacados.json', { cache: 'no-store' }).then(r => r.json());
+    destacadosPorId = {};
+    arr.forEach(d => destacadosPorId[d.id] = d.nombre);
+  }catch(e){
+    destacadosPorId = {};
+  }
+}
+
+function renderDestacadosEliminar(destacadosPartida){
+  if(!destacadosPartida || !destacadosPartida.length) return '';
+  const chips = destacadosPartida.map(d => {
+    const nombre = destacadosPorId[d.destacado] || d.destacado;
+    const comentario = d.comentario ? `<span class="destacado-comentario">"${d.comentario}"</span>` : '';
+    return `<div class="destacado-chip"><span class="destacado-nombre">🎭 ${nombre}</span>${comentario}</div>`;
+  }).join('');
+  return `
+    <div class="destacados-partida">
+      <div class="destacados-titulo">Personajes destacados</div>
+      ${chips}
+    </div>
+  `;
 }
 
 async function poblarSelector(){
@@ -81,6 +104,7 @@ function renderPartidasMostradas(){
         <button type="button" class="btn-quitar-partida-mostrada">✕ Eliminar esta partida</button>
       </div>
       <div class="jugadores-tabla">${filas}</div>
+      ${renderDestacadosEliminar(p.destacados)}
     `;
     div.querySelector('.btn-quitar-partida-mostrada').addEventListener('click', () => eliminarPartida(idx));
     cont.appendChild(div);

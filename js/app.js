@@ -3,13 +3,17 @@
 // ---------- Carga de datos ----------
 async function cargarDatos(){
   const sinCache = { cache: 'no-store' };
-  const [manifest, jugadoresArr] = await Promise.all([
+  const [manifest, jugadoresArr, destacadosArr] = await Promise.all([
     fetch('data/manifest.json', sinCache).then(r => r.json()).catch(() => []),
     fetch('data/players.json', sinCache).then(r => r.json()).catch(() => []),
+    fetch('data/destacados.json', sinCache).then(r => r.json()).catch(() => []),
   ]);
 
   const jugadores = {};
   jugadoresArr.forEach(j => jugadores[j.id] = j.nombre);
+
+  const destacados = {};
+  destacadosArr.forEach(d => destacados[d.id] = d.nombre);
 
   const sesiones = [];
   for(const archivo of manifest){
@@ -22,7 +26,7 @@ async function cargarDatos(){
   }
   sesiones.sort((a,b) => a.fecha.localeCompare(b.fecha));
 
-  return { jugadores, sesiones };
+  return { jugadores, destacados, sesiones };
 }
 
 // ---------- Salón de la fama ----------
@@ -136,7 +140,22 @@ function renderJugadorFila(j, jugadores){
   `;
 }
 
-function renderPartida(p, index, jugadores){
+function renderDestacados(destacadosPartida, destacados){
+  if(!destacadosPartida || !destacadosPartida.length) return '';
+  const chips = destacadosPartida.map(d => {
+    const nombre = destacados[d.destacado] || d.destacado;
+    const comentario = d.comentario ? `<span class="destacado-comentario">"${d.comentario}"</span>` : '';
+    return `<div class="destacado-chip"><span class="destacado-nombre">🎭 ${nombre}</span>${comentario}</div>`;
+  }).join('');
+  return `
+    <div class="destacados-partida">
+      <div class="destacados-titulo">Personajes destacados</div>
+      ${chips}
+    </div>
+  `;
+}
+
+function renderPartida(p, index, jugadores, destacados){
   const resultadoClase = p.resultado === 'Victoria' ? 'victoria' : 'derrota';
   const meta = [p.duracion].filter(Boolean).join(' · ');
   const filas = (p.jugadores || []).map(j => renderJugadorFila(j, jugadores)).join('');
@@ -149,11 +168,12 @@ function renderPartida(p, index, jugadores){
         ${meta ? `<span class="partida-meta">${meta}</span>` : ''}
       </div>
       <div class="jugadores-tabla">${filas}</div>
+      ${renderDestacados(p.destacados, destacados)}
     </div>
   `;
 }
 
-function renderCapitulo(sesion, numero, jugadores){
+function renderCapitulo(sesion, numero, jugadores, destacados){
   const cantPartidas = (sesion.partidas || []).length;
   const victorias = (sesion.partidas || []).filter(p => p.resultado === 'Victoria').length;
 
@@ -170,7 +190,7 @@ function renderCapitulo(sesion, numero, jugadores){
     </div>
     <div class="capitulo-cuerpo" hidden>
       ${sesion.notas ? `<p class="capitulo-notas">${sesion.notas}</p>` : ''}
-      ${(sesion.partidas || []).map((p,i) => renderPartida(p,i,jugadores)).join('')}
+      ${(sesion.partidas || []).map((p,i) => renderPartida(p,i,jugadores,destacados)).join('')}
     </div>
   `;
 
@@ -184,7 +204,7 @@ function renderCapitulo(sesion, numero, jugadores){
   return div;
 }
 
-function renderTimeline(sesiones, jugadores){
+function renderTimeline(sesiones, jugadores, destacados){
   const el = document.getElementById('timeline');
   el.innerHTML = '';
 
@@ -194,7 +214,7 @@ function renderTimeline(sesiones, jugadores){
   }
 
   sesiones.forEach((s, i) => {
-    const capitulo = renderCapitulo(s, i + 1, jugadores);
+    const capitulo = renderCapitulo(s, i + 1, jugadores, destacados);
     if(i === sesiones.length - 1){
       capitulo.classList.add('abierto');
       capitulo.querySelector('.capitulo-cuerpo').hidden = false;
@@ -205,9 +225,9 @@ function renderTimeline(sesiones, jugadores){
 
 // ---------- Init ----------
 (async function init(){
-  const { jugadores, sesiones } = await cargarDatos();
+  const { jugadores, destacados, sesiones } = await cargarDatos();
   const { stats, totalPartidas, totalSesiones } = calcularEstadisticas(sesiones, jugadores);
 
   renderSalonDeLaFama(stats, totalPartidas, totalSesiones);
-  renderTimeline(sesiones, jugadores);
+  renderTimeline(sesiones, jugadores, destacados);
 })();

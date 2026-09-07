@@ -19,6 +19,7 @@ DATA_DIR = os.path.join(RAIZ, "data")
 SESSIONS_DIR = os.path.join(DATA_DIR, "sessions")
 MANIFEST_PATH = os.path.join(DATA_DIR, "manifest.json")
 PLAYERS_PATH = os.path.join(DATA_DIR, "players.json")
+DESTACADOS_PATH = os.path.join(DATA_DIR, "destacados.json")
 IMG_JUGADORES_DIR = os.path.join(RAIZ, "img", "jugadores")
 
 FECHA_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -143,6 +144,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     cambio_roster = True
         if cambio_roster:
             escribir_json(PLAYERS_PATH, players)
+
+        # Da de alta personajes destacados nuevos (gente ajena al grupo)
+        destacados_roster = leer_json(DESTACADOS_PATH, [])
+        ids_destacados = {d["id"] for d in destacados_roster}
+        cambio_destacados = False
+        for partida in partidas_nuevas:
+            for d in partida.get("destacados", []):
+                nuevo = d.pop("nuevo_destacado", None)
+                did = d.get("destacado")
+                if did and did not in ids_destacados and nuevo and nuevo.get("nombre"):
+                    destacados_roster.append({"id": did, "nombre": nuevo["nombre"]})
+                    ids_destacados.add(did)
+                    cambio_destacados = True
+        if cambio_destacados:
+            escribir_json(DESTACADOS_PATH, destacados_roster)
 
         if os.path.exists(ruta_sesion):
             sesion = leer_json(ruta_sesion, {})

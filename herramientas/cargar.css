@@ -261,6 +261,34 @@ textarea{resize:vertical; width:100%;}
   font-size:.85rem;
 }
 
+.destacados-titulo-form{
+  font-family:'Cinzel', serif;
+  font-size:.85rem;
+  color:#c9a2f0;
+  margin:1.2rem 0 .6rem;
+}
+.destacados-form{
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+  margin-bottom:.8rem;
+}
+.destacado-card{
+  background:rgba(139,95,191,.08);
+  border:1px dashed #8b5fbf;
+  border-radius:6px;
+  padding:.6rem .7rem;
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+}
+.dc-cabecera{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+}
+.dc-cabecera .d-select{flex:1; font-weight:600;}
+
 .btn{
   font-family:'Cinzel', serif;
   border-radius:6px;

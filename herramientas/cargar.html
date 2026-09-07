@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css?v=4">
-<link rel="stylesheet" href="cargar.css?v=7">
+<link rel="stylesheet" href="../css/style.css?v=5">
+<link rel="stylesheet" href="cargar.css?v=8">
 </head>
 <body class="pagina-carga">
 
@@ -107,6 +107,10 @@
 
     <div class="jugadores-form"></div>
     <button type="button" class="btn-agregar-jugador btn btn-secundario">+ Agregar jugador</button>
+
+    <div class="destacados-titulo-form">🎭 Personajes destacados de la partida (opcional)</div>
+    <div class="destacados-form"></div>
+    <button type="button" class="btn-agregar-destacado btn btn-secundario">+ Agregar personaje destacado</button>
   </fieldset>
 </template>
 
@@ -167,9 +171,22 @@
   </div>
 </template>
 
+<template id="tpl-destacado-card">
+  <div class="destacado-card">
+    <div class="dc-cabecera">
+      <select class="d-select">
+        <option value="">Elegí un personaje...</option>
+      </select>
+      <button type="button" class="btn-quitar-jugador" title="Quitar">✕</button>
+    </div>
+    <input type="text" class="nd-nombre" placeholder="Nombre del personaje" hidden>
+    <input type="text" class="d-comentario" placeholder="¿Qué hizo? (opcional, ej: nos trolleó toda la partida)">
+  </div>
+</template>
+
 <script src="../js/comunes.js?v=3"></script>
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="cargar.js?v=6"></script>
+<script src="cargar.js?v=7"></script>
 </body>
 </html>

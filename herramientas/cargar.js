@@ -1,4 +1,5 @@
 let jugadoresRoster = [];
+let destacadosRoster = [];
 let contadorPartidas = 0;
 
 const MAX_JUGADORES_POR_PARTIDA = 5;
@@ -6,6 +7,7 @@ const MAX_JUGADORES_POR_PARTIDA = 5;
 const contenedorPartidas = document.getElementById('partidas-contenedor');
 const tplPartida = document.getElementById('tpl-partida');
 const tplJugadorCard = document.getElementById('tpl-jugador-card');
+const tplDestacadoCard = document.getElementById('tpl-destacado-card');
 
 function normalizarTexto(s){
   return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -113,6 +115,11 @@ async function cargarRoster(){
   }catch(e){
     jugadoresRoster = [];
   }
+  try{
+    destacadosRoster = await fetch('../data/destacados.json', { cache: 'no-store' }).then(r => r.json());
+  }catch(e){
+    destacadosRoster = [];
+  }
 }
 
 function slugify(nombre){
@@ -218,6 +225,70 @@ function agregarTarjetaJugador(bloque){
   actualizarBotonAgregar(bloque);
 }
 
+// ---------- Personajes destacados (gente ajena al grupo, no compañeros) ----------
+
+function idsDestacadosUsados(bloque, tarjetaExcluida){
+  const ids = new Set();
+  bloque.querySelectorAll('.destacado-card').forEach(tarjeta => {
+    if(tarjeta === tarjetaExcluida) return;
+    const valor = tarjeta.querySelector('.d-select').value;
+    if(valor && valor !== '__nuevo__') ids.add(valor);
+  });
+  return ids;
+}
+
+function poblarSelectDestacado(select, idsUsados){
+  const valorPrevio = select.value;
+  select.innerHTML = '<option value="">Elegí un personaje...</option>';
+
+  destacadosRoster.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.nombre;
+    opt.disabled = idsUsados.has(d.id);
+    select.appendChild(opt);
+  });
+
+  const optNuevo = document.createElement('option');
+  optNuevo.value = '__nuevo__';
+  optNuevo.textContent = '+ Nuevo personaje...';
+  select.appendChild(optNuevo);
+
+  select.value = valorPrevio || '';
+}
+
+function refrescarSelectsDeDestacados(bloque){
+  bloque.querySelectorAll('.destacado-card').forEach(tarjeta => {
+    const select = tarjeta.querySelector('.d-select');
+    poblarSelectDestacado(select, idsDestacadosUsados(bloque, tarjeta));
+  });
+}
+
+function crearTarjetaDestacado(bloque){
+  const nodo = tplDestacadoCard.content.cloneNode(true);
+  const tarjeta = nodo.querySelector('.destacado-card');
+  const select = tarjeta.querySelector('.d-select');
+  const inputNombre = tarjeta.querySelector('.nd-nombre');
+
+  poblarSelectDestacado(select, idsDestacadosUsados(bloque, null));
+
+  select.addEventListener('change', () => {
+    inputNombre.hidden = select.value !== '__nuevo__';
+    refrescarSelectsDeDestacados(bloque);
+  });
+
+  tarjeta.querySelector('.btn-quitar-jugador').addEventListener('click', () => {
+    tarjeta.remove();
+    refrescarSelectsDeDestacados(bloque);
+  });
+
+  return tarjeta;
+}
+
+function agregarTarjetaDestacado(bloque){
+  bloque.querySelector('.destacados-form').appendChild(crearTarjetaDestacado(bloque));
+}
+
 function agregarBloquePartida(){
   contadorPartidas++;
   const nodo = tplPartida.content.cloneNode(true);
@@ -225,6 +296,7 @@ function agregarBloquePartida(){
   bloque.querySelector('.num-partida').textContent = contadorPartidas;
 
   bloque.querySelector('.btn-agregar-jugador').addEventListener('click', () => agregarTarjetaJugador(bloque));
+  bloque.querySelector('.btn-agregar-destacado').addEventListener('click', () => agregarTarjetaDestacado(bloque));
   bloque.querySelector('.btn-quitar-partida').addEventListener('click', () => {
     bloque.remove();
     renumerarPartidas();
@@ -284,19 +356,58 @@ function leerJugadoresDePartida(bloque){
   return jugadores;
 }
 
+function leerDestacadosDePartida(bloque){
+  const destacados = [];
+
+  bloque.querySelectorAll('.destacado-card').forEach(tarjeta => {
+    const select = tarjeta.querySelector('.d-select');
+    let destacadoId, nuevoDestacado;
+
+    if(select.value === '__nuevo__'){
+      const nombre = tarjeta.querySelector('.nd-nombre').value.trim();
+      if(!nombre) return;
+      destacadoId = slugify(nombre);
+      nuevoDestacado = { nombre };
+    }else if(select.value){
+      destacadoId = select.value;
+    }else{
+      return;
+    }
+
+    const destacado = { destacado: destacadoId };
+    const comentario = tarjeta.querySelector('.d-comentario').value.trim();
+    if(comentario) destacado.comentario = comentario;
+    if(nuevoDestacado) destacado.nuevo_destacado = nuevoDestacado;
+
+    destacados.push(destacado);
+  });
+
+  return destacados;
+}
+
 function leerPartidas(){
-  return Array.from(contenedorPartidas.querySelectorAll('.bloque-partida')).map(bloque => ({
-    resultado: bloque.querySelector('.p-resultado').value,
-    duracion: bloque.querySelector('.p-duracion').value.trim(),
-    jugadores: leerJugadoresDePartida(bloque),
-  }));
+  return Array.from(contenedorPartidas.querySelectorAll('.bloque-partida')).map(bloque => {
+    const partida = {
+      resultado: bloque.querySelector('.p-resultado').value,
+      duracion: bloque.querySelector('.p-duracion').value.trim(),
+      jugadores: leerJugadoresDePartida(bloque),
+    };
+    const destacados = leerDestacadosDePartida(bloque);
+    if(destacados.length) partida.destacados = destacados;
+    return partida;
+  });
 }
 
 function hayTarjetaNuevaSinNombre(){
-  return Array.from(document.querySelectorAll('.jugador-card')).some(tarjeta => {
+  const jugadorSinNombre = Array.from(document.querySelectorAll('.jugador-card')).some(tarjeta => {
     const select = tarjeta.querySelector('.j-select');
     return select.value === '__nuevo__' && !tarjeta.querySelector('.nj-nombre').value.trim();
   });
+  const destacadoSinNombre = Array.from(document.querySelectorAll('.destacado-card')).some(tarjeta => {
+    const select = tarjeta.querySelector('.d-select');
+    return select.value === '__nuevo__' && !tarjeta.querySelector('.nd-nombre').value.trim();
+  });
+  return jugadorSinNombre || destacadoSinNombre;
 }
 
 function mostrarMensaje(texto, tipo){
@@ -317,7 +428,7 @@ async function manejarSubmit(ev){
   }
 
   if(hayTarjetaNuevaSinNombre()){
-    mostrarMensaje('Hay un jugador nuevo sin nombre completado — completalo o quitá esa tarjeta.', 'error');
+    mostrarMensaje('Hay un jugador o personaje nuevo sin nombre completado — completalo o quitá esa tarjeta.', 'error');
     return;
   }
 

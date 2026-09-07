@@ -297,6 +297,29 @@ async function guardarSesion(cfg, payload) {
     }
   }
 
+  // 2b) Dar de alta personajes destacados nuevos (gente ajena al grupo)
+  const nuevosDestacados = [];
+  sesion.partidas.forEach((p) => (p.destacados || []).forEach((d) => {
+    if (d.nuevo_destacado) nuevosDestacados.push({ id: d.destacado, datos: d.nuevo_destacado });
+    delete d.nuevo_destacado;
+  }));
+  if (nuevosDestacados.length) {
+    const destacadosFile = await ghObtenerArchivo(cfg, 'data/destacados.json');
+    const destacados = destacadosFile ? destacadosFile.datos : [];
+    const idsExistentes = new Set(destacados.map((d) => d.id));
+    let cambio = false;
+    nuevosDestacados.forEach((n) => {
+      if (!idsExistentes.has(n.id)) {
+        destacados.push({ id: n.id, nombre: n.datos.nombre });
+        idsExistentes.add(n.id);
+        cambio = true;
+      }
+    });
+    if (cambio) {
+      await ghGuardarArchivo(cfg, 'data/destacados.json', destacados, destacadosFile ? destacadosFile.sha : undefined, `Suma personaje destacado a la bitacora${firma}`);
+    }
+  }
+
   // 3) Guardar la sesion
   await ghGuardarArchivo(cfg, rutaSesion, sesion, existente ? existente.sha : undefined, `Agrega sesion ${payload.fecha}${firma}`);
 

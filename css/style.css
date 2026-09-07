@@ -364,6 +364,32 @@ main{
 .premio.troll{background:var(--troll);}
 .premio.ancla{background:var(--ancla);}
 
+.destacados-partida{
+  margin-top:.8rem;
+  padding:.6rem .8rem;
+  border:1px dashed #6a3f96;
+  border-radius:6px;
+  background:rgba(106,63,150,.08);
+}
+.destacados-titulo{
+  font-family:'Cinzel', serif;
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:#6a3f96;
+  margin-bottom:.4rem;
+}
+.destacado-chip{
+  display:flex;
+  gap:.6rem;
+  align-items:baseline;
+  flex-wrap:wrap;
+  font-size:.9rem;
+  margin-bottom:.2rem;
+}
+.destacado-nombre{font-weight:600; color:var(--tinta);}
+.destacado-comentario{font-style:italic; color:var(--tinta-suave);}
+
 .vacio-timeline{
   color:var(--pergamino-osc);
   font-style:italic;
