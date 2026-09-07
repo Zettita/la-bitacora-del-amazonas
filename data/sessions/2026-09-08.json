@@ -1,0 +1,42 @@
+{
+  "fecha": "2026-09-08",
+  "titulo": "lolcito v2",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Derrota",
+      "duracion": "11:22",
+      "modo": "Ranked Solo/Duo",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "dr. mundo",
+          "rol": "TOP",
+          "kda": {
+            "k": 12,
+            "d": 1,
+            "a": 1
+          },
+          "premios": [
+            "mvp",
+            "carry",
+            "troll",
+            "ancla"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "",
+          "rol": "",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": []
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
