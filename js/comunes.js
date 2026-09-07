@@ -32,10 +32,15 @@ const CAMPEON_ESPECIALES = {
   "aurelion sol": "AurelionSol",
 };
 
-let DDRAGON_VERSION = '14.23.1';
+// Íconos "clásicos": fijamos una versión vieja (parche 4.20, fin de Season 4 /
+// noviembre 2014) para el look old-school. Los campeones lanzados después de
+// esa fecha no existen ahí, así que hay un segundo intento con la versión
+// actual antes de caer en las iniciales — ver avatarHtml() más abajo.
+const DDRAGON_VERSION_CLASICA = '4.20.2';
+let DDRAGON_VERSION_ACTUAL = '14.23.1';
 fetch('https://ddragon.leagueoflegends.com/api/versions.json')
   .then(r => r.json())
-  .then(v => { if(Array.isArray(v) && v[0]) DDRAGON_VERSION = v[0]; })
+  .then(v => { if(Array.isArray(v) && v[0]) DDRAGON_VERSION_ACTUAL = v[0]; })
   .catch(() => {});
 
 function champKey(nombre){
@@ -47,14 +52,38 @@ function champKey(nombre){
     .join('');
 }
 
-function champIconUrl(nombre){
+function champIconUrl(nombre, version){
   const key = champKey(nombre);
   if(!key) return null;
-  return `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/champion/${key}.png`;
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${key}.png`;
 }
 
 function iniciales(nombre){
   return (nombre || '?').trim().slice(0,2).toUpperCase();
+}
+
+// Arma el <img> del campeón con fallback en cascada: ícono clásico (2014) ->
+// ícono actual (por si el campeón es más nuevo que esa versión) -> iniciales.
+function avatarHtml(nombreJugador, campeon){
+  const clasica = champIconUrl(campeon, DDRAGON_VERSION_CLASICA);
+  const inic = iniciales(nombreJugador);
+  if(!clasica){
+    return `<div class="jugador-avatar-fallback">${inic}</div>`;
+  }
+  const actual = champIconUrl(campeon, DDRAGON_VERSION_ACTUAL);
+  return `<img class="jugador-avatar" src="${clasica}" alt="${campeon || ''}" data-actual="${actual}" data-iniciales="${inic}" onerror="manejarErrorAvatar(this)">`;
+}
+
+function manejarErrorAvatar(img){
+  if(!img.dataset.intento){
+    img.dataset.intento = '1';
+    img.src = img.dataset.actual;
+    return;
+  }
+  const div = document.createElement('div');
+  div.className = 'jugador-avatar-fallback';
+  div.textContent = img.dataset.iniciales;
+  img.replaceWith(div);
 }
 
 function formatFecha(iso){

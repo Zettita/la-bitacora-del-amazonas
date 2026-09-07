@@ -136,7 +136,9 @@ Un jugador puede tener ninguno, uno, o varios premios en la misma partida (ej: `
 
 ### Nombres de campeón
 
-Escribilos como en el juego ("Kai'Sa", "Dr. Mundo", "Wukong", etc.) — la web se encarga de mapearlos al ícono correcto. Si algún campeón no carga el ícono, muestra las iniciales del jugador como respaldo, así que nunca rompe el diseño.
+Escribilos como en el juego ("Kai'Sa", "Dr. Mundo", "Wukong", etc.) — la web se encarga de mapearlos al ícono correcto.
+
+Los íconos son "clásicos": se pide a propósito una versión vieja de Data Dragon (parche 4.20, fin de 2014) para el look old-school, en vez de los íconos actuales. Si el campeón es más nuevo que esa fecha (no existía en 2014), cae automáticamente al ícono actual; si el nombre tiene un typo y no matchea nada, muestra las iniciales del jugador como último respaldo. Nunca rompe el diseño. La versión clásica está fijada en `DDRAGON_VERSION_CLASICA` en [js/comunes.js](js/comunes.js) — cambiarla ahí si en algún momento quieren otra época.
 
 ## Publicar en GitHub Pages
 

@@ -42,20 +42,17 @@ async function poblarSelector(){
 
 function renderJugadorFilaEliminar(j){
   const nombre = jugadoresPorId[j.jugador] || j.jugador;
-  const iconUrl = champIconUrl(j.campeon);
   const kda = j.kda ? `${j.kda.k ?? 0}/${j.kda.d ?? 0}/${j.kda.a ?? 0}` : '';
   const premiosHtml = (j.premios || []).map(p => {
     const info = PREMIOS_INFO[p];
     return info ? `<span class="premio ${p}">${info.icono} ${info.label}</span>` : '';
   }).join('');
-  const avatarHtml = iconUrl
-    ? `<img class="jugador-avatar" src="${iconUrl}" alt="${j.campeon || ''}" onerror="this.outerHTML='<div class=&quot;jugador-avatar-fallback&quot;>${iniciales(nombre)}</div>'">`
-    : `<div class="jugador-avatar-fallback">${iniciales(nombre)}</div>`;
+  const avatarMarkup = avatarHtml(nombre, j.campeon);
   const comentarioHtml = j.comentario ? `<div class="jugador-comentario">"${j.comentario}"</div>` : '';
 
   return `
     <div class="jugador-fila">
-      ${avatarHtml}
+      ${avatarMarkup}
       <div class="jugador-info">
         <div class="jugador-nombre">${nombre} ${premiosHtml ? `<span class="jugador-premios">${premiosHtml}</span>` : ''}</div>
         <div class="jugador-rol">${j.rol || ''}${j.rol && j.campeon ? ' · ' : ''}<span class="jugador-campeon">${j.campeon || ''}</span></div>
