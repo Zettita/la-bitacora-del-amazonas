@@ -32,11 +32,31 @@ const CAMPEON_ESPECIALES = {
   "aurelion sol": "AurelionSol",
 };
 
-// Íconos "clásicos": fijamos una versión vieja (parche 4.20, fin de Season 4 /
-// noviembre 2014) para el look old-school. Los campeones lanzados después de
-// esa fecha no existen ahí, así que hay un segundo intento con la versión
-// actual antes de caer en las iniciales — ver avatarHtml() más abajo.
-const DDRAGON_VERSION_CLASICA = '4.20.2';
+// Íconos "clásicos": Riot relanzó los 60 campeones originales del juego en
+// el modo "LoL Classic" (https://www.leagueoflegends.com/es-es/classic/champions/),
+// cada uno con su propio tile cuadrado (reskin "Jade"). Usamos esos mismos
+// tiles como ícono — es el modo que juega el grupo, así que en teoría todo
+// campeón que se cargue va a estar ahí. El número junto al nombre es el id
+// de esa skin "Jade" particular (no es igual para todos).
+const JADE_CLASSIC_TILE = {
+  Ahri: 301, Alistar: 301, Amumu: 0, Anivia: 0, Annie: 301, Ashe: 0,
+  Blitzcrank: 0, Brand: 0, Chogath: 0, Corki: 0, DrMundo: 301, Evelynn: 301,
+  Ezreal: 301, Fiddlesticks: 301, Gangplank: 301, Garen: 301, Gragas: 0,
+  Heimerdinger: 301, Janna: 0, JarvanIV: 0, Jax: 301, Karthus: 301,
+  Kassadin: 301, Katarina: 301, Kayle: 0, KogMaw: 0, LeeSin: 301, Leona: 0,
+  Lulu: 0, Lux: 0, MasterYi: 301, Malphite: 0, Malzahar: 0, MissFortune: 0,
+  Morgana: 301, Nasus: 301, Nidalee: 301, Nunu: 301, Olaf: 0, Pantheon: 301,
+  Rammus: 0, Ryze: 301, Shaco: 0, Singed: 0, Sion: 301, Sivir: 0,
+  Skarner: 301, Sona: 0, Soraka: 301, Taric: 301, Teemo: 301, Tristana: 301,
+  Tryndamere: 0, TwistedFate: 301, Twitch: 301, Vayne: 0, Veigar: 0,
+  Warwick: 301, MonkeyKing: 0, Zilean: 0,
+};
+
+// El archivo del tile de Wukong se llama "Wukong", pero champKey() lo
+// resuelve a "MonkeyKing" (la clave real que usa Data Dragon para ese
+// campeón en todos los demás endpoints).
+const JADE_CLASSIC_ARCHIVO = { MonkeyKing: 'Wukong' };
+
 let DDRAGON_VERSION_ACTUAL = '14.23.1';
 fetch('https://ddragon.leagueoflegends.com/api/versions.json')
   .then(r => r.json())
@@ -52,6 +72,13 @@ function champKey(nombre){
     .join('');
 }
 
+function classicTileUrl(nombre){
+  const key = champKey(nombre);
+  if(!key || !(key in JADE_CLASSIC_TILE)) return null;
+  const archivo = JADE_CLASSIC_ARCHIVO[key] || key;
+  return `https://ddragon.leagueoflegends.com/cdn/img/mode/classic/champion/tiles/Jade_${archivo}_${JADE_CLASSIC_TILE[key]}.jpg`;
+}
+
 function champIconUrl(nombre, version){
   const key = champKey(nombre);
   if(!key) return null;
@@ -62,16 +89,17 @@ function iniciales(nombre){
   return (nombre || '?').trim().slice(0,2).toUpperCase();
 }
 
-// Arma el <img> del campeón con fallback en cascada: ícono clásico (2014) ->
-// ícono actual (por si el campeón es más nuevo que esa versión) -> iniciales.
+// Arma el <img> del campeón con fallback en cascada: tile de LoL Classic ->
+// ícono actual (por si el campeón todavía no está en ese modo) -> iniciales.
 function avatarHtml(nombreJugador, campeon){
-  const clasica = champIconUrl(campeon, DDRAGON_VERSION_CLASICA);
+  const key = champKey(campeon);
   const inic = iniciales(nombreJugador);
-  if(!clasica){
+  if(!key){
     return `<div class="jugador-avatar-fallback">${inic}</div>`;
   }
   const actual = champIconUrl(campeon, DDRAGON_VERSION_ACTUAL);
-  return `<img class="jugador-avatar" src="${clasica}" alt="${campeon || ''}" data-actual="${actual}" data-iniciales="${inic}" onerror="manejarErrorAvatar(this)">`;
+  const principal = classicTileUrl(campeon) || actual;
+  return `<img class="jugador-avatar" src="${principal}" alt="${campeon || ''}" data-actual="${actual}" data-iniciales="${inic}" onerror="manejarErrorAvatar(this)">`;
 }
 
 function manejarErrorAvatar(img){

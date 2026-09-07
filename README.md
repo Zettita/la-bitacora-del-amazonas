@@ -138,7 +138,7 @@ Un jugador puede tener ninguno, uno, o varios premios en la misma partida (ej: `
 
 Escribilos como en el juego ("Kai'Sa", "Dr. Mundo", "Wukong", etc.) — la web se encarga de mapearlos al ícono correcto.
 
-Los íconos son "clásicos": se pide a propósito una versión vieja de Data Dragon (parche 4.20, fin de 2014) para el look old-school, en vez de los íconos actuales. Si el campeón es más nuevo que esa fecha (no existía en 2014), cae automáticamente al ícono actual; si el nombre tiene un typo y no matchea nada, muestra las iniciales del jugador como último respaldo. Nunca rompe el diseño. La versión clásica está fijada en `DDRAGON_VERSION_CLASICA` en [js/comunes.js](js/comunes.js) — cambiarla ahí si en algún momento quieren otra época.
+Los íconos salen del modo [LoL Classic](https://www.leagueoflegends.com/es-es/classic/champions/) de Riot — el mismo modo que juega el grupo — que tiene un tile propio para cada uno de los 60 campeones originales. Si el campeón todavía no está en ese modo (o el nombre tiene un typo y no matchea nada), cae al ícono actual de Data Dragon, y si tampoco matchea, muestra las iniciales del jugador como último respaldo. Nunca rompe el diseño. El mapeo campeón → tile está en `JADE_CLASSIC_TILE` en [js/comunes.js](js/comunes.js) — si Riot suma más campeones a Classic, se agregan ahí a mano.
 
 ## Publicar en GitHub Pages
 
