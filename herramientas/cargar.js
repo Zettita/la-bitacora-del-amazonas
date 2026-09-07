@@ -1,10 +1,11 @@
 let jugadoresRoster = [];
 let contadorPartidas = 0;
 
+const MAX_JUGADORES_POR_PARTIDA = 5;
+
 const contenedorPartidas = document.getElementById('partidas-contenedor');
 const tplPartida = document.getElementById('tpl-partida');
-const tplJugador = document.getElementById('tpl-jugador');
-const tplInvitado = document.getElementById('tpl-invitado');
+const tplJugadorCard = document.getElementById('tpl-jugador-card');
 
 function normalizarTexto(s){
   return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -14,8 +15,8 @@ function normalizarTexto(s){
 // Buscador de campeón: al enfocar o escribir muestra los 60 campeones de
 // LoL Classic (con su ícono) filtrados por lo tipeado; un click en una
 // opción completa el campo.
-function initCampeonPicker(fila){
-  const input = fila.querySelector('.j-campeon');
+function initCampeonPicker(raiz){
+  const input = raiz.querySelector('.j-campeon');
   const picker = input.closest('.campeon-picker');
   const opciones = picker.querySelector('.campeon-opciones');
   let resaltado = -1;
@@ -85,49 +86,105 @@ async function cargarRoster(){
   }
 }
 
-function crearFilaJugador(jugador){
-  const nodo = tplJugador.content.cloneNode(true);
-  const fila = nodo.querySelector('.jugador-form-fila');
-  fila.dataset.jugadorId = jugador.id;
-  fila.querySelector('.j-nombre-roster').textContent = jugador.nombre;
-
-  const check = fila.querySelector('.j-participo');
-  check.addEventListener('change', () => fila.classList.toggle('desactivado', !check.checked));
-  initCampeonPicker(fila);
-
-  return fila;
+function slugify(nombre){
+  return nombre.trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'jugador';
 }
 
-function crearFilaInvitado(){
-  const nodo = tplInvitado.content.cloneNode(true);
-  const fila = nodo.querySelector('.jugador-form-fila');
-  const check = fila.querySelector('.inv-participo');
-  const nombre = fila.querySelector('.inv-nombre');
-  const actualizar = () => fila.classList.toggle('desactivado', !check.checked);
-  check.addEventListener('change', actualizar);
-  nombre.addEventListener('input', () => { if(nombre.value.trim()) check.checked = true; actualizar(); });
-  actualizar();
-  initCampeonPicker(fila);
-  return fila;
+function idsUsadosEnPartida(bloque, tarjetaExcluida){
+  const ids = new Set();
+  bloque.querySelectorAll('.jugador-card').forEach(tarjeta => {
+    if(tarjeta === tarjetaExcluida) return;
+    const valor = tarjeta.querySelector('.j-select').value;
+    if(valor && valor !== '__nuevo__') ids.add(valor);
+  });
+  return ids;
+}
+
+function poblarSelectJugador(select, idsUsados){
+  const valorPrevio = select.value;
+  select.innerHTML = '<option value="">Elegí un jugador...</option>';
+
+  jugadoresRoster.forEach(j => {
+    const opt = document.createElement('option');
+    opt.value = j.id;
+    opt.textContent = j.nombre;
+    opt.disabled = idsUsados.has(j.id);
+    select.appendChild(opt);
+  });
+
+  const optNuevo = document.createElement('option');
+  optNuevo.value = '__nuevo__';
+  optNuevo.textContent = '+ Nuevo jugador...';
+  select.appendChild(optNuevo);
+
+  select.value = valorPrevio || '';
+}
+
+function refrescarSelectsDePartida(bloque){
+  bloque.querySelectorAll('.jugador-card').forEach(tarjeta => {
+    const select = tarjeta.querySelector('.j-select');
+    poblarSelectJugador(select, idsUsadosEnPartida(bloque, tarjeta));
+  });
+}
+
+function actualizarBotonAgregar(bloque){
+  const cant = bloque.querySelectorAll('.jugador-card').length;
+  const btn = bloque.querySelector('.btn-agregar-jugador');
+  btn.disabled = cant >= MAX_JUGADORES_POR_PARTIDA;
+  btn.textContent = cant >= MAX_JUGADORES_POR_PARTIDA ? 'Máximo 5 jugadores' : '+ Agregar jugador';
+}
+
+function crearTarjetaJugador(bloque){
+  const nodo = tplJugadorCard.content.cloneNode(true);
+  const tarjeta = nodo.querySelector('.jugador-card');
+  const select = tarjeta.querySelector('.j-select');
+  const zonaNuevo = tarjeta.querySelector('.jc-nuevo-jugador');
+
+  poblarSelectJugador(select, idsUsadosEnPartida(bloque, null));
+  initCampeonPicker(tarjeta);
+
+  select.addEventListener('change', () => {
+    zonaNuevo.hidden = select.value !== '__nuevo__';
+    if(select.value && select.value !== '__nuevo__'){
+      const jugador = jugadoresRoster.find(j => j.id === select.value);
+      const rolSelect = tarjeta.querySelector('.j-rol');
+      if(jugador && jugador.rolPreferido && !rolSelect.value) rolSelect.value = jugador.rolPreferido;
+    }
+    refrescarSelectsDePartida(bloque);
+  });
+
+  tarjeta.querySelector('.btn-quitar-jugador').addEventListener('click', () => {
+    tarjeta.remove();
+    refrescarSelectsDePartida(bloque);
+    actualizarBotonAgregar(bloque);
+  });
+
+  return tarjeta;
+}
+
+function agregarTarjetaJugador(bloque){
+  const contJugadores = bloque.querySelector('.jugadores-form');
+  if(contJugadores.querySelectorAll('.jugador-card').length >= MAX_JUGADORES_POR_PARTIDA) return;
+  contJugadores.appendChild(crearTarjetaJugador(bloque));
+  actualizarBotonAgregar(bloque);
 }
 
 function agregarBloquePartida(){
   contadorPartidas++;
   const nodo = tplPartida.content.cloneNode(true);
   const bloque = nodo.querySelector('.bloque-partida');
-  bloque.dataset.indice = contadorPartidas;
   bloque.querySelector('.num-partida').textContent = contadorPartidas;
 
-  const contJugadores = bloque.querySelector('.jugadores-form');
-  jugadoresRoster.forEach(j => contJugadores.appendChild(crearFilaJugador(j)));
-  contJugadores.appendChild(crearFilaInvitado());
-
+  bloque.querySelector('.btn-agregar-jugador').addEventListener('click', () => agregarTarjetaJugador(bloque));
   bloque.querySelector('.btn-quitar-partida').addEventListener('click', () => {
     bloque.remove();
     renumerarPartidas();
   });
 
   contenedorPartidas.appendChild(bloque);
+  actualizarBotonAgregar(bloque);
 }
 
 function renumerarPartidas(){
@@ -139,38 +196,40 @@ function renumerarPartidas(){
 function leerJugadoresDePartida(bloque){
   const jugadores = [];
 
-  bloque.querySelectorAll('.jugador-form-fila').forEach(fila => {
-    const esInvitado = fila.classList.contains('jugador-invitado');
-    const participo = esInvitado
-      ? fila.querySelector('.inv-participo').checked
-      : fila.querySelector('.j-participo').checked;
-    if(!participo) return;
+  bloque.querySelectorAll('.jugador-card').forEach(tarjeta => {
+    const select = tarjeta.querySelector('.j-select');
+    let jugadorId, nuevoJugador;
 
-    let jugadorId, nombreInvitado;
-    if(esInvitado){
-      const nombre = fila.querySelector('.inv-nombre').value.trim();
+    if(select.value === '__nuevo__'){
+      const nombre = tarjeta.querySelector('.nj-nombre').value.trim();
       if(!nombre) return;
-      jugadorId = nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'invitado';
-      nombreInvitado = nombre;
+      jugadorId = slugify(nombre);
+      nuevoJugador = { nombre };
+      const rolPreferido = tarjeta.querySelector('.nj-rol-preferido').value;
+      if(rolPreferido) nuevoJugador.rolPreferido = rolPreferido;
+      const imagen = tarjeta.querySelector('.nj-imagen').value.trim();
+      if(imagen) nuevoJugador.imagen = imagen;
+    }else if(select.value){
+      jugadorId = select.value;
     }else{
-      jugadorId = fila.dataset.jugadorId;
+      return;
     }
 
-    const premios = Array.from(fila.querySelectorAll('.premio-check input:checked')).map(c => c.value);
-    const k = fila.querySelector('.j-k').value;
-    const d = fila.querySelector('.j-d').value;
-    const a = fila.querySelector('.j-a').value;
+    const premios = Array.from(tarjeta.querySelectorAll('.premio-check input:checked')).map(c => c.value);
+    const k = tarjeta.querySelector('.j-k').value;
+    const d = tarjeta.querySelector('.j-d').value;
+    const a = tarjeta.querySelector('.j-a').value;
 
     const jugador = {
       jugador: jugadorId,
-      campeon: fila.querySelector('.j-campeon').value.trim(),
-      rol: fila.querySelector('.j-rol').value,
+      campeon: tarjeta.querySelector('.j-campeon').value.trim(),
+      rol: tarjeta.querySelector('.j-rol').value,
       kda: { k: Number(k)||0, d: Number(d)||0, a: Number(a)||0 },
       premios,
     };
-    const comentario = fila.querySelector('.j-comentario').value.trim();
+    const comentario = tarjeta.querySelector('.j-comentario').value.trim();
     if(comentario) jugador.comentario = comentario;
-    if(nombreInvitado) jugador.nombre_invitado = nombreInvitado;
+    if(nuevoJugador) jugador.nuevo_jugador = nuevoJugador;
 
     jugadores.push(jugador);
   });
@@ -182,9 +241,15 @@ function leerPartidas(){
   return Array.from(contenedorPartidas.querySelectorAll('.bloque-partida')).map(bloque => ({
     resultado: bloque.querySelector('.p-resultado').value,
     duracion: bloque.querySelector('.p-duracion').value.trim(),
-    modo: bloque.querySelector('.p-modo').value.trim(),
     jugadores: leerJugadoresDePartida(bloque),
   }));
+}
+
+function hayTarjetaNuevaSinNombre(){
+  return Array.from(document.querySelectorAll('.jugador-card')).some(tarjeta => {
+    const select = tarjeta.querySelector('.j-select');
+    return select.value === '__nuevo__' && !tarjeta.querySelector('.nj-nombre').value.trim();
+  });
 }
 
 function mostrarMensaje(texto, tipo){
@@ -204,6 +269,11 @@ async function manejarSubmit(ev){
     return;
   }
 
+  if(hayTarjetaNuevaSinNombre()){
+    mostrarMensaje('Hay un jugador nuevo sin nombre completado — completalo o quitá esa tarjeta.', 'error');
+    return;
+  }
+
   const partidas = leerPartidas();
   if(partidas.length === 0){
     mostrarMensaje('Agregá al menos una partida.', 'error');
@@ -211,7 +281,7 @@ async function manejarSubmit(ev){
   }
   const sinJugadores = partidas.some(p => p.jugadores.length === 0);
   if(sinJugadores){
-    mostrarMensaje('Hay una partida sin ningún jugador marcado como participante.', 'error');
+    mostrarMensaje('Hay una partida sin jugadores cargados.', 'error');
     return;
   }
 
@@ -234,6 +304,7 @@ async function manejarSubmit(ev){
       : 'Se subió como commit directo al repo — en un minuto lo va a reflejar el sitio publicado.';
     mostrarMensaje(`Guardado en data/sessions/${data.archivo} (${data.partidas_en_la_sesion} partida(s) en total ese día). ${notaCommit}`, 'ok');
 
+    await cargarRoster();
     contenedorPartidas.innerHTML = '';
     contadorPartidas = 0;
     agregarBloquePartida();

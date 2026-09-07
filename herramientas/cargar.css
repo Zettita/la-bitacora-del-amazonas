@@ -129,29 +129,42 @@ textarea{resize:vertical; width:100%;}
   margin-top:1rem;
 }
 
-.jugador-form-fila{
-  display:grid;
-  grid-template-columns:150px 130px 110px 150px auto;
-  gap:.5rem .7rem;
-  align-items:center;
+.jugador-card{
   background:rgba(0,0,0,.2);
-  padding:.6rem .7rem;
+  border:1px solid var(--borde);
   border-radius:6px;
+  padding:.7rem .8rem;
 }
-.jugador-form-fila.jugador-invitado{background:rgba(0,0,0,.32); border:1px dashed var(--borde);}
 
-.jf-check{
+.jc-cabecera{
   display:flex;
   align-items:center;
-  gap:.4rem;
+  gap:.6rem;
+  margin-bottom:.6rem;
+}
+.jc-cabecera .j-select{
+  flex:1;
   font-weight:600;
 }
-.jf-check .inv-nombre{
-  padding:.3rem .4rem;
-  font-size:.9rem;
-  width:100%;
+
+.jc-nuevo-jugador{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  margin:0 0 .7rem;
+  padding:.6rem;
+  border:1px dashed var(--oro);
+  border-radius:6px;
+  background:rgba(201,162,39,.06);
 }
-.j-nombre-roster{white-space:nowrap;}
+.jc-nuevo-jugador input, .jc-nuevo-jugador select{flex:1 1 160px;}
+
+.jc-datos-partida{
+  display:grid;
+  grid-template-columns:150px 110px 150px auto;
+  gap:.5rem .7rem;
+  align-items:center;
+}
 
 .kda-inputs{
   display:flex;
@@ -171,6 +184,7 @@ textarea{resize:vertical; width:100%;}
 .campo-comentario{
   grid-column:1 / -1;
   width:100%;
+  margin-top:.4rem;
 }
 
 .campeon-picker{position:relative;}
@@ -215,10 +229,14 @@ textarea{resize:vertical; width:100%;}
   color:var(--pergamino-osc);
 }
 
-.jugador-form-fila.desactivado{opacity:.4;}
-.jugador-form-fila.desactivado input:not(.j-participo):not(.inv-participo),
-.jugador-form-fila.desactivado select{
-  pointer-events:none;
+.btn-quitar-jugador{
+  background:none;
+  border:1px solid var(--derrota);
+  color:#f0c6c6;
+  border-radius:5px;
+  cursor:pointer;
+  padding:.2rem .6rem;
+  font-size:.85rem;
 }
 
 .btn{
@@ -241,6 +259,8 @@ textarea{resize:vertical; width:100%;}
   margin-bottom:1.4rem;
 }
 .btn-secundario:hover{background:rgba(201,162,39,.1);}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+.btn:disabled:hover{background:transparent;}
 
 .acciones-finales{
   display:flex;
@@ -255,7 +275,7 @@ textarea{resize:vertical; width:100%;}
 }
 
 @media (max-width:760px){
-  .jugador-form-fila{grid-template-columns:1fr 1fr; grid-auto-rows:auto;}
+  .jc-datos-partida{grid-template-columns:1fr 1fr; grid-auto-rows:auto;}
   .premios-checks{grid-column:1/-1;}
   .kda-inputs{grid-column:1/-1;}
 }

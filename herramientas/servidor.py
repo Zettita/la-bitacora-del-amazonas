@@ -35,12 +35,6 @@ def escribir_json(ruta, datos):
         f.write("\n")
 
 
-def slug(nombre):
-    s = nombre.strip().lower()
-    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
-    return s or "invitado"
-
-
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=RAIZ, **kwargs)
@@ -110,19 +104,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         # accion == "agregar" (comportamiento por defecto)
 
-        # Da de alta jugadores invitados que todavia no esten en el roster
+        # Da de alta jugadores nuevos que todavia no esten en el roster
         players = leer_json(PLAYERS_PATH, [])
         ids_existentes = {p["id"] for p in players}
         cambio_roster = False
         for partida in partidas_nuevas:
             for j in partida.get("jugadores", []):
+                nuevo = j.pop("nuevo_jugador", None)
                 jid = j.get("jugador")
-                jnombre = j.get("nombre_invitado")
-                if jid and jid not in ids_existentes and jnombre:
-                    players.append({"id": jid, "nombre": jnombre})
+                if jid and jid not in ids_existentes and nuevo and nuevo.get("nombre"):
+                    entrada = {"id": jid, "nombre": nuevo["nombre"]}
+                    if nuevo.get("rolPreferido"):
+                        entrada["rolPreferido"] = nuevo["rolPreferido"]
+                    if nuevo.get("imagen"):
+                        entrada["imagen"] = nuevo["imagen"]
+                    players.append(entrada)
                     ids_existentes.add(jid)
                     cambio_roster = True
-                j.pop("nombre_invitado", None)
         if cambio_roster:
             escribir_json(PLAYERS_PATH, players)
 

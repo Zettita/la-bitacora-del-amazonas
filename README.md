@@ -26,7 +26,7 @@ La forma más fácil es con el formulario incluido, que escribe el JSON por vos:
 
 1. Arrancá el servidor local (doble click en `cargar-partidas.bat`, o corré `python herramientas/servidor.py` desde la carpeta del proyecto).
 2. Abrí `http://localhost:8420/herramientas/cargar.html`.
-3. Completá la fecha, cargá una o más partidas (podés destildar a alguien si no jugó esa partida, o agregar un invitado suelto), y tocá **Guardar sesión**.
+3. Completá la fecha, y por cada partida tocá **"+ Agregar jugador"** para sumar una tarjeta (hasta 5 por partida) — elegís quién es de un desplegable, o cargás a alguien nuevo con **"+ Nuevo jugador..."** (nombre, línea preferida e imagen opcionales; queda en el roster para la próxima). El campo de campeón tiene su propio buscador con ícono. Tocá **Guardar sesión** cuando termines.
 4. Eso escribe directo `data/sessions/<fecha>.json` y actualiza `data/manifest.json`. Refrescá `index.html` (o el link "Volver a la crónica") para verlo.
 5. Commiteá y pusheá los cambios (ver abajo) para que se reflejen en el sitio publicado.
 
@@ -87,7 +87,6 @@ También podés saltear el formulario y editar el JSON directamente:
          "numero": 1,
          "resultado": "Victoria",
          "duracion": "32:10",
-         "modo": "Ranked Solo/Duo",
          "jugadores": [
            {
              "jugador": "xero",
@@ -102,6 +101,8 @@ También podés saltear el formulario y editar el JSON directamente:
      ]
    }
    ```
+
+   Hasta 5 jugadores por partida.
 
 3. Agregá el nombre del archivo a `data/manifest.json` (es la lista de sesiones que la web va a cargar):
 
@@ -121,7 +122,13 @@ También podés saltear el formulario y editar el JSON directamente:
 
 ### Los `id` de jugador válidos
 
-Están definidos en `data/players.json`: `xero`, `tutte`, `jonan`, `saukoz`, `zetta`. Si se suma alguien nuevo al grupo, agregalo ahí primero (`{"id": "nuevo", "nombre": "Nuevo"}`).
+Viven en `data/players.json`, con este esquema por jugador:
+
+```json
+{ "id": "xero", "nombre": "Xero", "rolPreferido": "MID", "imagen": "https://..." }
+```
+
+`rolPreferido` e `imagen` son opcionales. Si se suma alguien nuevo al grupo, **no hace falta editar este archivo a mano** — se agrega directo desde `cargar.html` eligiendo "+ Nuevo jugador..." en el desplegable de cualquier tarjeta; queda guardado en el roster para siempre.
 
 ### Los `premios` disponibles
 

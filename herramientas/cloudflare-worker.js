@@ -227,26 +227,29 @@ async function guardarSesion(cfg, payload) {
     };
   }
 
-  // 2) Dar de alta invitados nuevos en el roster, si aparece alguno
-  const invitados = [];
+  // 2) Dar de alta jugadores nuevos en el roster, si aparece alguno
+  const nuevos = [];
   sesion.partidas.forEach((p) => p.jugadores.forEach((j) => {
-    if (j.nombre_invitado) invitados.push({ id: j.jugador, nombre: j.nombre_invitado });
-    delete j.nombre_invitado;
+    if (j.nuevo_jugador) nuevos.push({ id: j.jugador, datos: j.nuevo_jugador });
+    delete j.nuevo_jugador;
   }));
-  if (invitados.length) {
+  if (nuevos.length) {
     const playersFile = await ghObtenerArchivo(cfg, 'data/players.json');
     const players = playersFile ? playersFile.datos : [];
     const idsExistentes = new Set(players.map((p) => p.id));
     let cambio = false;
-    invitados.forEach((inv) => {
-      if (!idsExistentes.has(inv.id)) {
-        players.push(inv);
-        idsExistentes.add(inv.id);
+    nuevos.forEach((n) => {
+      if (!idsExistentes.has(n.id)) {
+        const entrada = { id: n.id, nombre: n.datos.nombre };
+        if (n.datos.rolPreferido) entrada.rolPreferido = n.datos.rolPreferido;
+        if (n.datos.imagen) entrada.imagen = n.datos.imagen;
+        players.push(entrada);
+        idsExistentes.add(n.id);
         cambio = true;
       }
     });
     if (cambio) {
-      await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Suma invitado a la bitacora${firma}`);
+      await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Suma jugador nuevo a la bitacora${firma}`);
     }
   }
 
