@@ -1,5 +1,3 @@
-https://zettita.github.io/la-bitacora-del-amazonas/
-
 # La Bitácora del Amazonas
 
 Crónica de las partidas de LoL de la banda: quién sale mejor, quién se la carga al equipo, quién trollea y quién es medio ancla. Un sitio estático (sin build) que lee los datos de archivos JSON versionados en este repo — cada partida cargada es un commit, y la web publicada se actualiza sola al pushear.
