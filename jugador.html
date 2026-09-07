@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil de invocador — La Bitácora del Amazonas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📜</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body>
+
+<header class="portada portada-chica">
+  <div class="portada-orla">
+    <p class="portada-eyebrow">Crónicas de la Grieta</p>
+    <h1 id="perfil-nombre">Perfil de invocador</h1>
+    <p class="portada-sub" id="perfil-sub">Cargando...</p>
+    <a class="volver-link" href="index.html">← Volver a la crónica</a>
+  </div>
+</header>
+
+<main>
+  <div id="selector-jugador" class="selector-jugador" hidden></div>
+
+  <section id="perfil-contenido" class="seccion" hidden>
+    <div class="perfil-cabecera">
+      <div id="perfil-avatar" class="perfil-avatar"></div>
+      <div class="perfil-resumen-texto">
+        <div class="perfil-resumen-nombre" id="perfil-resumen-nombre"></div>
+        <div class="perfil-resumen-sub" id="perfil-resumen-sub"></div>
+      </div>
+    </div>
+
+    <div class="seccion">
+      <h2 class="titulo-seccion">📊 Estadísticas</h2>
+      <div id="perfil-stats" class="fama-resumen"></div>
+    </div>
+
+    <div class="seccion">
+      <h2 class="titulo-seccion">🥇 Campeones más jugados</h2>
+      <div id="perfil-campeones" class="perfil-campeones"></div>
+    </div>
+  </section>
+
+  <div id="perfil-vacio" class="vacio-timeline" hidden></div>
+</main>
+
+<footer>
+  <p>Escrito y reescrito por la banda. Cada partida es una página más.</p>
+</footer>
+
+<script src="js/comunes.js?v=3"></script>
+<script src="js/jugador.js?v=1"></script>
+</body>
+</html>

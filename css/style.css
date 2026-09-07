@@ -381,10 +381,83 @@ footer{
   font-size:.9rem;
 }
 
+/* ---------- Perfil de jugador ---------- */
+.selector-jugador{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+  margin-bottom:2.5rem;
+}
+.selector-jugador a{
+  font-family:'Cinzel', serif;
+  font-size:.85rem;
+  color:var(--oro-claro);
+  text-decoration:none;
+  border:1px solid var(--borde);
+  border-radius:20px;
+  padding:.5rem 1.1rem;
+  background:var(--noche-panel);
+}
+.selector-jugador a:hover{border-color:var(--oro);}
+.selector-jugador a.activo{background:var(--oro); color:var(--tinta); border-color:var(--oro);}
+
+.perfil-cabecera{
+  display:flex;
+  align-items:center;
+  gap:1.3rem;
+  margin-bottom:2.5rem;
+  flex-wrap:wrap;
+}
+.perfil-avatar .jugador-avatar,
+.perfil-avatar .jugador-avatar-fallback{
+  width:96px;
+  height:96px;
+  border-radius:12px;
+  font-size:2rem;
+}
+.perfil-resumen-nombre{
+  font-family:'Cinzel', serif;
+  font-size:1.5rem;
+  color:var(--oro-claro);
+}
+.perfil-resumen-sub{
+  color:var(--pergamino-osc);
+  font-style:italic;
+}
+
+.perfil-campeones{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:1rem;
+}
+.campeon-card{
+  background:var(--noche-panel);
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:1rem 1.1rem;
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+}
+.campeon-card .jugador-avatar,
+.campeon-card .jugador-avatar-fallback{width:52px; height:52px; border-radius:8px; font-size:1.1rem;}
+.campeon-card-info{flex:1; min-width:0;}
+.campeon-card-nombre{font-weight:600; color:var(--pergamino);}
+.campeon-card-detalle{font-size:.85rem; color:var(--pergamino-osc);}
+.campeon-card-puesto{
+  font-family:'Cinzel', serif;
+  color:var(--oro-claro);
+  font-size:1.3rem;
+  width:1.8rem;
+  text-align:center;
+  flex-shrink:0;
+}
+
 @media (max-width:600px){
   body{font-size:16px;}
   .jugador-fila{grid-template-columns:auto 1fr; grid-template-areas:"avatar info" "kda kda" "premios premios";}
   .jugador-kda{grid-column:1/-1;}
   .jugador-premios{grid-column:1/-1;}
   .partida-meta{margin-left:0;}
+  .perfil-cabecera{flex-direction:column; text-align:center;}
 }
