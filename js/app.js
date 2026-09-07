@@ -60,9 +60,10 @@ function formatFecha(iso){
 
 // ---------- Carga de datos ----------
 async function cargarDatos(){
+  const sinCache = { cache: 'no-store' };
   const [manifest, jugadoresArr] = await Promise.all([
-    fetch('data/manifest.json').then(r => r.json()).catch(() => []),
-    fetch('data/players.json').then(r => r.json()).catch(() => []),
+    fetch('data/manifest.json', sinCache).then(r => r.json()).catch(() => []),
+    fetch('data/players.json', sinCache).then(r => r.json()).catch(() => []),
   ]);
 
   const jugadores = {};
@@ -71,7 +72,7 @@ async function cargarDatos(){
   const sesiones = [];
   for(const archivo of manifest){
     try{
-      const s = await fetch(`data/sessions/${archivo}`).then(r => r.json());
+      const s = await fetch(`data/sessions/${archivo}`, sinCache).then(r => r.json());
       sesiones.push(s);
     }catch(e){
       console.warn('No se pudo cargar la sesión', archivo, e);

@@ -8,7 +8,7 @@ const tplInvitado = document.getElementById('tpl-invitado');
 
 async function cargarRoster(){
   try{
-    jugadoresRoster = await fetch('../data/players.json').then(r => r.json());
+    jugadoresRoster = await fetch('../data/players.json', { cache: 'no-store' }).then(r => r.json());
   }catch(e){
     jugadoresRoster = [];
   }
