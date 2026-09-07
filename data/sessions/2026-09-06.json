@@ -86,47 +86,6 @@
       "numero": 2
     },
     {
-      "resultado": "Victoria",
-      "duracion": "",
-      "modo": "Ranked Solo/Duo",
-      "jugadores": [
-        {
-          "jugador": "xero",
-          "campeon": "Sona",
-          "rol": "SUPPORT",
-          "kda": {
-            "k": 4,
-            "d": 11,
-            "a": 24
-          },
-          "premios": []
-        },
-        {
-          "jugador": "tutte",
-          "campeon": "Evelynn",
-          "rol": "JUNGLE",
-          "kda": {
-            "k": 18,
-            "d": 4,
-            "a": 12
-          },
-          "premios": []
-        },
-        {
-          "jugador": "zetta",
-          "campeon": "Katarina",
-          "rol": "MID",
-          "kda": {
-            "k": 18,
-            "d": 10,
-            "a": 3
-          },
-          "premios": []
-        }
-      ],
-      "numero": 3
-    },
-    {
       "resultado": "Derrota",
       "duracion": "",
       "modo": "Ranked Solo/Duo",
@@ -144,7 +103,7 @@
           "comentario": "Que game jeje"
         }
       ],
-      "numero": 4
+      "numero": 3
     }
   ]
 }
