@@ -22,6 +22,27 @@
         }
       ],
       "numero": 1
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "12:22",
+      "modo": "Ranked Solo/Duo",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "mundo",
+          "rol": "",
+          "kda": {
+            "k": 1,
+            "d": 3,
+            "a": 3
+          },
+          "premios": [
+            "carry"
+          ]
+        }
+      ],
+      "numero": 2
     }
   ]
 }
