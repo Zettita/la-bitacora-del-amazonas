@@ -24,7 +24,8 @@ html,body{
   margin:0;
   padding:0;
   background:
-    radial-gradient(ellipse at top, #241d14 0%, var(--noche) 60%);
+    radial-gradient(ellipse at top, rgba(36,29,20,.85) 0%, rgba(18,16,14,.94) 60%),
+    url('../img/lolclassicgrieta.webp') center / cover no-repeat fixed;
   color:var(--pergamino);
   font-family:'EB Garamond', Georgia, serif;
   font-size:18px;
