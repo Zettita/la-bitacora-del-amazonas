@@ -62,9 +62,11 @@ function calcularEstadisticasJugador(sesiones, jugadorId){
   };
 }
 
-// Fondo de pantalla por defecto: el splash art del campeón más jugado.
+// Fondo de pantalla por defecto: el splash art clásico (skin "Jade" de LoL
+// Classic, igual que los íconos del resto del sitio) del campeón más
+// jugado; si el campeón no está en Classic, cae al splash actual.
 function aplicarFondoCampeon(campeon){
-  const url = champSplashUrl(campeon);
+  const url = classicSplashUrl(campeon) || champSplashUrl(campeon);
   if(!url) return;
   document.getElementById('body-perfil').style.backgroundImage =
     `radial-gradient(ellipse at top, rgba(36,29,20,.85) 0%, rgba(18,16,14,.94) 60%), url('${url}')`;
@@ -95,7 +97,7 @@ function renderPerfil(jugador, stats){
         d: c.partidas ? c.d / c.partidas : 0,
         a: c.partidas ? c.a / c.partidas : 0,
       };
-      const splash = champSplashUrl(c.nombre);
+      const splash = classicSplashUrl(c.nombre) || champSplashUrl(c.nombre);
       return `
         <div class="campeon-card" style="background-image:url('${splash}')">
           <span class="campeon-card-puesto">${i + 1}°</span>

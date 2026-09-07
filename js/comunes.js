@@ -94,6 +94,16 @@ function classicTileUrl(nombre){
   return `https://ddragon.leagueoflegends.com/cdn/img/mode/classic/champion/tiles/Jade_${archivo}_${JADE_CLASSIC_TILE[key]}.jpg`;
 }
 
+// Splash art grande del mismo skin "Jade" de LoL Classic, recortado
+// "centered" (el personaje queda centrado en el cuadro en vez de corrido
+// a un costado) — para usar como fondo de pantalla o de carta.
+function classicSplashUrl(nombre){
+  const key = champKey(nombre);
+  if(!key || !(key in JADE_CLASSIC_TILE)) return null;
+  const archivo = JADE_CLASSIC_ARCHIVO[key] || key;
+  return `https://ddragon.leagueoflegends.com/cdn/img/mode/classic/champion/centered/Jade_${archivo}_${JADE_CLASSIC_TILE[key]}.jpg`;
+}
+
 function champIconUrl(nombre, version){
   const key = champKey(nombre);
   if(!key) return null;
