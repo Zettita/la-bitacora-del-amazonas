@@ -1,4 +1,4 @@
-// PREMIOS_INFO, champKey/champIconUrl/avatarHtml/iniciales viven en comunes.js
+// PREMIOS_INFO, champKey/champSplashUrl/iniciales viven en comunes.js
 
 async function cargarDatos(){
   const sinCache = { cache: 'no-store' };
@@ -21,8 +21,8 @@ async function cargarDatos(){
 }
 
 // Recorre todas las sesiones y arma las estadísticas de un solo jugador:
-// partidas/victorias, KDA promedio, y sus campeones más jugados (con
-// winrate propio de cada uno).
+// partidas/victorias, KDA promedio general, y sus campeones más jugados,
+// cada uno con su propio KDA y winrate.
 function calcularEstadisticasJugador(sesiones, jugadorId){
   let partidas = 0, victorias = 0;
   let k = 0, d = 0, a = 0;
@@ -36,9 +36,12 @@ function calcularEstadisticasJugador(sesiones, jugadorId){
       if(gano) victorias++;
       if(j.kda){ k += j.kda.k || 0; d += j.kda.d || 0; a += j.kda.a || 0; }
       if(j.campeon){
-        const c = campeones[j.campeon] || (campeones[j.campeon] = { nombre: j.campeon, partidas: 0, victorias: 0 });
+        const c = campeones[j.campeon] || (campeones[j.campeon] = {
+          nombre: j.campeon, partidas: 0, victorias: 0, k: 0, d: 0, a: 0,
+        });
         c.partidas++;
         if(gano) c.victorias++;
+        if(j.kda){ c.k += j.kda.k || 0; c.d += j.kda.d || 0; c.a += j.kda.a || 0; }
       }
     });
   }));
@@ -59,25 +62,19 @@ function calcularEstadisticasJugador(sesiones, jugadorId){
   };
 }
 
-function renderSelectorJugadores(jugadoresArr, idActual){
-  const el = document.getElementById('selector-jugador');
-  if(jugadoresArr.length === 0) return;
-  el.hidden = false;
-  el.innerHTML = jugadoresArr.map(j =>
-    `<a href="jugador.html?id=${encodeURIComponent(j.id)}" class="${j.id === idActual ? 'activo' : ''}">${j.nombre}</a>`
-  ).join('');
+// Fondo de pantalla por defecto: el splash art del campeón más jugado.
+function aplicarFondoCampeon(campeon){
+  const url = champSplashUrl(campeon);
+  if(!url) return;
+  document.getElementById('body-perfil').style.backgroundImage =
+    `radial-gradient(ellipse at top, rgba(36,29,20,.85) 0%, rgba(18,16,14,.94) 60%), url('${url}')`;
 }
 
 function renderPerfil(jugador, stats){
   document.getElementById('perfil-nombre').textContent = jugador.nombre;
-  document.getElementById('perfil-sub').textContent = `Perfil de invocador de ${jugador.nombre}`;
 
   const campeonPrincipal = stats.topCampeones[0]?.nombre || '';
-  document.getElementById('perfil-avatar').innerHTML = avatarHtml(jugador.nombre, campeonPrincipal);
-  document.getElementById('perfil-resumen-nombre').textContent = jugador.nombre;
-  document.getElementById('perfil-resumen-sub').textContent = campeonPrincipal
-    ? `Suele jugar ${campeonPrincipal}`
-    : 'Todavía sin campeón favorito claro';
+  aplicarFondoCampeon(campeonPrincipal);
 
   const winratePct = Math.round(stats.winrate * 100);
   document.getElementById('perfil-stats').innerHTML = `
@@ -93,13 +90,22 @@ function renderPerfil(jugador, stats){
   }else{
     elCampeones.innerHTML = stats.topCampeones.map((c, i) => {
       const wr = c.partidas ? Math.round((c.victorias / c.partidas) * 100) : 0;
+      const kdaProm = {
+        k: c.partidas ? c.k / c.partidas : 0,
+        d: c.partidas ? c.d / c.partidas : 0,
+        a: c.partidas ? c.a / c.partidas : 0,
+      };
+      const splash = champSplashUrl(c.nombre);
       return `
-        <div class="campeon-card">
+        <div class="campeon-card" style="background-image:url('${splash}')">
           <span class="campeon-card-puesto">${i + 1}°</span>
-          ${avatarHtml(jugador.nombre, c.nombre)}
           <div class="campeon-card-info">
             <div class="campeon-card-nombre">${c.nombre}</div>
-            <div class="campeon-card-detalle">${c.partidas} partida${c.partidas === 1 ? '' : 's'} · ${wr}% winrate</div>
+            <div class="campeon-card-detalle">
+              <span>${c.partidas} partida${c.partidas === 1 ? '' : 's'}</span>
+              <span>KDA ${kdaProm.k.toFixed(1)}/${kdaProm.d.toFixed(1)}/${kdaProm.a.toFixed(1)}</span>
+              <span>${wr}% winrate</span>
+            </div>
           </div>
         </div>
       `;
@@ -114,13 +120,11 @@ function renderPerfil(jugador, stats){
   const { jugadoresArr, sesiones } = await cargarDatos();
   const jugador = jugadoresArr.find(j => j.id === idPedido);
 
-  renderSelectorJugadores(jugadoresArr, idPedido);
-
   if(!jugador){
-    document.getElementById('perfil-nombre').textContent = 'Elegí un invocador';
-    document.getElementById('perfil-sub').textContent = jugadoresArr.length
-      ? 'Elegí de quién ver el perfil ahí arriba.'
-      : 'Todavía no hay jugadores cargados en el roster.';
+    document.getElementById('perfil-nombre').textContent = 'Jugador no encontrado';
+    const vacio = document.getElementById('perfil-vacio');
+    vacio.textContent = 'Agregá ?id=<jugador> a la URL (ver data/players.json para los ids válidos).';
+    vacio.hidden = false;
     return;
   }
 
@@ -128,7 +132,6 @@ function renderPerfil(jugador, stats){
 
   if(stats.partidas === 0){
     document.getElementById('perfil-nombre').textContent = jugador.nombre;
-    document.getElementById('perfil-sub').textContent = 'Todavía no tiene partidas cargadas.';
     const vacio = document.getElementById('perfil-vacio');
     vacio.textContent = `${jugador.nombre} todavía no tiene ninguna partida cargada.`;
     vacio.hidden = false;

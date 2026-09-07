@@ -100,6 +100,14 @@ function champIconUrl(nombre, version){
   return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${key}.png`;
 }
 
+// Splash art (imagen grande, skin base) de un campeón — para usar como
+// fondo, no como ícono. No depende de la versión de Data Dragon.
+function champSplashUrl(nombre){
+  const key = champKey(nombre);
+  if(!key) return null;
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${key}_0.jpg`;
+}
+
 function iniciales(nombre){
   return (nombre || '?').trim().slice(0,2).toUpperCase();
 }
