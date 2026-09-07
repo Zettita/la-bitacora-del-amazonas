@@ -397,6 +397,131 @@ footer{
 }
 
 /* ---------- Perfil de jugador ---------- */
+.volver-top{
+  max-width:920px;
+  margin:0 auto;
+  padding:1.4rem 1.5rem 0;
+}
+.volver-top a{
+  color:var(--oro-claro);
+  text-decoration:none;
+  font-family:'Cinzel', serif;
+  font-size:.85rem;
+  border-bottom:1px solid transparent;
+}
+.volver-top a:hover{border-color:var(--oro-claro);}
+
+.perfil-header{
+  display:flex;
+  align-items:center;
+  gap:1.4rem;
+  max-width:920px;
+  margin:0 auto;
+  padding:1.6rem 1.5rem 1rem;
+}
+.perfil-header-avatar{
+  width:100px;
+  height:100px;
+  border-radius:12px;
+  overflow:hidden;
+  border:2px solid var(--oro);
+  flex-shrink:0;
+  background:var(--noche-panel);
+}
+.perfil-header-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.perfil-header-avatar-fallback{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Cinzel', serif;
+  font-size:2rem;
+  font-weight:700;
+  color:var(--oro-claro);
+}
+.perfil-header-texto{min-width:0;}
+.perfil-header h1{
+  font-family:'Cinzel Decorative', serif;
+  font-size:clamp(1.7rem, 4.5vw, 2.5rem);
+  color:var(--oro-claro);
+  text-align:left;
+  margin:0;
+  text-shadow:0 2px 12px rgba(201,162,39,.25);
+}
+.perfil-header-sub{
+  margin:.35rem 0 0;
+  font-style:italic;
+  font-size:1.05rem;
+  color:var(--pergamino-osc);
+}
+
+.premios-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:.9rem;
+}
+.premio-card{
+  background:var(--noche-panel);
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:1rem .6rem;
+  text-align:center;
+}
+.premio-card .ico{font-size:1.4rem; display:block; margin-bottom:.3rem;}
+.premio-card .cnt{font-family:'Cinzel', serif; font-size:1.4rem; display:block; font-variant-numeric:tabular-nums;}
+.premio-card .lbl{font-size:.72rem; color:var(--pergamino-osc); text-transform:uppercase; letter-spacing:.05em;}
+.premio-card.mvp .cnt{color:var(--mvp);}
+.premio-card.carry .cnt{color:var(--carry);}
+.premio-card.troll .cnt{color:var(--troll);}
+.premio-card.ancla .cnt{color:var(--ancla);}
+
+.ver-mas{
+  display:block;
+  margin:1.1rem auto 0;
+  background:none;
+  border:1px solid var(--borde);
+  color:var(--oro-claro);
+  font-family:'Cinzel', serif;
+  font-size:.85rem;
+  padding:.55rem 1.3rem;
+  border-radius:20px;
+  cursor:pointer;
+}
+.ver-mas:hover{border-color:var(--oro);}
+.ver-mas[hidden]{display:none;}
+
+.partidas-mini{
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+}
+.partida-mini{
+  display:grid;
+  grid-template-columns:auto 40px 1fr auto auto;
+  gap:.9rem;
+  align-items:center;
+  background:var(--noche-panel);
+  border:1px solid var(--borde);
+  border-radius:8px;
+  padding:.7rem 1rem;
+}
+.partida-mini .campeon-rol{font-size:.95rem;}
+.partida-mini .campeon-rol small{
+  display:block;
+  color:var(--pergamino-osc);
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.partida-mini .kda{font-variant-numeric:tabular-nums; font-size:.9rem; white-space:nowrap;}
+.partida-mini .fecha{font-size:.78rem; color:var(--pergamino-osc); white-space:nowrap;}
+
 .perfil-campeones{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
@@ -464,4 +589,10 @@ footer{
   .jugador-kda{grid-column:1/-1;}
   .jugador-premios{grid-column:1/-1;}
   .partida-meta{margin-left:0;}
+  .perfil-header{flex-direction:column; text-align:center; padding-top:1.2rem;}
+  .perfil-header h1{text-align:center;}
+  .premios-grid{grid-template-columns:repeat(2, 1fr);}
+  .partida-mini{grid-template-columns:auto 34px 1fr; grid-template-areas:"badge avatar info" "kda kda fecha";}
+  .partida-mini .kda{grid-area:kda;}
+  .partida-mini .fecha{grid-area:fecha; text-align:right;}
 }

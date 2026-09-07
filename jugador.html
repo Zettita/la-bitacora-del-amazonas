@@ -8,13 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=6">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body id="body-perfil">
 
-<header class="portada">
-  <div class="portada-orla">
+<div class="volver-top"><a href="index.html">← Volver a la crónica</a></div>
+
+<header class="perfil-header">
+  <div class="perfil-header-avatar" id="perfil-avatar"></div>
+  <div class="perfil-header-texto">
     <h1 id="perfil-nombre">Perfil de invocador</h1>
+    <p id="perfil-subtitulo" class="perfil-header-sub" hidden></p>
   </div>
 </header>
 
@@ -26,8 +30,19 @@
     </div>
 
     <div class="seccion">
+      <h2 class="titulo-seccion">🏆 Premios ganados</h2>
+      <div id="perfil-premios" class="premios-grid"></div>
+    </div>
+
+    <div class="seccion">
       <h2 class="titulo-seccion">🥇 Campeones más jugados</h2>
       <div id="perfil-campeones" class="perfil-campeones"></div>
+      <button type="button" id="btn-ver-mas-campeones" class="ver-mas" hidden></button>
+    </div>
+
+    <div class="seccion">
+      <h2 class="titulo-seccion">📜 Últimas partidas</h2>
+      <div id="perfil-partidas" class="partidas-mini"></div>
     </div>
   </section>
 
@@ -39,6 +54,6 @@
 </footer>
 
 <script src="js/comunes.js?v=5"></script>
-<script src="js/jugador.js?v=3"></script>
+<script src="js/jugador.js?v=5"></script>
 </body>
 </html>
