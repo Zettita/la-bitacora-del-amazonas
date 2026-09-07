@@ -158,15 +158,17 @@ textarea{resize:vertical; width:100%;}
   border-radius:6px;
   background:rgba(201,162,39,.06);
 }
-.jc-nuevo-jugador input, .jc-nuevo-jugador select{flex:1 1 160px;}
+.jc-nuevo-jugador > input, .jc-nuevo-jugador > select{flex:1 1 160px;}
 .nj-imagen-label{
   display:flex;
   flex-direction:column;
   gap:.25rem;
+  flex:1 1 160px;
   font-size:.8rem;
   color:var(--pergamino-osc);
 }
 .nj-imagen-label input[type="file"]{
+  flex:none;
   padding:.35rem .4rem;
   font-size:.85rem;
 }
