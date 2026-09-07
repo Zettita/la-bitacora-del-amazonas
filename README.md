@@ -139,6 +139,10 @@ Escribilos como en el juego ("Kai'Sa", "Dr. Mundo", "Wukong", etc.) — la web s
 
 De ahí en adelante, cada vez que agregues una sesión y hagas `git push`, GitHub Pages reconstruye el sitio automáticamente — no hace falta ningún paso extra.
 
+### Si cambia el código (no los datos)
+
+Los archivos de datos (`data/*.json`) siempre se piden sin caché, así que un F5 normal siempre trae la última sesión cargada. Pero `js/app.js`, `css/style.css` y los archivos de `herramientas/` sí pueden quedar cacheados por el navegador. Por eso `index.html` y `cargar.html` los referencian con un `?v=2` al final (`js/app.js?v=2`) — si en algún momento se edita alguno de esos archivos, hay que subir ese número (`?v=3`, etc.) en el/los HTML que lo referencian, así los navegadores lo vuelven a descargar solos sin que nadie tenga que hacer Ctrl+F5.
+
 ## Estructura del proyecto
 
 ```
