@@ -147,6 +147,7 @@ textarea{resize:vertical; width:100%;}
   font-weight:600;
 }
 
+.jc-nuevo-jugador[hidden]{display:none;}
 .jc-nuevo-jugador{
   display:flex;
   flex-wrap:wrap;
