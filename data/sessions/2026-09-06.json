@@ -1,0 +1,89 @@
+{
+  "fecha": "2026-09-06",
+  "titulo": "Dia 1",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Victoria",
+      "duracion": "39:03",
+      "modo": "Ranked Solo/Duo",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Ezreal",
+          "rol": "ADC",
+          "kda": {
+            "k": 14,
+            "d": 5,
+            "a": 19
+          },
+          "premios": []
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Taric",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 3,
+            "d": 11,
+            "a": 32
+          },
+          "premios": []
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 22,
+            "d": 12,
+            "a": 13
+          },
+          "premios": []
+        }
+      ],
+      "numero": 1
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "modo": "Ranked Solo/Duo",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Nasus",
+          "rol": "TOP",
+          "kda": {
+            "k": 10,
+            "d": 0,
+            "a": 5
+          },
+          "premios": []
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Taric",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 4,
+            "d": 3,
+            "a": 20
+          },
+          "premios": []
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 16,
+            "d": 8,
+            "a": 2
+          },
+          "premios": []
+        }
+      ],
+      "numero": 2
+    }
+  ]
+}
