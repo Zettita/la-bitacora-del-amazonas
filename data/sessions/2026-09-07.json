@@ -1,0 +1,27 @@
+{
+  "fecha": "2026-09-07",
+  "titulo": "lolcito",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "modo": "Ranked Solo/Duo",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "jax",
+          "rol": "TOP",
+          "kda": {
+            "k": 3,
+            "d": 12,
+            "a": 2
+          },
+          "premios": [],
+          "comentario": "asd"
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
