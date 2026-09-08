@@ -2,17 +2,20 @@
   {
     "id": "zetta",
     "nombre": "Zetta",
-    "rolPreferido": "MID"
+    "rolPreferido": "MID",
+    "imagen": "img/jugadores/zetta.jpg"
   },
   {
     "id": "xero",
     "nombre": "Xero",
-    "rolPreferido": "TOP"
+    "rolPreferido": "TOP",
+    "imagen": "img/jugadores/xero.jpg"
   },
   {
     "id": "tutte",
     "nombre": "Tutte",
-    "rolPreferido": "JUNGLE"
+    "rolPreferido": "JUNGLE",
+    "imagen": "img/jugadores/tutte.jpg"
   },
   {
     "id": "nikito",
