@@ -155,6 +155,24 @@
         }
       ],
       "numero": 7
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "NASUS",
+          "rol": "TOP",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": []
+        }
+      ],
+      "numero": 8
     }
   ]
 }
