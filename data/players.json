@@ -13,5 +13,11 @@
     "id": "tutte",
     "nombre": "Tutte",
     "rolPreferido": "JUNGLE"
+  },
+  {
+    "id": "nikito",
+    "nombre": "Nikito",
+    "rolPreferido": "TOP",
+    "imagen": "img/jugadores/nikito.jpg"
   }
 ]
