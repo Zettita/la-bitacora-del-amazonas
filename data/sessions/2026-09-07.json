@@ -102,24 +102,6 @@
     },
     {
       "resultado": "Victoria",
-      "duracion": "",
-      "jugadores": [
-        {
-          "jugador": "xero",
-          "campeon": "Garen",
-          "rol": "TOP",
-          "kda": {
-            "k": 0,
-            "d": 0,
-            "a": 0
-          },
-          "premios": []
-        }
-      ],
-      "numero": 5
-    },
-    {
-      "resultado": "Victoria",
       "duracion": "34:45",
       "jugadores": [
         {
@@ -134,7 +116,7 @@
           "premios": []
         }
       ],
-      "numero": 6
+      "numero": 5
     },
     {
       "resultado": "Victoria",
@@ -152,7 +134,7 @@
           "premios": []
         }
       ],
-      "numero": 7
+      "numero": 6
     }
   ]
 }
