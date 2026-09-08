@@ -61,6 +61,82 @@
         }
       ],
       "numero": 2
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "23:43",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Garen",
+          "rol": "TOP",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": [
+            "mvp"
+          ]
+        }
+      ],
+      "numero": 3
+    },
+    {
+      "resultado": "Derrota",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Garen",
+          "rol": "TOP",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": [
+            "ancla"
+          ]
+        }
+      ],
+      "numero": 4
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Garen",
+          "rol": "MID",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": []
+        }
+      ],
+      "numero": 5
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "GAREN",
+          "rol": "TOP",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": []
+        }
+      ],
+      "numero": 6
     }
   ]
 }
