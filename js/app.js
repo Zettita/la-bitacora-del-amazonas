@@ -111,6 +111,58 @@ function renderSalonDeLaFama(stats, totalPartidas, totalSesiones){
   grid.appendChild(cardWr);
 }
 
+// ---------- Podio de invocadores ----------
+// Por ahora ordena por winrate (a definir más adelante otro criterio).
+function renderPodio(stats, jugadores){
+  const carrusel = document.getElementById('podio-carrusel');
+  const flechaIzq = document.querySelector('.podio-flecha.izq');
+  const flechaDer = document.querySelector('.podio-flecha.der');
+
+  if(stats.length === 0){
+    carrusel.innerHTML = `<p class="podio-vacio">Todavía no hay invocadores con partidas cargadas.</p>`;
+    flechaIzq.hidden = true;
+    flechaDer.hidden = true;
+    return;
+  }
+
+  const ordenado = [...stats].sort((a, b) => {
+    const wrA = a.partidas ? a.victorias / a.partidas : -1;
+    const wrB = b.partidas ? b.victorias / b.partidas : -1;
+    if(wrB !== wrA) return wrB - wrA;
+    return b.partidas - a.partidas;
+  });
+
+  carrusel.innerHTML = ordenado.map((s, i) => {
+    const winratePct = s.partidas ? Math.round((s.victorias / s.partidas) * 100) : 0;
+    const imagen = jugadores[s.id]?.imagen;
+    const avatar = imagen
+      ? `<img src="${imagen}" alt="${s.nombre}">`
+      : `<div class="podio-avatar-fallback">${iniciales(s.nombre)}</div>`;
+    return `
+      <div class="podio-tarjeta">
+        <span class="podio-puesto">${i + 1}°</span>
+        <div class="podio-avatar">${avatar}</div>
+        <div class="podio-nombre">${s.nombre}</div>
+        <div class="podio-detalle">${winratePct}% WR · ${s.partidas} partida${s.partidas === 1 ? '' : 's'}</div>
+      </div>
+    `;
+  }).join('');
+
+  const sinOverflow = carrusel.scrollWidth <= carrusel.clientWidth + 1;
+  flechaIzq.hidden = sinOverflow;
+  flechaDer.hidden = sinOverflow;
+}
+
+function initPodioFlechas(){
+  const carrusel = document.getElementById('podio-carrusel');
+  document.querySelector('.podio-flecha.izq').addEventListener('click', () => {
+    carrusel.scrollBy({ left: -256, behavior: 'smooth' });
+  });
+  document.querySelector('.podio-flecha.der').addEventListener('click', () => {
+    carrusel.scrollBy({ left: 256, behavior: 'smooth' });
+  });
+}
+
 // ---------- Timeline ----------
 
 // Fondo de fila: el splash art clásico del campeón jugado (o el actual si
@@ -259,6 +311,8 @@ function renderTimeline(sesiones, jugadores, destacados){
   const { jugadores, destacados, sesiones } = await cargarDatos();
   const { stats, totalPartidas, totalSesiones } = calcularEstadisticas(sesiones, jugadores);
 
+  renderPodio(stats, jugadores);
+  initPodioFlechas();
   renderSalonDeLaFama(stats, totalPartidas, totalSesiones);
   renderTimeline(sesiones, jugadores, destacados);
 })();
