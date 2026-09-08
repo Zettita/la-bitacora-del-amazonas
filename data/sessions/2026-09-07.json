@@ -90,6 +90,49 @@
         }
       ],
       "numero": 3
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 16,
+            "d": 4,
+            "a": 5
+          },
+          "premios": [],
+          "comentario": "\"Que rico se mueve este Zetta\""
+        },
+        {
+          "jugador": "xero",
+          "campeon": "Nasus",
+          "rol": "TOP",
+          "kda": {
+            "k": 1,
+            "d": 1,
+            "a": 4
+          },
+          "premios": [],
+          "comentario": "\"Solo se dedico a farmear\""
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Jax",
+          "rol": "JUNGLE",
+          "kda": {
+            "k": 5,
+            "d": 3,
+            "a": 7
+          },
+          "premios": [],
+          "comentario": "\"lo dio todo\""
+        }
+      ],
+      "numero": 4
     }
   ]
 }
