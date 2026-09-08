@@ -137,6 +137,24 @@
         }
       ],
       "numero": 6
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "34:45",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Sona",
+          "rol": "TOP",
+          "kda": {
+            "k": 0,
+            "d": 0,
+            "a": 0
+          },
+          "premios": []
+        }
+      ],
+      "numero": 7
     }
   ]
 }
