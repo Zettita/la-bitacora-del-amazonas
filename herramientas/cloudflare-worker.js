@@ -66,6 +66,22 @@ export default {
       }
     }
 
+    if (body.accion === 'agregar_jugador') {
+      const nombre = String(body.nombre || '').trim();
+      const id = String(body.id || '').trim();
+      if (!nombre || !id) return jsonResp({ error: 'Falta el nombre' }, 400, cors);
+      try {
+        const resultado = await agregarJugador(cfg, {
+          id, nombre,
+          rolPreferido: String(body.rolPreferido || '').trim(),
+          imagenDatos: body.imagenDatos,
+        }, autor);
+        return jsonResp(resultado, 200, cors);
+      } catch (err) {
+        return jsonResp({ error: err.message }, 500, cors);
+      }
+    }
+
     const fecha = String(body.fecha || '').trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       return jsonResp({ error: 'Fecha invalida, se espera AAAA-MM-DD' }, 400, cors);
@@ -282,6 +298,29 @@ async function editarImagenJugador(cfg, jugadorId, imagenDatos, autor) {
   return { ok: true, imagen: rutaNueva };
 }
 
+// Da de alta un jugador nuevo en el roster (accion "agregar_jugador"),
+// independiente de guardar una sesion.
+async function agregarJugador(cfg, datos, autor) {
+  const firma = autor ? ` (por ${autor})` : '';
+  const playersFile = await ghObtenerArchivo(cfg, 'data/players.json');
+  const players = playersFile ? playersFile.datos : [];
+  if (players.some((p) => p.id === datos.id)) {
+    throw new Error('Ya hay un jugador con ese nombre en el roster');
+  }
+
+  const entrada = { id: datos.id, nombre: datos.nombre };
+  if (datos.rolPreferido) entrada.rolPreferido = datos.rolPreferido;
+  if (datos.imagenDatos) {
+    const ruta = await guardarImagenJugador(cfg, datos.id, datos.imagenDatos, firma);
+    if (ruta) entrada.imagen = ruta;
+  }
+
+  players.push(entrada);
+  await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Suma jugador nuevo a la bitacora${firma}`);
+
+  return { ok: true, jugador: entrada };
+}
+
 async function guardarSesion(cfg, payload) {
   const archivo = `${payload.fecha}.json`;
   const rutaSesion = `data/sessions/${archivo}`;
@@ -308,35 +347,7 @@ async function guardarSesion(cfg, payload) {
     };
   }
 
-  // 2) Dar de alta jugadores nuevos en el roster, si aparece alguno
-  const nuevos = [];
-  sesion.partidas.forEach((p) => p.jugadores.forEach((j) => {
-    if (j.nuevo_jugador) nuevos.push({ id: j.jugador, datos: j.nuevo_jugador });
-    delete j.nuevo_jugador;
-  }));
-  if (nuevos.length) {
-    const playersFile = await ghObtenerArchivo(cfg, 'data/players.json');
-    const players = playersFile ? playersFile.datos : [];
-    const idsExistentes = new Set(players.map((p) => p.id));
-    let cambio = false;
-    for (const n of nuevos) {
-      if (idsExistentes.has(n.id)) continue;
-      const entrada = { id: n.id, nombre: n.datos.nombre };
-      if (n.datos.rolPreferido) entrada.rolPreferido = n.datos.rolPreferido;
-      if (n.datos.imagenDatos) {
-        const rutaImagen = await guardarImagenJugador(cfg, n.id, n.datos.imagenDatos, firma);
-        if (rutaImagen) entrada.imagen = rutaImagen;
-      }
-      players.push(entrada);
-      idsExistentes.add(n.id);
-      cambio = true;
-    }
-    if (cambio) {
-      await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Suma jugador nuevo a la bitacora${firma}`);
-    }
-  }
-
-  // 2b) Dar de alta personajes destacados nuevos (gente ajena al grupo)
+  // 2) Dar de alta personajes destacados nuevos (gente ajena al grupo)
   const nuevosDestacados = [];
   sesion.partidas.forEach((p) => (p.destacados || []).forEach((d) => {
     if (d.nuevo_destacado) nuevosDestacados.push({ id: d.destacado, datos: d.nuevo_destacado });

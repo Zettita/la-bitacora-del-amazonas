@@ -63,8 +63,43 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.manejar_guardar_sesion()
         elif self.path == "/api/editar-imagen-jugador":
             self.manejar_editar_imagen_jugador()
+        elif self.path == "/api/agregar-jugador":
+            self.manejar_agregar_jugador()
         else:
             self.send_json(404, {"error": "Ruta no encontrada"})
+
+    def manejar_agregar_jugador(self):
+        largo = int(self.headers.get("Content-Length", 0))
+        try:
+            cuerpo = json.loads(self.rfile.read(largo).decode("utf-8"))
+        except Exception:
+            self.send_json(400, {"error": "El cuerpo no es JSON valido"})
+            return
+
+        nombre = str(cuerpo.get("nombre", "")).strip()
+        jugador_id = str(cuerpo.get("id", "")).strip()
+        if not nombre or not jugador_id:
+            self.send_json(400, {"error": "Falta el nombre"})
+            return
+
+        players = leer_json(PLAYERS_PATH, [])
+        if any(p.get("id") == jugador_id for p in players):
+            self.send_json(409, {"error": "Ya hay un jugador con ese nombre en el roster"})
+            return
+
+        entrada = {"id": jugador_id, "nombre": nombre}
+        rol_preferido = str(cuerpo.get("rolPreferido", "")).strip()
+        if rol_preferido:
+            entrada["rolPreferido"] = rol_preferido
+        imagen_datos = cuerpo.get("imagenDatos")
+        if imagen_datos:
+            ruta_imagen = guardar_imagen_jugador(jugador_id, imagen_datos)
+            if ruta_imagen:
+                entrada["imagen"] = ruta_imagen
+
+        players.append(entrada)
+        escribir_json(PLAYERS_PATH, players)
+        self.send_json(200, {"ok": True, "jugador": entrada})
 
     def manejar_editar_imagen_jugador(self):
         largo = int(self.headers.get("Content-Length", 0))
@@ -164,28 +199,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
 
         # accion == "agregar" (comportamiento por defecto)
-
-        # Da de alta jugadores nuevos que todavia no esten en el roster
-        players = leer_json(PLAYERS_PATH, [])
-        ids_existentes = {p["id"] for p in players}
-        cambio_roster = False
-        for partida in partidas_nuevas:
-            for j in partida.get("jugadores", []):
-                nuevo = j.pop("nuevo_jugador", None)
-                jid = j.get("jugador")
-                if jid and jid not in ids_existentes and nuevo and nuevo.get("nombre"):
-                    entrada = {"id": jid, "nombre": nuevo["nombre"]}
-                    if nuevo.get("rolPreferido"):
-                        entrada["rolPreferido"] = nuevo["rolPreferido"]
-                    if nuevo.get("imagenDatos"):
-                        ruta_imagen = guardar_imagen_jugador(jid, nuevo["imagenDatos"])
-                        if ruta_imagen:
-                            entrada["imagen"] = ruta_imagen
-                    players.append(entrada)
-                    ids_existentes.add(jid)
-                    cambio_roster = True
-        if cambio_roster:
-            escribir_json(PLAYERS_PATH, players)
 
         # Da de alta personajes destacados nuevos (gente ajena al grupo)
         destacados_roster = leer_json(DESTACADOS_PATH, [])

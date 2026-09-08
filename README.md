@@ -26,9 +26,10 @@ La forma más fácil es con el formulario incluido, que escribe el JSON por vos:
 
 1. Arrancá el servidor local (doble click en `cargar-partidas.bat`, o corré `python herramientas/servidor.py` desde la carpeta del proyecto).
 2. Abrí `http://localhost:8420/herramientas/cargar.html`.
-3. Completá la fecha, y por cada partida tocá **"+ Agregar jugador"** para sumar una tarjeta (hasta 5 por partida) — elegís quién es de un desplegable, o cargás a alguien nuevo con **"+ Nuevo jugador..."** (nombre, línea preferida e imagen opcionales; queda en el roster para la próxima). El campo de campeón tiene su propio buscador con ícono. Tocá **Guardar sesión** cuando termines.
-4. Eso escribe directo `data/sessions/<fecha>.json` y actualiza `data/manifest.json`. Refrescá `index.html` (o el link "Volver a la crónica") para verlo.
-5. Commiteá y pusheá los cambios (ver abajo) para que se reflejen en el sitio publicado.
+3. Si falta alguien en el roster, sumalo primero arriba de todo en **"👤 Alta rápida de jugador"** (nombre, línea preferida e imagen opcionales) — queda guardado al toque, sin esperar a guardar la sesión.
+4. Completá la fecha, y por cada partida tocá **"+ Agregar jugador"** para sumar una fila a la planilla (hasta 5 por partida) y elegir quién es del desplegable. El campo de campeón tiene su propio buscador con ícono. Tocá **Guardar sesión** cuando termines.
+5. Eso escribe directo `data/sessions/<fecha>.json` y actualiza `data/manifest.json`. Refrescá `index.html` (o el link "Volver a la crónica") para verlo.
+6. Commiteá y pusheá los cambios (ver abajo) para que se reflejen en el sitio publicado.
 
 El servidor solo corre en tu máquina — es una herramienta de carga, no hace falta para que la web publicada funcione.
 
@@ -128,7 +129,7 @@ Viven en `data/players.json`, con este esquema por jugador:
 { "id": "xero", "nombre": "Xero", "rolPreferido": "MID", "imagen": "img/jugadores/xero.jpg" }
 ```
 
-`rolPreferido` e `imagen` son opcionales. Si se suma alguien nuevo al grupo, **no hace falta editar este archivo a mano** — se agrega directo desde `cargar.html` eligiendo "+ Nuevo jugador..." en el desplegable de cualquier tarjeta; queda guardado en el roster para siempre.
+`rolPreferido` e `imagen` son opcionales. Si se suma alguien nuevo al grupo, **no hace falta editar este archivo a mano** — se agrega directo desde el bloque "👤 Alta rápida de jugador" arriba de todo en `cargar.html`; queda guardado en el roster para siempre.
 
 La foto se elige del disco (no es un link): el navegador la redimensiona/comprime a un JPEG chico (200px de lado mayor) antes de mandarla, y el backend la guarda como archivo real en `img/jugadores/<id>.<ext>` — `imagen` en `players.json` termina siendo esa ruta relativa. Con como mucho ~10 jugadores en el grupo, el peso total es insignificante.
 
