@@ -10,7 +10,7 @@ async function cargarDatos(){
   ]);
 
   const jugadores = {};
-  jugadoresArr.forEach(j => jugadores[j.id] = j.nombre);
+  jugadoresArr.forEach(j => jugadores[j.id] = { nombre: j.nombre, imagen: j.imagen });
 
   const destacados = {};
   destacadosArr.forEach(d => destacados[d.id] = d.nombre);
@@ -34,7 +34,7 @@ function calcularEstadisticas(sesiones, jugadores){
   const stats = {};
   const asegurar = (id) => {
     if(!stats[id]) stats[id] = {
-      id, nombre: jugadores[id] || id,
+      id, nombre: jugadores[id]?.nombre || id,
       partidas:0, victorias:0, derrotas:0,
       premios: { mvp:0, carry:0, troll:0, ancla:0 },
     };
@@ -112,8 +112,18 @@ function renderSalonDeLaFama(stats, totalPartidas, totalSesiones){
 }
 
 // ---------- Timeline ----------
+
+// Fondo de fila: el splash art clásico del campeón jugado (o el actual si
+// todavía no está en LoL Classic). Devuelve un atributo style listo para
+// pegar en el div, o vacío si no hay campeón cargado.
+function fondoFilaStyle(campeon){
+  const splash = classicSplashUrl(campeon) || champSplashUrl(campeon);
+  return splash ? ` style="background-image:url('${splash}')"` : '';
+}
+
 function renderJugadorFila(j, jugadores){
-  const nombre = jugadores[j.jugador] || j.jugador;
+  const jugadorInfo = jugadores[j.jugador];
+  const nombre = jugadorInfo?.nombre || j.jugador;
   const kda = j.kda ? `${j.kda.k ?? 0}/${j.kda.d ?? 0}/${j.kda.a ?? 0}` : '';
   const premiosHtml = (j.premios || []).map(p => {
     const info = PREMIOS_INFO[p];
@@ -121,14 +131,18 @@ function renderJugadorFila(j, jugadores){
     return `<span class="premio ${p}">${info.icono} ${info.label}</span>`;
   }).join('');
 
-  const avatarMarkup = avatarHtml(nombre, j.campeon);
+  // Foto propia del jugador (cargada desde "cargar sesión" al sumarlo al
+  // roster) si existe; si no, el ícono de campeón de siempre.
+  const avatarMarkup = jugadorInfo?.imagen
+    ? `<img class="jugador-avatar" src="${jugadorInfo.imagen}" alt="${nombre}">`
+    : avatarHtml(nombre, j.campeon);
 
   const comentarioHtml = j.comentario
     ? `<div class="jugador-comentario">"${j.comentario}"</div>`
     : '';
 
   return `
-    <div class="jugador-fila">
+    <div class="jugador-fila"${fondoFilaStyle(j.campeon)}>
       ${avatarMarkup}
       <div class="jugador-info">
         <div class="jugador-nombre">${nombre} ${premiosHtml ? `<span class="jugador-premios">${premiosHtml}</span>` : ''}</div>
@@ -149,7 +163,7 @@ function renderDestacadoFila(d, destacados){
     : '';
 
   return `
-    <div class="jugador-fila">
+    <div class="jugador-fila"${fondoFilaStyle(d.campeon)}>
       ${avatarMarkup}
       <div class="jugador-info">
         <div class="jugador-nombre">🎭 ${nombre}</div>

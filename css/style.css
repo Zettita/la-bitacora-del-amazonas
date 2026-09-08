@@ -289,29 +289,41 @@ main{
   gap:.6rem;
 }
 .jugador-fila{
+  position:relative;
   display:grid;
   grid-template-columns:auto 1fr auto;
   gap:.6rem 1rem;
   align-items:center;
-  padding:.5rem .6rem;
-  background:rgba(43,29,14,.05);
+  padding:.6rem .7rem;
   border-radius:6px;
+  background-color:var(--noche-panel);
+  background-size:cover;
+  background-position:center 22%;
+  overflow:hidden;
+  color:var(--pergamino);
 }
+.jugador-fila::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg, rgba(18,16,14,.92) 0%, rgba(18,16,14,.8) 55%, rgba(18,16,14,.5) 100%);
+}
+.jugador-fila > *{position:relative;}
 .jugador-avatar{
   width:40px;
   height:40px;
   border-radius:6px;
   object-fit:cover;
-  border:1px solid var(--tinta-suave);
-  background:var(--pergamino-osc);
+  border:1px solid var(--oro);
+  background:var(--noche-panel);
 }
 .jugador-avatar-fallback{
   width:40px;
   height:40px;
   border-radius:6px;
-  border:1px solid var(--tinta-suave);
-  background:var(--tinta-suave);
-  color:var(--pergamino);
+  border:1px solid var(--oro);
+  background:var(--noche-panel);
+  color:var(--oro-claro);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -321,6 +333,8 @@ main{
 .jugador-info{min-width:0;}
 .jugador-nombre{
   font-weight:600;
+  color:var(--pergamino);
+  text-shadow:0 1px 3px rgba(0,0,0,.65);
   display:flex;
   align-items:center;
   gap:.5rem;
@@ -328,7 +342,8 @@ main{
 }
 .jugador-rol{
   font-size:.75rem;
-  color:var(--tinta-suave);
+  color:var(--pergamino-osc);
+  text-shadow:0 1px 2px rgba(0,0,0,.65);
   text-transform:uppercase;
   letter-spacing:.05em;
 }
@@ -337,14 +352,17 @@ main{
   grid-column:1 / -1;
   font-size:.9rem;
   font-style:italic;
-  color:var(--tinta-suave);
+  color:var(--pergamino-osc);
+  text-shadow:0 1px 2px rgba(0,0,0,.65);
   padding-left:.6rem;
-  border-left:2px solid var(--tinta-suave);
+  border-left:2px solid var(--oro);
 }
 .jugador-kda{
   font-variant-numeric:tabular-nums;
   font-size:.9rem;
   white-space:nowrap;
+  color:var(--pergamino);
+  text-shadow:0 1px 2px rgba(0,0,0,.65);
 }
 .jugador-premios{
   display:flex;
