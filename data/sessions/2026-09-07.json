@@ -1,6 +1,6 @@
 {
   "fecha": "2026-09-07",
-  "titulo": "Dia 2",
+  "titulo": "Dia 3",
   "notas": "",
   "partidas": [
     {
@@ -133,6 +133,86 @@
         }
       ],
       "numero": 4
+    },
+    {
+      "resultado": "Derrota",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 7,
+            "d": 11,
+            "a": 15
+          },
+          "premios": []
+        },
+        {
+          "jugador": "xero",
+          "campeon": "Ezreal",
+          "rol": "ADC",
+          "kda": {
+            "k": 13,
+            "d": 9,
+            "a": 12
+          },
+          "premios": []
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Leona",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 1,
+            "d": 12,
+            "a": 20
+          },
+          "premios": []
+        }
+      ],
+      "numero": 5
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Ryze",
+          "rol": "MID",
+          "kda": {
+            "k": 17,
+            "d": 4,
+            "a": 7
+          },
+          "premios": []
+        },
+        {
+          "jugador": "xero",
+          "campeon": "Nasus",
+          "rol": "TOP",
+          "kda": {
+            "k": 5,
+            "d": 3,
+            "a": 7
+          },
+          "premios": []
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Leona",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 0,
+            "d": 11,
+            "a": 23
+          },
+          "premios": []
+        }
+      ],
+      "numero": 6
     }
   ]
 }
