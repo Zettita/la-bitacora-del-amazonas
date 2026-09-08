@@ -19,7 +19,7 @@
   padding:.9rem 1.2rem;
   border-radius:8px;
   margin-bottom:1.5rem;
-  font-family:'Cinzel', serif;
+  font-family:'Marcellus', serif;
   font-size:.95rem;
 }
 .mensaje.ok{background:rgba(63,125,79,.2); border:1px solid var(--victoria); color:#bfe6c8;}
@@ -33,7 +33,7 @@
   background:var(--noche-panel);
 }
 .bloque legend{
-  font-family:'Cinzel', serif;
+  font-family:'Marcellus', serif;
   color:var(--oro-claro);
   padding:0 .5rem;
   font-size:1rem;
@@ -81,7 +81,7 @@ textarea{resize:vertical; width:100%;}
 .bloque-config{padding:.9rem 1.4rem;}
 .bloque-config summary{
   cursor:pointer;
-  font-family:'Cinzel', serif;
+  font-family:'Marcellus', serif;
   color:var(--oro-claro);
   display:flex;
   align-items:center;
@@ -262,7 +262,7 @@ textarea{resize:vertical; width:100%;}
 }
 
 .destacados-titulo-form{
-  font-family:'Cinzel', serif;
+  font-family:'Marcellus', serif;
   font-size:.85rem;
   color:#c9a2f0;
   margin:1.2rem 0 .6rem;
@@ -290,7 +290,7 @@ textarea{resize:vertical; width:100%;}
 .dc-cabecera .d-select{flex:1; font-weight:600;}
 
 .btn{
-  font-family:'Cinzel', serif;
+  font-family:'Marcellus', serif;
   border-radius:6px;
   padding:.65rem 1.3rem;
   cursor:pointer;
