@@ -133,35 +133,6 @@
         }
       ],
       "numero": 4
-    },
-    {
-      "resultado": "Victoria",
-      "duracion": "",
-      "jugadores": [
-        {
-          "jugador": "nikito",
-          "campeon": "Alistar",
-          "rol": "TOP",
-          "kda": {
-            "k": 1,
-            "d": 1,
-            "a": 1
-          },
-          "premios": []
-        },
-        {
-          "jugador": "jorge",
-          "campeon": "Amumu",
-          "rol": "JUNGLE",
-          "kda": {
-            "k": 0,
-            "d": 0,
-            "a": 0
-          },
-          "premios": []
-        }
-      ],
-      "numero": 5
     }
   ]
 }
