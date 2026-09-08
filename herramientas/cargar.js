@@ -14,6 +14,20 @@ function normalizarTexto(s){
     .replace(/[^a-z0-9]/gi, '').toLowerCase();
 }
 
+// El campo de campeón es de texto libre (para poder tipear campeones que
+// todavía no están en LoL Classic), así que dos cargas del mismo campeón
+// pueden quedar con distinta mayúscula/tilde ("Garen" vs "GAREN") y
+// contarse como campeones distintos en las estadísticas. Si lo tipeado
+// coincide (sin importar mayúsculas/tildes) con uno de la lista clásica,
+// se guarda siempre con esa misma grafía oficial.
+function normalizarNombreCampeon(texto){
+  const valor = (texto || '').trim();
+  if(!valor) return '';
+  const norm = normalizarTexto(valor);
+  const oficial = CAMPEONES_CLASICOS.find(c => normalizarTexto(c) === norm);
+  return oficial || valor;
+}
+
 // Buscador de campeón: al enfocar o escribir muestra los 60 campeones de
 // LoL Classic (con su ícono) filtrados por lo tipeado; un click en una
 // opción completa el campo.
@@ -342,7 +356,7 @@ function leerJugadoresDePartida(bloque){
 
     const jugador = {
       jugador: jugadorId,
-      campeon: tarjeta.querySelector('.j-campeon').value.trim(),
+      campeon: normalizarNombreCampeon(tarjeta.querySelector('.j-campeon').value),
       rol: tarjeta.querySelector('.j-rol').value,
       kda: { k: Number(k)||0, d: Number(d)||0, a: Number(a)||0 },
       premios,
@@ -381,7 +395,7 @@ function leerDestacadosDePartida(bloque){
 
     const destacado = {
       destacado: destacadoId,
-      campeon: tarjeta.querySelector('.d-campeon').value.trim(),
+      campeon: normalizarNombreCampeon(tarjeta.querySelector('.d-campeon').value),
       rol: tarjeta.querySelector('.d-rol').value,
       kda: { k: Number(k)||0, d: Number(d)||0, a: Number(a)||0 },
     };
