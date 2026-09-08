@@ -26,7 +26,11 @@ async function cargarDatos(){
   }
   sesiones.sort((a,b) => a.fecha.localeCompare(b.fecha));
 
-  return { jugadores, destacados, sesiones };
+  // jugadoresArr mantiene el orden de data/players.json, que es el orden en
+  // que se fueron sumando (no hay un campo de fecha de alta propio) — sirve
+  // como orden por "antigüedad en el roster" para cuando todavía no hay
+  // partidas para ordenar por estadísticas.
+  return { jugadores, jugadoresArr, destacados, sesiones };
 }
 
 // ---------- Salón de la fama ----------
@@ -112,13 +116,18 @@ function renderSalonDeLaFama(stats, totalPartidas, totalSesiones){
 }
 
 // ---------- Podio de invocadores ----------
-// Por ahora ordena por winrate (a definir más adelante otro criterio).
-function renderPodio(stats, jugadores){
+// Muestra a todo el roster, haya jugado o no. Sin partidas cargadas se
+// ordena por antigüedad en el roster (orden de alta); en cuanto hay
+// estadísticas, pasa a ordenar por winrate (a definir más adelante otro
+// criterio). Object.values(stats) y jugadoresArr respetan el orden de
+// data/players.json, así que un jugador sin partidas queda al final, en
+// orden de alta, aunque conviva con otros que sí tienen estadísticas.
+function renderPodio(stats, jugadores, jugadoresArr){
   const carrusel = document.getElementById('podio-carrusel');
   const flechaIzq = document.querySelector('.podio-flecha.izq');
   const flechaDer = document.querySelector('.podio-flecha.der');
 
-  if(stats.length === 0){
+  if(jugadoresArr.length === 0){
     carrusel.classList.add('vacio');
     carrusel.innerHTML = `
       <a href="herramientas/cargar.html" class="podio-tarjeta podio-tarjeta-vacia">
@@ -136,25 +145,38 @@ function renderPodio(stats, jugadores){
   }
 
   carrusel.classList.remove('vacio');
-  const ordenado = [...stats].sort((a, b) => {
-    const wrA = a.partidas ? a.victorias / a.partidas : -1;
-    const wrB = b.partidas ? b.victorias / b.partidas : -1;
-    if(wrB !== wrA) return wrB - wrA;
-    return b.partidas - a.partidas;
+
+  const statsPorId = {};
+  stats.forEach(s => { statsPorId[s.id] = s; });
+  const lista = jugadoresArr.map(j => statsPorId[j.id] || {
+    id: j.id, nombre: j.nombre, partidas: 0, victorias: 0, derrotas: 0,
+    premios: { mvp:0, carry:0, troll:0, ancla:0 },
   });
 
+  const hayPartidas = lista.some(s => s.partidas > 0);
+  const ordenado = hayPartidas
+    ? [...lista].sort((a, b) => {
+        const wrA = a.partidas ? a.victorias / a.partidas : -1;
+        const wrB = b.partidas ? b.victorias / b.partidas : -1;
+        if(wrB !== wrA) return wrB - wrA;
+        return b.partidas - a.partidas;
+      })
+    : lista;
+
   carrusel.innerHTML = ordenado.map((s, i) => {
-    const winratePct = s.partidas ? Math.round((s.victorias / s.partidas) * 100) : 0;
     const imagen = jugadores[s.id]?.imagen;
     const avatar = imagen
       ? `<img src="${imagen}" alt="${s.nombre}">`
       : `<div class="podio-avatar-fallback">${iniciales(s.nombre)}</div>`;
+    const detalle = s.partidas
+      ? `${Math.round((s.victorias / s.partidas) * 100)}% WR · ${s.partidas} partida${s.partidas === 1 ? '' : 's'}`
+      : 'Sin partidas todavía';
     return `
       <div class="podio-tarjeta">
         <span class="podio-puesto">${i + 1}°</span>
         <div class="podio-avatar">${avatar}</div>
         <div class="podio-nombre">${s.nombre}</div>
-        <div class="podio-detalle">${winratePct}% WR · ${s.partidas} partida${s.partidas === 1 ? '' : 's'}</div>
+        <div class="podio-detalle">${detalle}</div>
       </div>
     `;
   }).join('');
@@ -360,10 +382,10 @@ function renderTimeline(sesiones, jugadores, destacados){
 
 // ---------- Init ----------
 (async function init(){
-  const { jugadores, destacados, sesiones } = await cargarDatos();
+  const { jugadores, jugadoresArr, destacados, sesiones } = await cargarDatos();
   const { stats, totalPartidas, totalSesiones } = calcularEstadisticas(sesiones, jugadores);
 
-  renderPodio(stats, jugadores);
+  renderPodio(stats, jugadores, jugadoresArr);
   initPodioFlechas();
   renderSalonDeLaFama(stats, totalPartidas, totalSesiones);
   renderTimeline(sesiones, jugadores, destacados);
