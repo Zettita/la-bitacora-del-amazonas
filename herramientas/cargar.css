@@ -146,29 +146,54 @@ textarea{resize:vertical; width:100%;}
   gap:1rem;
   flex-wrap:wrap;
 }
-.roster-form-fila label{
+.roster-form-fila > label, .roster-form-fila > .campo-alta-foto{
   display:flex;
   flex-direction:column;
   gap:.35rem;
   flex:1 1 160px;
 }
-.btn-oro-chico{
+.campo-alta-foto{flex:0 0 auto;}
+.avatar-upload-cuadro{
+  position:relative;
+  width:96px;
+  height:96px;
+  border-radius:8px;
+  border:2px solid var(--oro);
+  background:var(--noche);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  cursor:pointer;
+  padding:.4rem;
+  text-align:center;
+}
+.avatar-upload-cuadro:hover{border-color:var(--oro-claro);}
+.avatar-upload-cuadro img{width:100%; height:100%; object-fit:cover; display:block;}
+.avatar-upload-cuadro img[hidden]{display:none;}
+.avatar-upload-texto{font-size:.7rem; line-height:1.3; color:var(--pergamino-osc);}
+.avatar-upload-cuadro img:not([hidden]) ~ .avatar-upload-texto{display:none;}
+.campo-alta-nombre{flex:1 1 180px; min-width:140px;}
+.campo-alta-lane{flex:0 0 150px; min-width:0;}
+.campo-alta-boton{
   font-family:'Marcellus', serif;
-  background:linear-gradient(180deg, var(--oro-claro), var(--oro));
-  color:var(--tinta);
+  font-size:.8rem;
   font-weight:700;
   text-transform:uppercase;
-  letter-spacing:.03em;
-  font-size:.8rem;
-  border:1px solid var(--oro-claro);
-  border-radius:6px;
-  padding:.6rem 1.1rem;
+  letter-spacing:.04em;
+  color:var(--tinta);
+  padding:.75rem 1.6rem;
+  background:linear-gradient(180deg, var(--oro-claro) 0%, var(--oro) 100%);
+  box-shadow:0 0 0 1px var(--oro-claro) inset;
+  border:none;
+  border-radius:0;
   cursor:pointer;
   align-self:flex-end;
   white-space:nowrap;
+  transition:filter .15s ease;
 }
-.btn-oro-chico:hover{filter:brightness(1.08);}
-.btn-oro-chico:disabled{opacity:.5; cursor:not-allowed;}
+.campo-alta-boton:hover{filter:brightness(1.1);}
+.campo-alta-boton:disabled{opacity:.5; cursor:not-allowed;}
 
 /* ---------- Tabla tipo planilla (Partida) ---------- */
 .tabla-wrap{overflow-x:auto; margin-top:1rem;}
@@ -248,14 +273,6 @@ textarea{resize:vertical; width:100%;}
   flex:none;
   padding:.35rem .4rem;
   font-size:.85rem;
-}
-.nj-imagen-preview{
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  object-fit:cover;
-  border:1px solid var(--oro);
-  align-self:center;
 }
 
 .jc-datos-partida{
