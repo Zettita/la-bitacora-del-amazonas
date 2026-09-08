@@ -61,6 +61,35 @@
         }
       ],
       "numero": 2
+    },
+    {
+      "resultado": "Victoria",
+      "duracion": "",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Pantheon",
+          "rol": "TOP",
+          "kda": {
+            "k": 7,
+            "d": 5,
+            "a": 7
+          },
+          "premios": []
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 11,
+            "d": 1,
+            "a": 3
+          },
+          "premios": []
+        }
+      ],
+      "numero": 3
     }
   ]
 }
