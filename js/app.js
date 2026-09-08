@@ -119,12 +119,23 @@ function renderPodio(stats, jugadores){
   const flechaDer = document.querySelector('.podio-flecha.der');
 
   if(stats.length === 0){
-    carrusel.innerHTML = `<p class="podio-vacio">Todavía no hay invocadores con partidas cargadas.</p>`;
+    carrusel.classList.add('vacio');
+    carrusel.innerHTML = `
+      <a href="herramientas/cargar.html" class="podio-tarjeta podio-tarjeta-vacia">
+        <div class="podio-vacia-tilt">
+          <span class="podio-vacia-icono">+</span>
+          <div class="podio-vacia-titulo">Todavía no hay invocadores</div>
+          <div class="podio-vacia-sub">Agregá al primero</div>
+        </div>
+      </a>
+    `;
     flechaIzq.hidden = true;
     flechaDer.hidden = true;
+    initTarjetaVaciaTilt(carrusel.querySelector('.podio-tarjeta-vacia'));
     return;
   }
 
+  carrusel.classList.remove('vacio');
   const ordenado = [...stats].sort((a, b) => {
     const wrA = a.partidas ? a.victorias / a.partidas : -1;
     const wrB = b.partidas ? b.victorias / b.partidas : -1;
@@ -160,6 +171,47 @@ function initPodioFlechas(){
   });
   document.querySelector('.podio-flecha.der').addEventListener('click', () => {
     carrusel.scrollBy({ left: 256, behavior: 'smooth' });
+  });
+}
+
+// Efecto "carta": la tarjeta vacía se inclina levemente siguiendo al mouse,
+// siempre alrededor de su propio centro (no se traslada). El agrandado y el
+// resplandor van por CSS (mismo delay de 1s); esto solo rota el contenido
+// interno, rápido, para que se sienta responsivo al cursor.
+function initTarjetaVaciaTilt(tarjeta){
+  if(!tarjeta) return;
+  const MAX_GRADOS = 16;
+  const TRANSICION_LENTA = 'transform 1s ease, border-color 1s ease, background-color 1s ease, box-shadow 1s ease';
+  const TRANSICION_RAPIDA = 'transform .15s ease-out, border-color 1s ease, background-color 1s ease, box-shadow 1s ease';
+
+  let siguiendoMouse = false;
+
+  tarjeta.addEventListener('mouseenter', () => {
+    siguiendoMouse = false;
+    tarjeta.style.transition = TRANSICION_LENTA;
+  });
+
+  tarjeta.addEventListener('mousemove', (ev) => {
+    const rect = tarjeta.getBoundingClientRect();
+    const x = (ev.clientX - rect.left) / rect.width - 0.5;
+    const y = (ev.clientY - rect.top) / rect.height - 0.5;
+
+    // El primer movimiento entra con la transición lenta (a tono con el
+    // resplandor); a partir de ahí, rápida, para que siga al mouse sin
+    // sentirse pesada.
+    if(!siguiendoMouse){
+      siguiendoMouse = true;
+      tarjeta.style.transition = TRANSICION_RAPIDA;
+    }
+
+    tarjeta.style.transform =
+      `perspective(700px) scale(1.06) rotateX(${(-y * MAX_GRADOS).toFixed(2)}deg) rotateY(${(x * MAX_GRADOS).toFixed(2)}deg)`;
+  });
+
+  tarjeta.addEventListener('mouseleave', () => {
+    siguiendoMouse = false;
+    tarjeta.style.transition = TRANSICION_LENTA;
+    tarjeta.style.transform = '';
   });
 }
 

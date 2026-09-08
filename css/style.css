@@ -109,17 +109,22 @@ main{
   gap:1rem;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
-  padding-bottom:.6rem;
+  padding:8px 4px .6rem;
   scrollbar-width:thin;
   scrollbar-color:var(--oro) transparent;
+}
+.podio-carrusel.vacio{
+  justify-content:center;
+  /* Sin esto, overflow-x:auto obliga a overflow-y a valer "auto" tambien
+     (regla del spec), recortando el resplandor/escala del hover contra
+     el borde del carrusel. Vacío no necesita scroll para nada, así que
+     sacamos el overflow entero. */
+  overflow:visible;
+  scroll-snap-type:none;
 }
 .podio-carrusel::-webkit-scrollbar{height:6px;}
 .podio-carrusel::-webkit-scrollbar-thumb{background:var(--oro); border-radius:3px;}
 .podio-carrusel::-webkit-scrollbar-track{background:transparent;}
-.podio-vacio{
-  color:var(--pergamino-osc);
-  font-style:italic;
-}
 .podio-tarjeta{
   flex:0 0 240px;
   scroll-snap-align:start;
@@ -177,6 +182,63 @@ main{
   font-size:.8rem;
   color:var(--pergamino-osc);
 }
+
+.podio-tarjeta-vacia{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(34,28,21,.4);
+  border:1px dashed var(--borde);
+  text-decoration:none;
+  cursor:pointer;
+  box-shadow:0 0 0 rgba(201,162,39,0);
+  transform-style:preserve-3d;
+  /* El transform (scale + rotateX/Y) lo maneja JS por completo, para
+     poder alternar entre una transición lenta (entrar/salir, a tono con
+     el resplandor) y una rápida (mientras se sigue al mouse). */
+  transition:border-color 1s ease, background-color 1s ease, box-shadow 1s ease, transform 1s ease;
+}
+.podio-tarjeta-vacia:hover{
+  border-color:var(--oro);
+  background:rgba(34,28,21,.65);
+  box-shadow:0 0 26px rgba(201,162,39,.5);
+}
+.podio-tarjeta-vacia:hover .podio-vacia-icono{
+  box-shadow:0 0 14px rgba(201,162,39,.6);
+}
+.podio-vacia-tilt{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.3rem;
+}
+.podio-vacia-icono{
+  width:2.8rem;
+  height:2.8rem;
+  margin-bottom:.3rem;
+  border-radius:50%;
+  border:2px dashed var(--oro);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Cinzel', serif;
+  font-size:1.6rem;
+  line-height:1;
+  color:var(--oro-claro);
+  box-shadow:0 0 0 rgba(201,162,39,0);
+  transition:box-shadow 1s ease;
+}
+.podio-vacia-titulo{
+  font-family:'Cinzel', serif;
+  color:var(--oro-claro);
+  font-size:1rem;
+}
+.podio-vacia-sub{
+  font-size:.8rem;
+  color:var(--pergamino-osc);
+  text-align:center;
+}
+
 .podio-flecha{
   position:absolute;
   top:50%;
