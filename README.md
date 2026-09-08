@@ -130,7 +130,9 @@ Viven en `data/players.json`, con este esquema por jugador:
 
 `rolPreferido` e `imagen` son opcionales. Si se suma alguien nuevo al grupo, **no hace falta editar este archivo a mano** — se agrega directo desde `cargar.html` eligiendo "+ Nuevo jugador..." en el desplegable de cualquier tarjeta; queda guardado en el roster para siempre.
 
-La foto se elige del disco (no es un link): el navegador la redimensiona/comprime a un JPEG chico (200px de lado mayor) antes de mandarla, y el backend la guarda como archivo real en `img/jugadores/<id>.<ext>` — `imagen` en `players.json` termina siendo esa ruta relativa. Con como mucho ~10 jugadores en el grupo, el peso total es insignificante. Todavía no hay forma de reemplazar la foto de alguien que ya tiene una (eso va a vivir en la sección de perfil de jugador); si en algún momento se agrega, conviene borrar el archivo viejo en `img/jugadores/` antes de subir el nuevo para no dejar huérfanos.
+La foto se elige del disco (no es un link): el navegador la redimensiona/comprime a un JPEG chico (200px de lado mayor) antes de mandarla, y el backend la guarda como archivo real en `img/jugadores/<id>.<ext>` — `imagen` en `players.json` termina siendo esa ruta relativa. Con como mucho ~10 jugadores en el grupo, el peso total es insignificante.
+
+Para reemplazar la foto de alguien que ya tiene una, elegí a ese jugador en cualquier tarjeta de `cargar.html` y tocá el botón 📷 que aparece al lado de su nombre — se abre un mini formulario para subir la nueva foto, que se guarda al toque (no hace falta completar ni guardar la sesión entera). Si la foto vieja quedaba con otra extensión (por ejemplo `.png` y la nueva es `.jpg`), el archivo viejo se borra solo para no dejar huérfanos en `img/jugadores/`.
 
 ### Los `premios` disponibles
 

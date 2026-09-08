@@ -46,6 +46,26 @@ export default {
       return jsonResp({ error: 'Clave incorrecta' }, 401, cors);
     }
 
+    const cfg = {
+      owner: env.GITHUB_OWNER,
+      repo: env.GITHUB_REPO,
+      branch: env.GITHUB_BRANCH || 'main',
+      token: env.GITHUB_TOKEN,
+    };
+    const autor = String(body.autor || '').trim();
+
+    if (body.accion === 'editar_imagen_jugador') {
+      const jugadorId = String(body.jugadorId || '').trim();
+      if (!jugadorId) return jsonResp({ error: 'Falta el id del jugador' }, 400, cors);
+      if (!body.imagenDatos) return jsonResp({ error: 'Falta la imagen' }, 400, cors);
+      try {
+        const resultado = await editarImagenJugador(cfg, jugadorId, body.imagenDatos, autor);
+        return jsonResp(resultado, 200, cors);
+      } catch (err) {
+        return jsonResp({ error: err.message }, 500, cors);
+      }
+    }
+
     const fecha = String(body.fecha || '').trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       return jsonResp({ error: 'Fecha invalida, se espera AAAA-MM-DD' }, 400, cors);
@@ -56,18 +76,12 @@ export default {
       return jsonResp({ error: 'La sesion no tiene partidas' }, 400, cors);
     }
 
-    const cfg = {
-      owner: env.GITHUB_OWNER,
-      repo: env.GITHUB_REPO,
-      branch: env.GITHUB_BRANCH || 'main',
-      token: env.GITHUB_TOKEN,
-    };
     const payload = {
       fecha,
       titulo: String(body.titulo || '').trim(),
       notas: String(body.notas || '').trim(),
       partidas,
-      autor: String(body.autor || '').trim(),
+      autor,
     };
 
     try {
@@ -241,6 +255,31 @@ async function reemplazarSesion(cfg, payload) {
   await ghGuardarArchivo(cfg, rutaSesion, sesion, existente ? existente.sha : undefined, `Elimina una partida de ${payload.fecha}${firma}`);
 
   return { ok: true, archivo, partidas_en_la_sesion: sesion.partidas.length, eliminada: false };
+}
+
+// Reemplaza la foto de un jugador que ya está en el roster (a diferencia de
+// guardarImagenJugador, que solo sube el archivo, esto también actualiza
+// players.json y borra la foto vieja si tenía una extensión distinta).
+async function editarImagenJugador(cfg, jugadorId, imagenDatos, autor) {
+  const playersFile = await ghObtenerArchivo(cfg, 'data/players.json');
+  const players = playersFile ? playersFile.datos : [];
+  const jugador = players.find((p) => p.id === jugadorId);
+  if (!jugador) throw new Error('Ese jugador no existe en el roster');
+
+  const firma = autor ? ` (por ${autor})` : '';
+  const rutaVieja = jugador.imagen;
+  const rutaNueva = await guardarImagenJugador(cfg, jugadorId, imagenDatos, firma);
+  if (!rutaNueva) throw new Error('La imagen no tiene un formato valido');
+
+  if (rutaVieja && rutaVieja !== rutaNueva) {
+    const shaVieja = await ghShaSiExiste(cfg, rutaVieja);
+    if (shaVieja) await ghEliminarArchivo(cfg, rutaVieja, shaVieja, `Borra foto vieja de jugador${firma}`);
+  }
+
+  jugador.imagen = rutaNueva;
+  await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Actualiza foto de jugador${firma}`);
+
+  return { ok: true, imagen: rutaNueva };
 }
 
 async function guardarSesion(cfg, payload) {

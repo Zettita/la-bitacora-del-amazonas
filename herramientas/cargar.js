@@ -186,14 +186,97 @@ function actualizarBotonAgregar(bloque){
   btn.textContent = cant >= MAX_JUGADORES_POR_PARTIDA ? 'Máximo 5 jugadores' : '+ Agregar jugador';
 }
 
+// Foto de un jugador ya existente en el roster: se guarda al toque (no
+// espera al submit de la sesión), porque es un dato del roster, no de la
+// partida que se está cargando.
+function initEditarFoto(tarjeta, select){
+  const btnEditar = tarjeta.querySelector('.btn-editar-foto');
+  const zonaEditar = tarjeta.querySelector('.jc-editar-foto');
+  const fotoActual = tarjeta.querySelector('.ef-foto-actual');
+  const sinFoto = tarjeta.querySelector('.ef-sin-foto');
+  const inputImagen = tarjeta.querySelector('.ef-imagen');
+  const previewImagen = tarjeta.querySelector('.ef-imagen-preview');
+  const btnGuardar = tarjeta.querySelector('.btn-guardar-foto');
+  const estado = tarjeta.querySelector('.ef-estado');
+
+  btnEditar.addEventListener('click', () => {
+    zonaEditar.hidden = !zonaEditar.hidden;
+    if(zonaEditar.hidden) return;
+
+    const jugador = jugadoresRoster.find(j => j.id === select.value);
+    if(jugador && jugador.imagen){
+      fotoActual.src = `../${jugador.imagen}`;
+      fotoActual.hidden = false;
+      sinFoto.hidden = true;
+    }else{
+      fotoActual.hidden = true;
+      sinFoto.hidden = false;
+    }
+    inputImagen.value = '';
+    delete inputImagen.dataset.dataurl;
+    previewImagen.hidden = true;
+    estado.textContent = '';
+  });
+
+  inputImagen.addEventListener('change', async () => {
+    const archivo = inputImagen.files[0];
+    delete inputImagen.dataset.dataurl;
+    previewImagen.hidden = true;
+    if(!archivo) return;
+    try{
+      const dataUrl = await comprimirImagen(archivo);
+      inputImagen.dataset.dataurl = dataUrl;
+      previewImagen.src = dataUrl;
+      previewImagen.hidden = false;
+    }catch(e){
+      estado.textContent = 'No se pudo procesar esa imagen, probá con otra.';
+      inputImagen.value = '';
+    }
+  });
+
+  btnGuardar.addEventListener('click', async () => {
+    const dataUrl = inputImagen.dataset.dataurl;
+    if(!dataUrl){
+      estado.textContent = 'Elegí una foto primero.';
+      return;
+    }
+    const jugadorId = select.value;
+    btnGuardar.disabled = true;
+    estado.textContent = 'Guardando...';
+    try{
+      const data = await guardarEnBackend(
+        { accion: 'editar_imagen_jugador', jugadorId, imagenDatos: dataUrl },
+        { endpointLocal: '/api/editar-imagen-jugador' }
+      );
+      const jugador = jugadoresRoster.find(j => j.id === jugadorId);
+      if(jugador) jugador.imagen = data.imagen;
+      fotoActual.src = `../${data.imagen}?t=${Date.now()}`;
+      fotoActual.hidden = false;
+      sinFoto.hidden = true;
+      previewImagen.hidden = true;
+      inputImagen.value = '';
+      delete inputImagen.dataset.dataurl;
+      estado.textContent = '✓ Guardada';
+    }catch(err){
+      const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
+      estado.textContent = `Error: ${err.message}.${pista}`;
+    }finally{
+      btnGuardar.disabled = false;
+    }
+  });
+}
+
 function crearTarjetaJugador(bloque){
   const nodo = tplJugadorCard.content.cloneNode(true);
   const tarjeta = nodo.querySelector('.jugador-card');
   const select = tarjeta.querySelector('.j-select');
   const zonaNuevo = tarjeta.querySelector('.jc-nuevo-jugador');
+  const btnEditarFoto = tarjeta.querySelector('.btn-editar-foto');
+  const zonaEditarFoto = tarjeta.querySelector('.jc-editar-foto');
 
   poblarSelectJugador(select, idsUsadosEnPartida(bloque, null));
   initCampeonPicker(tarjeta);
+  initEditarFoto(tarjeta, select);
 
   const inputImagen = tarjeta.querySelector('.nj-imagen');
   const previewImagen = tarjeta.querySelector('.nj-imagen-preview');
@@ -215,7 +298,10 @@ function crearTarjetaJugador(bloque){
 
   select.addEventListener('change', () => {
     zonaNuevo.hidden = select.value !== '__nuevo__';
-    if(select.value && select.value !== '__nuevo__'){
+    const esExistente = !!select.value && select.value !== '__nuevo__';
+    btnEditarFoto.hidden = !esExistente;
+    zonaEditarFoto.hidden = true;
+    if(esExistente){
       const jugador = jugadoresRoster.find(j => j.id === select.value);
       const rolSelect = tarjeta.querySelector('.j-rol');
       if(jugador && jugador.rolPreferido && !rolSelect.value) rolSelect.value = jugador.rolPreferido;

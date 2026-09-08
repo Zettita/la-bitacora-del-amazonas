@@ -181,6 +181,61 @@ textarea{resize:vertical; width:100%;}
   align-self:center;
 }
 
+.btn-editar-foto{
+  background:none;
+  border:1px solid var(--borde);
+  color:var(--pergamino-osc);
+  border-radius:5px;
+  cursor:pointer;
+  padding:.2rem .5rem;
+  font-size:.9rem;
+}
+.btn-editar-foto:hover{border-color:var(--oro); color:var(--oro-claro);}
+
+.jc-editar-foto[hidden]{display:none;}
+.jc-editar-foto{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.6rem;
+  margin:0 0 .7rem;
+  padding:.6rem;
+  border:1px dashed var(--borde);
+  border-radius:6px;
+  background:rgba(0,0,0,.15);
+}
+.ef-foto-actual-wrap{
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+}
+.ef-foto-actual{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--borde);
+}
+.ef-sin-foto{
+  font-size:.8rem;
+  font-style:italic;
+  color:var(--pergamino-osc);
+}
+.ef-imagen-preview{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--oro);
+}
+.ef-acciones{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+}
+.ef-acciones .btn{padding:.4rem .9rem; font-size:.85rem; margin-bottom:0;}
+.ef-estado{font-size:.85rem; color:var(--pergamino-osc); font-style:italic;}
+
 .jc-datos-partida{
   display:grid;
   grid-template-columns:150px 110px 150px auto;

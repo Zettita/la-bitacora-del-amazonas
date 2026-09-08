@@ -59,10 +59,52 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=RAIZ, **kwargs)
 
     def do_POST(self):
-        if self.path != "/api/guardar-sesion":
+        if self.path == "/api/guardar-sesion":
+            self.manejar_guardar_sesion()
+        elif self.path == "/api/editar-imagen-jugador":
+            self.manejar_editar_imagen_jugador()
+        else:
             self.send_json(404, {"error": "Ruta no encontrada"})
+
+    def manejar_editar_imagen_jugador(self):
+        largo = int(self.headers.get("Content-Length", 0))
+        try:
+            cuerpo = json.loads(self.rfile.read(largo).decode("utf-8"))
+        except Exception:
+            self.send_json(400, {"error": "El cuerpo no es JSON valido"})
             return
 
+        jugador_id = str(cuerpo.get("jugadorId", "")).strip()
+        if not jugador_id:
+            self.send_json(400, {"error": "Falta el id del jugador"})
+            return
+        imagen_datos = cuerpo.get("imagenDatos")
+        if not imagen_datos:
+            self.send_json(400, {"error": "Falta la imagen"})
+            return
+
+        players = leer_json(PLAYERS_PATH, [])
+        jugador = next((p for p in players if p.get("id") == jugador_id), None)
+        if not jugador:
+            self.send_json(404, {"error": "Ese jugador no existe en el roster"})
+            return
+
+        ruta_imagen = guardar_imagen_jugador(jugador_id, imagen_datos)
+        if not ruta_imagen:
+            self.send_json(400, {"error": "La imagen no tiene un formato valido"})
+            return
+
+        ruta_vieja = jugador.get("imagen")
+        if ruta_vieja and ruta_vieja != ruta_imagen:
+            ruta_absoluta_vieja = os.path.join(RAIZ, ruta_vieja)
+            if os.path.exists(ruta_absoluta_vieja):
+                os.remove(ruta_absoluta_vieja)
+
+        jugador["imagen"] = ruta_imagen
+        escribir_json(PLAYERS_PATH, players)
+        self.send_json(200, {"ok": True, "imagen": ruta_imagen})
+
+    def manejar_guardar_sesion(self):
         largo = int(self.headers.get("Content-Length", 0))
         try:
             cuerpo = json.loads(self.rfile.read(largo).decode("utf-8"))

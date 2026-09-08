@@ -81,11 +81,70 @@ h1,h2,h3,.cinzel{
   white-space:nowrap;
 }
 .nav-links a:hover{color:var(--oro-claro);}
-.nav-links a.nav-tool{font-size:.85rem;}
+.nav-links a.nav-tool{
+  font-size:.8rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--tinta);
+  padding:.55rem 1.2rem;
+  background:linear-gradient(180deg, var(--oro-claro) 0%, var(--oro) 100%);
+  box-shadow:0 0 0 1px var(--oro-claro) inset;
+  transition:filter .15s ease;
+}
+.nav-links a.nav-tool:hover{
+  color:var(--tinta);
+  filter:brightness(1.1);
+}
 .nav-sep{
   width:1px;
   align-self:stretch;
   background:var(--borde);
+}
+.nav-burger{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:2.1rem;
+  height:2.1rem;
+  background:none;
+  border:1px solid var(--borde);
+  border-radius:6px;
+  color:var(--pergamino);
+  font-size:1.05rem;
+  line-height:1;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.nav-burger:hover{border-color:var(--oro);}
+
+@media (max-width:700px){
+  .nav-burger{display:flex;}
+  .nav-links{
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    background:rgba(18,16,14,.98);
+    border-bottom:1px solid var(--borde);
+    padding:.3rem 1.5rem .8rem;
+  }
+  .nav-links.abierto{display:flex;}
+  .nav-links a{
+    padding:.7rem 0;
+    border-bottom:1px solid rgba(201,162,39,.12);
+  }
+  .nav-links a:last-child{border-bottom:none;}
+  .nav-sep{display:none;}
+  .nav-links a.nav-tool{
+    text-align:center;
+    margin-top:.6rem;
+    border-bottom:none;
+  }
 }
 
 /* ---------- Portada ---------- */
@@ -619,10 +678,14 @@ main{
 
 footer{
   text-align:center;
-  padding:2rem 1rem 3rem;
-  color:var(--tinta-suave);
+  padding:3rem 1rem 3rem;
+  color:var(--pergamino-osc);
   font-style:italic;
   font-size:.9rem;
+  border-top:1px solid var(--borde);
+  background:
+    linear-gradient(180deg, rgba(12,10,8,0) 0%, rgba(12,10,8,.78) 45%, rgba(12,10,8,.93) 100%),
+    url('../img/role-swapping.jpg') center / cover no-repeat;
 }
 
 /* ---------- Perfil de jugador ---------- */

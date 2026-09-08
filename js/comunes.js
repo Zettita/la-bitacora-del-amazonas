@@ -147,6 +147,21 @@ function manejarErrorAvatar(img){
   img.replaceWith(div);
 }
 
+// Menú hamburguesa del nav fijo en pantallas chicas (ver @media en css/style.css)
+(function initNavMovil(){
+  const burger = document.querySelector('.nav-burger');
+  const links = document.querySelector('.nav-links');
+  if(!burger || !links) return;
+  burger.addEventListener('click', () => {
+    const abierto = links.classList.toggle('abierto');
+    burger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+  });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    links.classList.remove('abierto');
+    burger.setAttribute('aria-expanded', 'false');
+  }));
+})();
+
 function formatFecha(iso){
   try{
     const [y,m,d] = iso.split('-').map(Number);
