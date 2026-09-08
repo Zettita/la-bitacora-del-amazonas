@@ -22,5 +22,10 @@
     "nombre": "Nikito",
     "rolPreferido": "TOP",
     "imagen": "img/jugadores/nikito.jpg"
+  },
+  {
+    "id": "jorge",
+    "nombre": "jorge",
+    "rolPreferido": "ADC"
   }
 ]
