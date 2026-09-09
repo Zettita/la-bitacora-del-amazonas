@@ -15,8 +15,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css?v=29">
-<link rel="stylesheet" href="cargar.css?v=18">
+<link rel="stylesheet" href="../css/style.css?v=30">
+<link rel="stylesheet" href="cargar.css?v=20">
 </head>
 <body class="pagina-carga">
 
@@ -30,6 +30,7 @@
     <a href="../index.html#podio-seccion">Podio</a>
     <a href="../index.html#salon-fama">Salón de la Fama</a>
     <a href="../index.html#timeline-seccion">Crónica</a>
+    <a href="../torneos.html">Torneos</a>
     <span class="nav-sep"></span>
     <a href="cargar.html" class="nav-tool">+ Agregar sesión</a>
   </div>
@@ -173,15 +174,41 @@
       </label>
     </div>
 
-    <div class="tabla-wrap">
-      <table class="v3-tabla">
-        <thead>
-          <tr>
-            <th>Jugador</th><th>Campeón</th><th>Rol</th><th>K</th><th>D</th><th>A</th><th>Premios</th><th>Comentario</th><th></th>
-          </tr>
-        </thead>
-        <tbody class="jugadores-tbody"></tbody>
-      </table>
+    <div class="partida-cuerpo">
+      <div class="tabla-wrap">
+        <table class="v3-tabla">
+          <thead>
+            <tr>
+              <th>Jugador</th><th>Campeón</th><th>Rol</th><th>K</th><th>D</th><th>A</th><th>Premios</th><th>Comentario</th><th></th>
+            </tr>
+          </thead>
+          <tbody class="jugadores-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="mapa-lol-wrap">
+        <img class="mapa-lol" alt="Grieta del Invocador">
+        <div class="mapa-marcador" data-rol="TOP">
+          <div class="mapa-marcador-avatar"></div>
+          <span class="mapa-marcador-nombre">TOP</span>
+        </div>
+        <div class="mapa-marcador" data-rol="JUNGLE">
+          <div class="mapa-marcador-avatar"></div>
+          <span class="mapa-marcador-nombre">JUNGLE</span>
+        </div>
+        <div class="mapa-marcador" data-rol="MID">
+          <div class="mapa-marcador-avatar"></div>
+          <span class="mapa-marcador-nombre">MID</span>
+        </div>
+        <div class="mapa-marcador" data-rol="ADC">
+          <div class="mapa-marcador-avatar"></div>
+          <span class="mapa-marcador-nombre">ADC</span>
+        </div>
+        <div class="mapa-marcador" data-rol="SUPPORT">
+          <div class="mapa-marcador-avatar"></div>
+          <span class="mapa-marcador-nombre">SUPPORT</span>
+        </div>
+      </div>
     </div>
     <button type="button" class="btn-agregar-jugador btn btn-secundario">+ Agregar jugador</button>
 
@@ -290,9 +317,9 @@
   </div>
 </template>
 
-<script src="../js/comunes.js?v=6"></script>
+<script src="../js/comunes.js?v=8"></script>
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="cargar.js?v=12"></script>
+<script src="cargar.js?v=15"></script>
 </body>
 </html>

@@ -154,6 +154,34 @@ A veces se cruzan rivales o randoms memorables — un troll ajeno, alguien muy m
 
 Viven en `data/destacados.json` (mismo esquema chico que `players.json`: `{id, nombre}`), separado del roster del grupo — no cuentan para el Salón de la Fama ni el winrate de nadie, es puramente registro/anecdotario. Se ven en la crónica como un bloque aparte (borde punteado violeta) dentro de la partida, para diferenciarlos claramente del equipo. La idea a futuro es armarles su propio "salón de la fama" de villanos.
 
+## Torneos
+
+Desde `herramientas/torneo.html` se arma un cuadro de eliminación directa entre amigos: elegís nombre, fecha, modo (**individual** o **por equipos** — en equipos armás cada uno con jugadores ya existentes del roster) y cantidad de participantes (4, 8 o 16 — siempre potencia de 2, no hace falta contemplar "byes"). Al crearlo se genera el cuadro completo (todas las rondas, con las siguientes vacías hasta la final) más un partido aparte por el 3er puesto entre los perdedores de semifinal.
+
+Después, en la misma página, elegís el torneo en "Cargar resultados" y vas tocando quién ganó cada cruce — el ganador avanza solo a la siguiente ronda (y si te equivocaste y tocás otro resultado, el cambio se propaga y deshace lo que ya había avanzado a partir de ahí). Cada click se guarda al toque, no hace falta un botón de guardar aparte. Cuando la final tiene ganador, en `torneos.html` aparece el podio (2do a la izquierda, 1ro al centro y más alto, 3ro a la derecha).
+
+Los torneos son la única parte del sitio donde sí se edita el mismo registro en vez de "borrar y volver a cargar" — tiene sentido acá porque un cuadro es un documento vivo mientras el torneo está en curso, no un historial cerrado como las sesiones.
+
+Viven en `data/torneos/<id>.json` (uno por torneo) + `data/torneos-manifest.json` (lista de archivos, mismo patrón que `data/manifest.json`). Esquema resumido:
+
+```jsonc
+{
+  "id": "copa-de-verano",
+  "nombre": "Copa de Verano", "fecha": "2026-09-15", "modo": "individual", // o "equipos"
+  "participantes": [
+    { "id": "p0", "nombre": "Zetta", "jugadores": ["zetta"] },       // individual: 1 solo id
+    { "id": "p1", "nombre": "Equipo Rojo", "jugadores": ["xero","tutte"] } // equipos: 2 o más
+  ],
+  "rondas": [
+    [ { "a": "p0", "b": "p1", "ganador": "p0" }, /* ...resto de la primera ronda... */ ],
+    [ /* siguiente ronda, con "a"/"b" null hasta que avancen los ganadores */ ]
+  ],
+  "tercerPuesto": { "a": null, "b": null, "ganador": null }
+}
+```
+
+El armado del bracket (`armarBracketInicial`), el avance de ganadores (`elegirGanadorTorneo`) y el render del cuadro/podio (`renderBracketTorneoHtml`, `renderPodioTorneoHtml`) están en `js/comunes.js`, compartidos entre `herramientas/torneo.js` (armar/editar) y `js/torneos.js` (`torneos.html`, la página pública de solo lectura).
+
 ### Nombres de campeón
 
 Escribilos como en el juego ("Kai'Sa", "Dr. Mundo", "Wukong", etc.) — la web se encarga de mapearlos al ícono correcto.
@@ -190,6 +218,13 @@ js/app.js                        carga los datos y arma el salón de la fama + l
 data/players.json               roster de jugadores
 data/manifest.json              lista de sesiones a cargar
 data/sessions/*.json            una sesión (día de juego) por archivo
+data/torneos-manifest.json      lista de torneos a cargar
+data/torneos/*.json             un torneo (cuadro + participantes) por archivo
+torneos.html                     listado de torneos y, con ?id=, el cuadro + podio
+js/torneos.js                    lógica de torneos.html
+herramientas/torneo.html        armar un torneo nuevo y cargar sus resultados
+herramientas/torneo.js           lógica propia de torneo.html
+herramientas/torneo.css          estilos propios de torneo.html
 herramientas/cargar.html        formulario para cargar una sesión
 herramientas/cargar.js           lógica propia del formulario de carga
 herramientas/eliminar.html      elegir una sesión y borrar una partida (o el día entero)

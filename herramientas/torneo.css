@@ -1,0 +1,22 @@
+/* Estilos propios de armar/editar torneos — el resto sale de cargar.css y style.css */
+
+#tn-participantes{display:flex; flex-direction:column; gap:.7rem; margin-top:1rem;}
+
+.tn-part-individual{display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:.6rem;}
+.tn-part-individual select{width:100%;}
+
+.tn-equipo-card{
+  border:1px solid var(--borde); border-radius:8px; padding:.8rem .9rem;
+  background:rgba(201,162,39,.04);
+}
+.tn-equipo-nombre{width:100%; margin-bottom:.6rem; font-family:'Marcellus', serif;}
+.tn-equipo-jugadores{display:flex; flex-wrap:wrap; gap:.4rem;}
+.tn-chip-jugador{
+  border:1px solid var(--borde); background:var(--noche); color:var(--pergamino-osc);
+  border-radius:14px; padding:.3rem .7rem; font-size:.82rem; cursor:pointer;
+}
+.tn-chip-jugador.on{background:var(--oro); border-color:var(--oro); color:var(--tinta); font-weight:600;}
+.tn-chip-jugador:disabled{opacity:.35; cursor:not-allowed;}
+
+#te-bracket{margin-top:1rem;}
+#btn-eliminar-torneo{margin-top:1.5rem;}

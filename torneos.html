@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Bitácora del Amazonas</title>
+<title>Torneos — La Bitácora del Amazonas</title>
 <meta name="description" content="Crónica de las partidas de LoL de la banda: quién sale mejor, quién se la carga al equipo, quién trollea y quién es medio ancla.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="La Bitácora del Amazonas">
@@ -32,37 +32,38 @@
     <a href="index.html#timeline-seccion">Crónica</a>
     <a href="torneos.html">Torneos</a>
     <span class="nav-sep"></span>
-    <a href="herramientas/cargar.html" class="nav-tool">+ Agregar sesión</a>
+    <a href="herramientas/torneo.html" class="nav-tool">+ Armar torneo</a>
   </div>
 </nav>
 
-<header class="portada">
+<div class="volver-top"><a href="index.html">← Volver a la crónica</a></div>
+
+<header class="portada portada-chica">
   <div class="portada-orla">
-    <p class="portada-eyebrow">Crónicas de la Grieta</p>
-    <h1>La Bitácora del Amazonas</h1>
-    <p class="portada-sub">Donde quedan escritas las hazañas, las cargadas y los ints de la banda.</p>
+    <p class="portada-eyebrow">La Bitácora del Amazonas</p>
+    <h1 id="torneo-titulo">Torneos</h1>
+    <p class="portada-sub" id="torneo-sub">Los cuadros de eliminación que se armaron entre la banda.</p>
   </div>
 </header>
 
 <main>
-  <section id="podio-seccion" class="seccion podio-seccion">
-    <h2 class="titulo-seccion">🏅 Podio de Invocadores</h2>
-    <div class="podio-wrap">
-      <button type="button" class="podio-flecha izq" aria-label="Anterior">‹</button>
-      <div id="podio-carrusel" class="podio-carrusel"></div>
-      <button type="button" class="podio-flecha der" aria-label="Siguiente">›</button>
+  <section id="torneos-listado" class="seccion">
+    <div id="torneos-grid" class="fama-grid"></div>
+    <div id="torneos-vacio" class="vacio-timeline" hidden>Todavía no se armó ningún torneo. <a href="herramientas/torneo.html">Armá el primero acá.</a></div>
+  </section>
+
+  <section id="torneo-detalle" class="seccion" hidden>
+    <p class="capitulo-fecha" id="torneo-detalle-meta"></p>
+
+    <div id="torneo-podio-wrap" hidden>
+      <h2 class="titulo-seccion">🏅 Podio</h2>
+      <div id="torneo-podio"></div>
     </div>
-  </section>
 
-  <section id="salon-fama" class="seccion">
-    <h2 class="titulo-seccion">🏆 El Salón de la Fama</h2>
-    <div id="fama-resumen" class="fama-resumen"></div>
-    <div id="fama-grid" class="fama-grid"></div>
-  </section>
+    <h2 class="titulo-seccion">📋 Cuadro</h2>
+    <div id="torneo-bracket"></div>
 
-  <section id="timeline-seccion" class="seccion">
-    <h2 class="titulo-seccion">📜 La Crónica</h2>
-    <div id="timeline"></div>
+    <p><a class="volver-link" href="torneos.html">← Ver todos los torneos</a></p>
   </section>
 </main>
 
@@ -71,6 +72,6 @@
 </footer>
 
 <script src="js/comunes.js?v=8"></script>
-<script src="js/app.js?v=16"></script>
+<script src="js/torneos.js?v=1"></script>
 </body>
 </html>
