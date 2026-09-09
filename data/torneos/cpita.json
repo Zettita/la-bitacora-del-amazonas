@@ -57,7 +57,7 @@
   "tercerPuesto": {
     "a": "p1",
     "b": "p2",
-    "ganador": null
+    "ganador": "p2"
   },
   "cerrado": false
 }
