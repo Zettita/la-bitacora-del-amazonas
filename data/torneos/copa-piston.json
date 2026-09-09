@@ -57,6 +57,6 @@
   "tercerPuesto": {
     "a": "p1",
     "b": "p3",
-    "ganador": null
+    "ganador": "p3"
   }
 }
