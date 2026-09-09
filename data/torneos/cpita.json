@@ -43,20 +43,20 @@
       {
         "a": "p2",
         "b": "p3",
-        "ganador": null
+        "ganador": "p3"
       }
     ],
     [
       {
         "a": "p0",
-        "b": null,
+        "b": "p3",
         "ganador": null
       }
     ]
   ],
   "tercerPuesto": {
     "a": "p1",
-    "b": null,
+    "b": "p2",
     "ganador": null
   },
   "cerrado": false
