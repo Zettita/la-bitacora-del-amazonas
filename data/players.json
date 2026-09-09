@@ -27,10 +27,5 @@
     "id": "jorge",
     "nombre": "jorge",
     "rolPreferido": "ADC"
-  },
-  {
-    "id": "juja",
-    "nombre": "juja",
-    "rolPreferido": "JUNGLE"
   }
 ]
