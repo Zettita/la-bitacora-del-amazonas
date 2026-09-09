@@ -38,7 +38,7 @@
       {
         "a": "p0",
         "b": "p1",
-        "ganador": null
+        "ganador": "p1"
       },
       {
         "a": "p2",
@@ -48,14 +48,14 @@
     ],
     [
       {
-        "a": null,
+        "a": "p1",
         "b": null,
         "ganador": null
       }
     ]
   ],
   "tercerPuesto": {
-    "a": null,
+    "a": "p0",
     "b": null,
     "ganador": null
   }
