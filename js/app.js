@@ -130,7 +130,7 @@ function renderPodio(stats, jugadores, jugadoresArr){
   if(jugadoresArr.length === 0){
     carrusel.classList.add('vacio');
     carrusel.innerHTML = `
-      <a href="herramientas/cargar.html" class="podio-tarjeta podio-tarjeta-vacia">
+      <a href="herramientas/cargar.html" class="podio-tarjeta-vacia">
         <div class="podio-vacia-tilt">
           <span class="podio-vacia-icono">+</span>
           <div class="podio-vacia-titulo">Todavía no hay invocadores</div>
@@ -138,8 +138,7 @@ function renderPodio(stats, jugadores, jugadoresArr){
         </div>
       </a>
     `;
-    flechaIzq.hidden = true;
-    flechaDer.hidden = true;
+    actualizarFlechasPodio();
     initTarjetaVaciaTilt(carrusel.querySelector('.podio-tarjeta-vacia'));
     return;
   }
@@ -165,25 +164,47 @@ function renderPodio(stats, jugadores, jugadoresArr){
 
   carrusel.innerHTML = ordenado.map((s, i) => {
     const imagen = jugadores[s.id]?.imagen;
-    const avatar = imagen
-      ? `<img src="${imagen}" alt="${s.nombre}">`
-      : `<div class="podio-avatar-fallback">${iniciales(s.nombre)}</div>`;
+    const marcoEstilo = imagen ? ` style="background-image:url('${imagen}')"` : '';
+    const fallback = imagen ? '' : `<div class="podio-tarjeta-fallback">${iniciales(s.nombre)}</div>`;
     const detalle = s.partidas
       ? `${Math.round((s.victorias / s.partidas) * 100)}% WR · ${s.partidas} partida${s.partidas === 1 ? '' : 's'}`
       : 'Sin partidas todavía';
     return `
       <a href="jugador.html?id=${encodeURIComponent(s.id)}" class="podio-tarjeta">
+        <div class="podio-tarjeta-marco"${marcoEstilo}>
+          ${fallback}
+          <div class="podio-tarjeta-velo"></div>
+          <div class="podio-tarjeta-info">
+            <div class="podio-nombre">${s.nombre}</div>
+            <div class="podio-detalle">${detalle}</div>
+          </div>
+        </div>
         <span class="podio-puesto">${i + 1}°</span>
-        <div class="podio-avatar">${avatar}</div>
-        <div class="podio-nombre">${s.nombre}</div>
-        <div class="podio-detalle">${detalle}</div>
       </a>
     `;
   }).join('');
 
+  actualizarFlechasPodio();
+}
+
+// Muestra/oculta cada flecha según haya contenido para scrollear en esa
+// dirección — no solo si el carrusel desborda, sino según la posición actual.
+function actualizarFlechasPodio(){
+  const carrusel = document.getElementById('podio-carrusel');
+  const flechaIzq = document.querySelector('.podio-flecha.izq');
+  const flechaDer = document.querySelector('.podio-flecha.der');
+
+  if(carrusel.classList.contains('vacio')){
+    flechaIzq.hidden = true;
+    flechaDer.hidden = true;
+    return;
+  }
+
   const sinOverflow = carrusel.scrollWidth <= carrusel.clientWidth + 1;
-  flechaIzq.hidden = sinOverflow;
-  flechaDer.hidden = sinOverflow;
+  const alInicio = carrusel.scrollLeft <= 8;
+  const alFinal = carrusel.scrollLeft + carrusel.clientWidth >= carrusel.scrollWidth - 8;
+  flechaIzq.hidden = sinOverflow || alInicio;
+  flechaDer.hidden = sinOverflow || alFinal;
 }
 
 function initPodioFlechas(){
@@ -194,6 +215,8 @@ function initPodioFlechas(){
   document.querySelector('.podio-flecha.der').addEventListener('click', () => {
     carrusel.scrollBy({ left: 256, behavior: 'smooth' });
   });
+  carrusel.addEventListener('scroll', actualizarFlechasPodio);
+  window.addEventListener('resize', actualizarFlechasPodio);
 }
 
 // Efecto "carta": la tarjeta vacía se inclina levemente siguiendo al mouse,
