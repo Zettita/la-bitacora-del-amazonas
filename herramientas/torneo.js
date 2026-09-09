@@ -4,7 +4,27 @@
 
 let jugadoresRoster = [];
 let jugadoresPorId = {};
-let torneosCargados = [];
+// Torneos ya publicados en el repo (siempre cerrados: es la única forma en
+// que un torneo llega ahí). Se cargan una vez del sitio.
+let torneosCommiteados = [];
+// Torneos todavía en juego: viven solo en este navegador (localStorage),
+// nunca pisan el repo hasta que se tocan "Finalizar torneo" — así ni crear
+// el torneo ni anotar cada resultado dispara un commit/llamada al Worker.
+let torneosBorrador = [];
+
+const TORNEOS_BORRADOR_KEY = 'bitacora_torneos_borrador';
+
+function cargarBorradoresTorneos(){
+  try{
+    return JSON.parse(localStorage.getItem(TORNEOS_BORRADOR_KEY)) || [];
+  }catch(e){
+    return [];
+  }
+}
+
+function guardarBorradoresTorneos(){
+  localStorage.setItem(TORNEOS_BORRADOR_KEY, JSON.stringify(torneosBorrador));
+}
 
 function normalizarTextoTn(s){
   return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -27,15 +47,17 @@ async function cargarDatosIniciales(){
   jugadoresPorId = {};
   jugadoresArr.forEach(j => { jugadoresPorId[j.id] = j; });
 
-  torneosCargados = [];
+  torneosCommiteados = [];
   for(const archivo of manifest){
     try{
       const t = await fetch(`../data/torneos/${archivo}`, sinCache).then(r => r.json());
-      torneosCargados.push(t);
+      torneosCommiteados.push(t);
     }catch(e){
       console.warn('No se pudo cargar el torneo', archivo, e);
     }
   }
+
+  torneosBorrador = cargarBorradoresTorneos();
 }
 
 // ---------- Alta rápida de jugador (por si alguien viene solo para el torneo) ----------
@@ -245,7 +267,7 @@ function leerParticipantesFormulario(){
   };
 }
 
-async function manejarCrearTorneo(ev){
+function manejarCrearTorneo(ev){
   ev.preventDefault();
 
   const nombre = document.getElementById('tn-nombre').value.trim();
@@ -265,7 +287,7 @@ async function manejarCrearTorneo(ev){
   let base = slugifyTn(nombre);
   let id = base;
   let sufijo = 2;
-  const idsExistentes = new Set(torneosCargados.map(t => t.id));
+  const idsExistentes = new Set([...torneosBorrador, ...torneosCommiteados].map(t => t.id));
   while(idsExistentes.has(id)){
     id = `${base}-${sufijo}`;
     sufijo++;
@@ -279,32 +301,23 @@ async function manejarCrearTorneo(ev){
     cerrado: false,
   };
 
-  const btn = document.querySelector('#form-crear-torneo button[type="submit"]');
-  btn.disabled = true;
-  document.getElementById('tn-estado').textContent = 'Creando...';
+  // Todavía no se toca el Worker/GitHub acá: el torneo se arma y se juega
+  // por completo en este navegador (localStorage), y recién sube al repo
+  // con un único commit cuando se toca "Finalizar torneo" más abajo.
+  torneosBorrador.push(torneo);
+  guardarBorradoresTorneos();
+  poblarSelectTorneos();
 
-  try{
-    await guardarEnBackend({ accion: 'crear_torneo', torneo }, { endpointLocal: '/api/crear-torneo' });
-    torneosCargados.push(torneo);
-    poblarSelectTorneos();
-    document.getElementById('tn-estado').textContent = '';
-    mostrarMensajeCrear(`✓ Torneo "${nombre}" creado. Ya podés ir anotando los resultados acá abajo.`, 'ok');
-    document.getElementById('form-crear-torneo').reset();
-    regenerarParticipantesUI();
+  mostrarMensajeCrear(`✓ Torneo "${nombre}" armado acá en tu navegador. Anotá los resultados abajo — recién se sube al sitio cuando toques "Finalizar torneo".`, 'ok');
+  document.getElementById('form-crear-torneo').reset();
+  regenerarParticipantesUI();
 
-    // Abre directo el editor de resultados de este torneo recién creado,
-    // sin que haga falta elegirlo del desplegable de "Cargar resultados".
-    const selectResultados = document.getElementById('te-select');
-    selectResultados.value = torneo.id;
-    selectResultados.dispatchEvent(new Event('change', { bubbles: true }));
-    document.getElementById('te-zona').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }catch(err){
-    document.getElementById('tn-estado').textContent = '';
-    const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
-    mostrarMensajeCrear(`No se pudo crear: ${err.message}.${pista}`, 'error');
-  }finally{
-    btn.disabled = false;
-  }
+  // Abre directo el editor de resultados de este torneo recién creado, sin
+  // que haga falta elegirlo del desplegable de "Cargar resultados".
+  const selectResultados = document.getElementById('te-select');
+  selectResultados.value = torneo.id;
+  selectResultados.dispatchEvent(new Event('change', { bubbles: true }));
+  document.getElementById('te-zona').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ---------- Cargar resultados ----------
@@ -312,9 +325,21 @@ async function manejarCrearTorneo(ev){
 function poblarSelectTorneos(){
   const select = document.getElementById('te-select');
   const valorPrevio = select.value;
-  select.innerHTML = '<option value="">Elegí un torneo...</option>' +
-    torneosCargados.map(t => `<option value="${t.id}">${t.nombre}${torneoTerminado(t) ? ' — finalizado' : ''}</option>`).join('');
-  if(torneosCargados.some(t => t.id === valorPrevio)) select.value = valorPrevio;
+
+  const grupos = [];
+  if(torneosBorrador.length){
+    grupos.push(`<optgroup label="En curso (sin publicar todavía)">${
+      torneosBorrador.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('')
+    }</optgroup>`);
+  }
+  if(torneosCommiteados.length){
+    grupos.push(`<optgroup label="Publicados">${
+      torneosCommiteados.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('')
+    }</optgroup>`);
+  }
+
+  select.innerHTML = '<option value="">Elegí un torneo...</option>' + grupos.join('');
+  if([...torneosBorrador, ...torneosCommiteados].some(t => t.id === valorPrevio)) select.value = valorPrevio;
 }
 
 function mostrarMensajeEditar(texto, tipo){
@@ -325,7 +350,7 @@ function mostrarMensajeEditar(texto, tipo){
 }
 
 function renderTorneoEnEdicion(torneo){
-  const estado = torneo.cerrado ? ' · 🔒 Cerrado' : '';
+  const estado = torneo.cerrado ? ' · 🔒 Publicado y cerrado' : ' · 📝 Sin publicar (solo en este navegador)';
   document.getElementById('te-meta').textContent =
     `${formatFecha(torneo.fecha)} · ${torneo.modo === 'equipos' ? 'Por equipos' : 'Individual'}${estado}`;
 
@@ -357,17 +382,6 @@ function renderTorneoEnEdicion(torneo){
     renderBracketTorneoHtml(torneo, jugadoresPorId, { interactivo: true, cerrado: !!torneo.cerrado, prefijoImg: '../' });
 }
 
-async function guardarTorneoEditado(torneo){
-  try{
-    await guardarEnBackend({ accion: 'guardar_torneo', torneo }, { endpointLocal: '/api/guardar-torneo' });
-  }catch(err){
-    const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
-    mostrarMensajeEditar(`No se pudo guardar: ${err.message}.${pista}`, 'error');
-    return false;
-  }
-  return true;
-}
-
 function initCargaResultados(){
   poblarSelectTorneos();
 
@@ -381,12 +395,16 @@ function initCargaResultados(){
       torneoActual = null;
       return;
     }
-    torneoActual = torneosCargados.find(t => t.id === id);
+    torneoActual = torneosBorrador.find(t => t.id === id) || torneosCommiteados.find(t => t.id === id);
     document.getElementById('te-zona').hidden = false;
     renderTorneoEnEdicion(torneoActual);
   });
 
-  document.getElementById('te-bracket').addEventListener('click', async (ev) => {
+  // Cada click de resultado solo toca localStorage — nunca la red — así
+  // corregir varias veces seguidas no dispara pedidos en paralelo ni hace
+  // un commit por click. Solo un torneo ya publicado (cerrado) deja de
+  // tener botones clickeables, así que esto nunca corre sobre uno de esos.
+  document.getElementById('te-bracket').addEventListener('click', (ev) => {
     const boton = ev.target.closest('.tny-clickeable');
     if(!boton || !torneoActual) return;
 
@@ -401,27 +419,57 @@ function initCargaResultados(){
     }
 
     renderTorneoEnEdicion(torneoActual);
-    const guardado = await guardarTorneoEditado(torneoActual);
-    if(guardado) poblarSelectTorneos();
+    guardarBorradoresTorneos();
   });
 
+  // Único momento en que un torneo toca el Worker/GitHub: acá se manda de
+  // una sola vez, ya completo y cerrado, en un solo commit.
   document.getElementById('btn-finalizar-torneo').addEventListener('click', async () => {
     if(!torneoActual || !torneoListoParaCerrar(torneoActual)) return;
-    if(!confirm(`¿Finalizar "${torneoActual.nombre}"? Una vez cerrado ya no se van a poder cambiar los resultados.`)) return;
+    if(!confirm(`¿Finalizar "${torneoActual.nombre}"? Se sube al sitio y ya no se va a poder modificar.`)) return;
 
     torneoActual.cerrado = true;
-    renderTorneoEnEdicion(torneoActual);
-    const guardado = await guardarTorneoEditado(torneoActual);
-    if(guardado) poblarSelectTorneos();
+
+    const btn = document.getElementById('btn-finalizar-torneo');
+    btn.disabled = true;
+    mostrarMensajeEditar('Subiendo torneo...', '');
+
+    try{
+      await guardarEnBackend({ accion: 'crear_torneo', torneo: torneoActual }, { endpointLocal: '/api/crear-torneo' });
+      torneosBorrador = torneosBorrador.filter(t => t.id !== torneoActual.id);
+      guardarBorradoresTorneos();
+      torneosCommiteados.push(torneoActual);
+      document.getElementById('mensaje-editar').hidden = true;
+      poblarSelectTorneos();
+      renderTorneoEnEdicion(torneoActual);
+    }catch(err){
+      torneoActual.cerrado = false;
+      const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
+      mostrarMensajeEditar(`No se pudo finalizar: ${err.message}.${pista}`, 'error');
+      renderTorneoEnEdicion(torneoActual);
+    }finally{
+      btn.disabled = false;
+    }
   });
 
   document.getElementById('btn-eliminar-torneo').addEventListener('click', async () => {
     if(!torneoActual) return;
     if(!confirm(`¿Eliminar el torneo "${torneoActual.nombre}"? Esto no se puede deshacer.`)) return;
 
+    const esBorrador = torneosBorrador.some(t => t.id === torneoActual.id);
+
+    if(esBorrador){
+      torneosBorrador = torneosBorrador.filter(t => t.id !== torneoActual.id);
+      guardarBorradoresTorneos();
+      torneoActual = null;
+      document.getElementById('te-zona').hidden = true;
+      poblarSelectTorneos();
+      return;
+    }
+
     try{
       await guardarEnBackend({ accion: 'eliminar_torneo', id: torneoActual.id }, { endpointLocal: '/api/eliminar-torneo' });
-      torneosCargados = torneosCargados.filter(t => t.id !== torneoActual.id);
+      torneosCommiteados = torneosCommiteados.filter(t => t.id !== torneoActual.id);
       torneoActual = null;
       document.getElementById('te-zona').hidden = true;
       poblarSelectTorneos();

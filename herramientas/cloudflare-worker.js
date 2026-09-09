@@ -104,17 +104,6 @@ export default {
       }
     }
 
-    if (body.accion === 'guardar_torneo') {
-      const torneo = body.torneo || {};
-      if (!torneo.id) return jsonResp({ error: 'Falta el id del torneo' }, 400, cors);
-      try {
-        const resultado = await guardarTorneo(cfg, torneo, autor);
-        return jsonResp(resultado, 200, cors);
-      } catch (err) {
-        return jsonResp({ error: err.message }, 500, cors);
-      }
-    }
-
     if (body.accion === 'eliminar_torneo') {
       const id = String(body.id || '').trim();
       if (!id) return jsonResp({ error: 'Falta el id del torneo' }, 400, cors);
@@ -493,17 +482,6 @@ async function crearTorneo(cfg, torneo, autor) {
     await ghGuardarArchivo(cfg, 'data/torneos-manifest.json', manifest, manifestFile ? manifestFile.sha : undefined, `Registra torneo ${archivo} en el manifest${firma}`);
   }
 
-  return { ok: true, torneo };
-}
-
-async function guardarTorneo(cfg, torneo, autor) {
-  const firma = autor ? ` (por ${autor})` : '';
-  const ruta = `data/torneos/${torneo.id}.json`;
-
-  const existente = await ghObtenerArchivo(cfg, ruta);
-  if (!existente) throw new Error('Ese torneo no existe');
-
-  await ghGuardarArchivo(cfg, ruta, torneo, existente.sha, `Actualiza torneo "${torneo.nombre || torneo.id}"${firma}`);
   return { ok: true, torneo };
 }
 

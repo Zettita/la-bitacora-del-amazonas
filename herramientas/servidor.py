@@ -88,8 +88,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.manejar_eliminar_jugador()
         elif self.path == "/api/crear-torneo":
             self.manejar_crear_torneo()
-        elif self.path == "/api/guardar-torneo":
-            self.manejar_guardar_torneo()
         elif self.path == "/api/eliminar-torneo":
             self.manejar_eliminar_torneo()
         else:
@@ -126,27 +124,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             manifest.append(archivo)
             escribir_json(TORNEOS_MANIFEST_PATH, manifest)
 
-        self.send_json(200, {"ok": True, "torneo": torneo})
-
-    def manejar_guardar_torneo(self):
-        try:
-            cuerpo = self.leer_cuerpo()
-        except Exception:
-            self.send_json(400, {"error": "El cuerpo no es JSON valido"})
-            return
-
-        torneo = cuerpo.get("torneo") or {}
-        torneo_id = str(torneo.get("id", "")).strip()
-        if not torneo_id:
-            self.send_json(400, {"error": "Falta el id del torneo"})
-            return
-
-        ruta = os.path.join(TORNEOS_DIR, f"{torneo_id}.json")
-        if not os.path.exists(ruta):
-            self.send_json(404, {"error": "Ese torneo no existe"})
-            return
-
-        escribir_json(ruta, torneo)
         self.send_json(200, {"ok": True, "torneo": torneo})
 
     def manejar_eliminar_torneo(self):
