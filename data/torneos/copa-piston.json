@@ -1,0 +1,62 @@
+{
+  "id": "copa-piston",
+  "nombre": "Copa Piston",
+  "fecha": "2026-09-09",
+  "modo": "individual",
+  "participantes": [
+    {
+      "id": "p0",
+      "nombre": "Tutte",
+      "jugadores": [
+        "tutte"
+      ]
+    },
+    {
+      "id": "p1",
+      "nombre": "Xero",
+      "jugadores": [
+        "xero"
+      ]
+    },
+    {
+      "id": "p2",
+      "nombre": "Zetta",
+      "jugadores": [
+        "zetta"
+      ]
+    },
+    {
+      "id": "p3",
+      "nombre": "Nikito",
+      "jugadores": [
+        "nikito"
+      ]
+    }
+  ],
+  "rondas": [
+    [
+      {
+        "a": "p0",
+        "b": "p1",
+        "ganador": null
+      },
+      {
+        "a": "p2",
+        "b": "p3",
+        "ganador": null
+      }
+    ],
+    [
+      {
+        "a": null,
+        "b": null,
+        "ganador": null
+      }
+    ]
+  ],
+  "tercerPuesto": {
+    "a": null,
+    "b": null,
+    "ganador": null
+  }
+}
