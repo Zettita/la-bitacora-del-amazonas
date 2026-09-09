@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css?v=30">
 <link rel="stylesheet" href="cargar.css?v=20">
-<link rel="stylesheet" href="torneo.css?v=1">
+<link rel="stylesheet" href="torneo.css?v=2">
 </head>
 <body class="pagina-carga">
 
@@ -166,6 +166,8 @@
       <div id="te-podio-wrap" hidden>
         <div class="destacados-titulo-form">🏅 Podio</div>
         <div id="te-podio"></div>
+        <button type="button" id="btn-finalizar-torneo" class="btn btn-principal te-finalizado-btn" hidden>🏁 Finalizar torneo</button>
+        <p id="te-cerrado-aviso" class="config-ayuda te-finalizado-btn" hidden>🔒 Este torneo está cerrado, no se puede modificar. <a id="te-cerrado-link" href="../torneos.html">Verlo en Torneos →</a></p>
       </div>
       <div id="te-bracket"></div>
       <button type="button" id="btn-eliminar-torneo" class="btn campo-alta-boton-peligro">🗑️ Eliminar este torneo</button>
@@ -174,9 +176,9 @@
 
 </main>
 
-<script src="../js/comunes.js?v=8"></script>
+<script src="../js/comunes.js?v=9"></script>
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="torneo.js?v=2"></script>
+<script src="torneo.js?v=5"></script>
 </body>
 </html>

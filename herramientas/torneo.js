@@ -276,6 +276,7 @@ async function manejarCrearTorneo(ev){
     id, nombre, fecha, modo,
     participantes: lectura.participantes,
     rondas, tercerPuesto,
+    cerrado: false,
   };
 
   const btn = document.querySelector('#form-crear-torneo button[type="submit"]');
@@ -287,9 +288,16 @@ async function manejarCrearTorneo(ev){
     torneosCargados.push(torneo);
     poblarSelectTorneos();
     document.getElementById('tn-estado').textContent = '';
-    mostrarMensajeCrear(`✓ Torneo "${nombre}" creado. Ya podés cargar los resultados más abajo.`, 'ok');
+    mostrarMensajeCrear(`✓ Torneo "${nombre}" creado. Ya podés ir anotando los resultados acá abajo.`, 'ok');
     document.getElementById('form-crear-torneo').reset();
     regenerarParticipantesUI();
+
+    // Abre directo el editor de resultados de este torneo recién creado,
+    // sin que haga falta elegirlo del desplegable de "Cargar resultados".
+    const selectResultados = document.getElementById('te-select');
+    selectResultados.value = torneo.id;
+    selectResultados.dispatchEvent(new Event('change', { bubbles: true }));
+    document.getElementById('te-zona').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }catch(err){
     document.getElementById('tn-estado').textContent = '';
     const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
@@ -317,11 +325,15 @@ function mostrarMensajeEditar(texto, tipo){
 }
 
 function renderTorneoEnEdicion(torneo){
+  const estado = torneo.cerrado ? ' · 🔒 Cerrado' : '';
   document.getElementById('te-meta').textContent =
-    `${formatFecha(torneo.fecha)} · ${torneo.modo === 'equipos' ? 'Por equipos' : 'Individual'}`;
+    `${formatFecha(torneo.fecha)} · ${torneo.modo === 'equipos' ? 'Por equipos' : 'Individual'}${estado}`;
 
   const podioWrap = document.getElementById('te-podio-wrap');
   const podioHtml = renderPodioTorneoHtml(torneo, jugadoresPorId, { prefijoImg: '../' });
+  const btnFinalizar = document.getElementById('btn-finalizar-torneo');
+  const avisoCerrado = document.getElementById('te-cerrado-aviso');
+
   if(podioHtml){
     document.getElementById('te-podio').innerHTML = podioHtml;
     podioWrap.hidden = false;
@@ -329,8 +341,20 @@ function renderTorneoEnEdicion(torneo){
     podioWrap.hidden = true;
   }
 
+  if(torneo.cerrado){
+    btnFinalizar.hidden = true;
+    document.getElementById('te-cerrado-link').href = `../torneos.html?id=${encodeURIComponent(torneo.id)}`;
+    avisoCerrado.hidden = false;
+  }else{
+    avisoCerrado.hidden = true;
+    // Solo se puede finalizar cuando ya están decididos todos los puestos
+    // del podio (final + 3er puesto) — mientras se juega, se puede seguir
+    // corrigiendo cualquier resultado sin restricción.
+    btnFinalizar.hidden = !torneoListoParaCerrar(torneo);
+  }
+
   document.getElementById('te-bracket').innerHTML =
-    renderBracketTorneoHtml(torneo, jugadoresPorId, { interactivo: true, prefijoImg: '../' });
+    renderBracketTorneoHtml(torneo, jugadoresPorId, { interactivo: true, cerrado: !!torneo.cerrado, prefijoImg: '../' });
 }
 
 async function guardarTorneoEditado(torneo){
@@ -376,6 +400,16 @@ function initCargaResultados(){
       elegirGanadorTorneo(torneoActual, rondaIdx, matchIdx, participanteId);
     }
 
+    renderTorneoEnEdicion(torneoActual);
+    const guardado = await guardarTorneoEditado(torneoActual);
+    if(guardado) poblarSelectTorneos();
+  });
+
+  document.getElementById('btn-finalizar-torneo').addEventListener('click', async () => {
+    if(!torneoActual || !torneoListoParaCerrar(torneoActual)) return;
+    if(!confirm(`¿Finalizar "${torneoActual.nombre}"? Una vez cerrado ya no se van a poder cambiar los resultados.`)) return;
+
+    torneoActual.cerrado = true;
     renderTorneoEnEdicion(torneoActual);
     const guardado = await guardarTorneoEditado(torneoActual);
     if(guardado) poblarSelectTorneos();

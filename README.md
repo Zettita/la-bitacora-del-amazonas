@@ -158,9 +158,11 @@ Viven en `data/destacados.json` (mismo esquema chico que `players.json`: `{id, n
 
 Desde `herramientas/torneo.html` se arma un cuadro de eliminación directa entre amigos: elegís nombre, fecha, modo (**individual** o **por equipos** — en equipos armás cada uno con jugadores ya existentes del roster) y cantidad de participantes (4, 8 o 16 — siempre potencia de 2, no hace falta contemplar "byes"). Al crearlo se genera el cuadro completo (todas las rondas, con las siguientes vacías hasta la final) más un partido aparte por el 3er puesto entre los perdedores de semifinal.
 
-Después, en la misma página, elegís el torneo en "Cargar resultados" y vas tocando quién ganó cada cruce — el ganador avanza solo a la siguiente ronda (y si te equivocaste y tocás otro resultado, el cambio se propaga y deshace lo que ya había avanzado a partir de ahí). Cada click se guarda al toque, no hace falta un botón de guardar aparte. Cuando la final tiene ganador, en `torneos.html` aparece el podio (2do a la izquierda, 1ro al centro y más alto, 3ro a la derecha).
+Después, en la misma página (se abre solo, justo debajo, apenas creás el torneo) vas tocando quién ganó cada cruce — el ganador avanza solo a la siguiente ronda. Cada click se guarda al toque, no hace falta un botón de guardar aparte, y mientras el torneo no esté cerrado podés volver a tocar cualquier partido ya definido para corregirlo (el cambio se propaga y deshace en cascada lo que ya había avanzado a partir de ahí). Cuando la final tiene ganador aparece el podio (2do a la izquierda, 1ro al centro y más alto, 3ro a la derecha).
 
-Los torneos son la única parte del sitio donde sí se edita el mismo registro en vez de "borrar y volver a cargar" — tiene sentido acá porque un cuadro es un documento vivo mientras el torneo está en curso, no un historial cerrado como las sesiones.
+Una vez que **todos** los puestos del podio están decididos (final + 3er puesto) aparece el botón **"🏁 Finalizar torneo"** — al tocarlo el torneo queda `cerrado`, deja de poder editarse (el cuadro pasa a ser de solo lectura, ni siquiera desde acá) y recién ahí aparece en el historial público de `torneos.html`. Mientras no esté cerrado, un torneo con el podio ya armado sigue siendo editable y no se lista en `torneos.html` — así el historial público solo muestra resultados que el admin ya confirmó como definitivos.
+
+Los torneos son la única parte del sitio donde sí se edita el mismo registro en vez de "borrar y volver a cargar" — tiene sentido acá porque un cuadro es un documento vivo mientras el torneo está en curso (con su propio candado, "cerrado", para cuando deja de serlo), no un historial cerrado desde el vamos como las sesiones.
 
 Viven en `data/torneos/<id>.json` (uno por torneo) + `data/torneos-manifest.json` (lista de archivos, mismo patrón que `data/manifest.json`). Esquema resumido:
 
@@ -168,6 +170,7 @@ Viven en `data/torneos/<id>.json` (uno por torneo) + `data/torneos-manifest.json
 {
   "id": "copa-de-verano",
   "nombre": "Copa de Verano", "fecha": "2026-09-15", "modo": "individual", // o "equipos"
+  "cerrado": false, // true recién cuando se toca "Finalizar torneo"
   "participantes": [
     { "id": "p0", "nombre": "Zetta", "jugadores": ["zetta"] },       // individual: 1 solo id
     { "id": "p1", "nombre": "Equipo Rojo", "jugadores": ["xero","tutte"] } // equipos: 2 o más

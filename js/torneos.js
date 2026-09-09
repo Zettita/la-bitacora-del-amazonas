@@ -27,28 +27,35 @@ async function cargarTorneosYJugadores(){
 }
 
 function estadoTorneoTexto(torneo){
-  return torneoTerminado(torneo) ? '🏁 Finalizado' : '⏳ En curso';
+  return torneo.cerrado ? '🔒 Cerrado' : (torneoTerminado(torneo) ? '🏁 Podio listo, falta finalizar' : '⏳ En curso');
 }
 
+// El historial público solo muestra torneos ya cerrados — mientras un
+// torneo está en curso (o tiene el podio listo pero todavía no se tocó
+// "Finalizar torneo"), se sigue editando desde herramientas/torneo.html
+// (elegido del desplegable de "Cargar resultados"), pero no aparece acá.
 function renderListadoTorneos(torneos){
   const grid = document.getElementById('torneos-grid');
   const vacio = document.getElementById('torneos-vacio');
+  const cerrados = torneos.filter(t => t.cerrado);
 
-  if(torneos.length === 0){
+  if(cerrados.length === 0){
     grid.innerHTML = '';
+    vacio.innerHTML = torneos.length === 0
+      ? 'Todavía no se armó ningún torneo. <a href="herramientas/torneo.html">Armá el primero acá.</a>'
+      : 'Hay un torneo en curso, pero todavía no se cerró ninguno.';
     vacio.hidden = false;
     return;
   }
   vacio.hidden = true;
 
-  const ordenados = [...torneos].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+  const ordenados = [...cerrados].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
   grid.innerHTML = ordenados.map(t => `
     <a class="fama-card torneo-card" href="torneos.html?id=${encodeURIComponent(t.id)}">
       <h3>🏆 ${t.nombre}</h3>
       <p class="torneo-card-meta">
         ${formatFecha(t.fecha)}<br>
-        ${t.modo === 'equipos' ? 'Por equipos' : 'Individual'} · ${t.participantes.length} participantes<br>
-        ${estadoTorneoTexto(t)}
+        ${t.modo === 'equipos' ? 'Por equipos' : 'Individual'} · ${t.participantes.length} participantes
       </p>
     </a>
   `).join('');

@@ -286,6 +286,13 @@ function torneoTerminado(torneo){
   return !!(final && final.ganador);
 }
 
+// Todos los puestos del podio ya están decididos (final + 3er puesto, si
+// corresponde) — recién ahí tiene sentido habilitar "Finalizar torneo".
+function torneoListoParaCerrar(torneo){
+  if(!torneoTerminado(torneo)) return false;
+  return !torneo.tercerPuesto || !!torneo.tercerPuesto.ganador;
+}
+
 // Chips chiquitos con la foto (o iniciales) de cada jugador de un
 // participante — un jugador solo si es individual, dos o más si es equipo.
 function miniAvataresTorneoHtml(idsJugadores, jugadoresPorId, prefijoImg){
@@ -309,7 +316,7 @@ function nombreRondaTorneo(totalRondas, idx){
 
 function renderPartidoTorneoHtml(torneo, rondaIdx, matchIdx, match, jugadoresPorId, opts){
   const prefijo = (opts && opts.prefijoImg) || '';
-  const interactivo = !!(opts && opts.interactivo);
+  const interactivo = !!(opts && opts.interactivo) && !(opts && opts.cerrado);
 
   const lado = (participanteId) => {
     if(!participanteId){
@@ -319,7 +326,10 @@ function renderPartidoTorneoHtml(torneo, rondaIdx, matchIdx, match, jugadoresPor
     const nombre = p ? p.nombre : participanteId;
     const avatares = p ? miniAvataresTorneoHtml(p.jugadores, jugadoresPorId, prefijo) : '';
     const esGanador = match.ganador === participanteId;
-    const puedeElegir = interactivo && match.a && match.b && !match.ganador;
+    // Mientras el torneo no esté cerrado, se puede volver a tocar un
+    // partido ya definido para corregir un error (elige otro ganador, y
+    // eso deshace en cascada lo que ya había avanzado a partir de ahí).
+    const puedeElegir = interactivo && match.a && match.b;
     const clases = ['tny-lado'];
     if(esGanador) clases.push('tny-ganador');
     if(puedeElegir) clases.push('tny-clickeable');

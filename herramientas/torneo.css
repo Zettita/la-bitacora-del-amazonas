@@ -18,5 +18,10 @@
 .tn-chip-jugador.on{background:var(--oro); border-color:var(--oro); color:var(--tinta); font-weight:600;}
 .tn-chip-jugador:disabled{opacity:.35; cursor:not-allowed;}
 
+.te-finalizado-btn{
+  display:block; text-align:center; text-decoration:none;
+  margin:1rem auto 0; max-width:360px;
+}
+
 #te-bracket{margin-top:1rem;}
 #btn-eliminar-torneo{margin-top:1.5rem;}
