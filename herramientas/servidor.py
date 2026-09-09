@@ -48,6 +48,23 @@ def leer_json(ruta, default):
         return json.load(f)
 
 
+def jugador_tiene_partidas(jugador_id):
+    """Recorre todas las sesiones guardadas buscando si jugador_id jugo
+    alguna partida — se usa para no dejar eliminar del roster a alguien que
+    ya tiene historial (rompería sus stats y el timeline)."""
+    if not os.path.isdir(SESSIONS_DIR):
+        return False
+    for nombre_archivo in os.listdir(SESSIONS_DIR):
+        if not nombre_archivo.endswith(".json"):
+            continue
+        sesion = leer_json(os.path.join(SESSIONS_DIR, nombre_archivo), {})
+        for partida in sesion.get("partidas", []):
+            for j in partida.get("jugadores", []):
+                if j.get("jugador") == jugador_id:
+                    return True
+    return False
+
+
 def escribir_json(ruta, datos):
     with open(ruta, "w", encoding="utf-8") as f:
         json.dump(datos, f, ensure_ascii=False, indent=2)
@@ -65,8 +82,44 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.manejar_editar_imagen_jugador()
         elif self.path == "/api/agregar-jugador":
             self.manejar_agregar_jugador()
+        elif self.path == "/api/eliminar-jugador":
+            self.manejar_eliminar_jugador()
         else:
             self.send_json(404, {"error": "Ruta no encontrada"})
+
+    def manejar_eliminar_jugador(self):
+        largo = int(self.headers.get("Content-Length", 0))
+        try:
+            cuerpo = json.loads(self.rfile.read(largo).decode("utf-8"))
+        except Exception:
+            self.send_json(400, {"error": "El cuerpo no es JSON valido"})
+            return
+
+        jugador_id = str(cuerpo.get("id", "")).strip()
+        if not jugador_id:
+            self.send_json(400, {"error": "Falta el id del jugador"})
+            return
+
+        players = leer_json(PLAYERS_PATH, [])
+        jugador = next((p for p in players if p.get("id") == jugador_id), None)
+        if not jugador:
+            self.send_json(404, {"error": "Ese jugador no existe en el roster"})
+            return
+
+        if jugador_tiene_partidas(jugador_id):
+            self.send_json(409, {"error": "Ese jugador ya tiene partidas cargadas, no se puede eliminar del roster"})
+            return
+
+        players = [p for p in players if p.get("id") != jugador_id]
+        escribir_json(PLAYERS_PATH, players)
+
+        imagen = jugador.get("imagen")
+        if imagen:
+            ruta_imagen = os.path.join(RAIZ, imagen)
+            if os.path.exists(ruta_imagen):
+                os.remove(ruta_imagen)
+
+        self.send_json(200, {"ok": True})
 
     def manejar_agregar_jugador(self):
         largo = int(self.headers.get("Content-Length", 0))

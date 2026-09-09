@@ -172,12 +172,12 @@ function renderPodio(stats, jugadores, jugadoresArr){
       ? `${Math.round((s.victorias / s.partidas) * 100)}% WR · ${s.partidas} partida${s.partidas === 1 ? '' : 's'}`
       : 'Sin partidas todavía';
     return `
-      <div class="podio-tarjeta">
+      <a href="jugador.html?id=${encodeURIComponent(s.id)}" class="podio-tarjeta">
         <span class="podio-puesto">${i + 1}°</span>
         <div class="podio-avatar">${avatar}</div>
         <div class="podio-nombre">${s.nombre}</div>
         <div class="podio-detalle">${detalle}</div>
-      </div>
+      </a>
     `;
   }).join('');
 

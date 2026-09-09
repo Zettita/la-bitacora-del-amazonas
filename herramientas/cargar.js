@@ -176,6 +176,7 @@ function refrescarSelectsDePartida(bloque){
 
 function refrescarTodosLosSelects(){
   contenedorPartidas.querySelectorAll('.bloque-partida').forEach(bloque => refrescarSelectsDePartida(bloque));
+  poblarSelectEliminar();
 }
 
 function actualizarBotonAgregar(bloque){
@@ -391,6 +392,60 @@ function initAltaJugador(){
       inputImagen.value = '';
     }
   });
+}
+
+// ---------- Eliminar jugador del roster (form aparte, no toca sesiones) ----------
+
+function poblarSelectEliminar(){
+  const select = document.getElementById('elim-jugador-select');
+  const valorPrevio = select.value;
+  select.innerHTML = '<option value="" disabled selected>Elegí un jugador</option>';
+  jugadoresRoster.forEach(j => {
+    const opt = document.createElement('option');
+    opt.value = j.id;
+    opt.textContent = j.nombre;
+    select.appendChild(opt);
+  });
+  if(jugadoresRoster.some(j => j.id === valorPrevio)) select.value = valorPrevio;
+}
+
+function mostrarEstadoEliminar(texto, tipo){
+  const el = document.getElementById('eliminar-jugador-estado');
+  el.textContent = texto;
+  el.className = 'estado-guardado' + (tipo ? ` ${tipo}` : '');
+}
+
+async function manejarEliminarJugador(ev){
+  ev.preventDefault();
+
+  const select = document.getElementById('elim-jugador-select');
+  const id = select.value;
+  if(!id) return;
+
+  const jugador = jugadoresRoster.find(j => j.id === id);
+  const nombre = jugador ? jugador.nombre : id;
+  if(!confirm(`¿Eliminar a ${nombre} del roster? Esto no se puede deshacer.`)) return;
+
+  const btn = document.getElementById('btn-eliminar-jugador');
+  btn.disabled = true;
+  mostrarEstadoEliminar('Eliminando...', '');
+
+  try{
+    await guardarEnBackend({ accion: 'eliminar_jugador', id }, { endpointLocal: '/api/eliminar-jugador' });
+    jugadoresRoster = jugadoresRoster.filter(j => j.id !== id);
+    refrescarTodosLosSelects();
+    mostrarEstadoEliminar(`✓ ${nombre} se sacó del roster.`, 'ok');
+  }catch(err){
+    const pista = esModoLocal() ? ' ¿Está corriendo herramientas/servidor.py?' : '';
+    mostrarEstadoEliminar(`Error: ${err.message}.${pista}`, 'error');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function initEliminarJugador(){
+  poblarSelectEliminar();
+  document.getElementById('form-eliminar-jugador').addEventListener('submit', manejarEliminarJugador);
 }
 
 // ---------- Personajes destacados (gente ajena al grupo, no compañeros) ----------
@@ -637,6 +692,7 @@ async function manejarSubmit(ev){
   agregarBloquePartida();
   initConfigProxy();
   initAltaJugador();
+  initEliminarJugador();
   actualizarIndicadorModo();
 
   document.getElementById('btn-agregar-partida').addEventListener('click', agregarBloquePartida);

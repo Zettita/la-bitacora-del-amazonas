@@ -135,6 +135,8 @@ La foto se elige del disco (no es un link): el navegador la redimensiona/comprim
 
 Para reemplazar la foto de alguien que ya tiene una, elegí a ese jugador en cualquier tarjeta de `cargar.html` y tocá el botón 📷 que aparece al lado de su nombre — se abre un mini formulario para subir la nueva foto, que se guarda al toque (no hace falta completar ni guardar la sesión entera). Si la foto vieja quedaba con otra extensión (por ejemplo `.png` y la nueva es `.jpg`), el archivo viejo se borra solo para no dejar huérfanos en `img/jugadores/`.
 
+Para sacar a alguien del roster, usá el bloque "🗑️ Eliminar jugador" (debajo del alta rápida, en `cargar.html`). Solo funciona si ese jugador **todavía no tiene ninguna partida cargada** — si ya jugó algo, se rechaza el pedido para no dejar huérfano su historial en las sesiones guardadas; en ese caso hay que borrar primero sus partidas desde `eliminar.html`.
+
 ### Los `premios` disponibles
 
 | id      | Significado                        |

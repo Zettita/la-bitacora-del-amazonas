@@ -82,6 +82,17 @@ export default {
       }
     }
 
+    if (body.accion === 'eliminar_jugador') {
+      const id = String(body.id || '').trim();
+      if (!id) return jsonResp({ error: 'Falta el id del jugador' }, 400, cors);
+      try {
+        const resultado = await eliminarJugador(cfg, id, autor);
+        return jsonResp(resultado, 200, cors);
+      } catch (err) {
+        return jsonResp({ error: err.message }, 500, cors);
+      }
+    }
+
     const fecha = String(body.fecha || '').trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       return jsonResp({ error: 'Fecha invalida, se espera AAAA-MM-DD' }, 400, cors);
@@ -319,6 +330,49 @@ async function agregarJugador(cfg, datos, autor) {
   await ghGuardarArchivo(cfg, 'data/players.json', players, playersFile ? playersFile.sha : undefined, `Suma jugador nuevo a la bitacora${firma}`);
 
   return { ok: true, jugador: entrada };
+}
+
+// Recorre todas las sesiones guardadas buscando si jugadorId jugo alguna
+// partida — se usa para no dejar eliminar del roster a alguien que ya
+// tiene historial (rompería sus stats y el timeline).
+async function jugadorTienePartidas(cfg, jugadorId) {
+  const manifestFile = await ghObtenerArchivo(cfg, 'data/manifest.json');
+  const manifest = manifestFile ? manifestFile.datos : [];
+  for (const archivo of manifest) {
+    const sesionFile = await ghObtenerArchivo(cfg, `data/sessions/${archivo}`);
+    if (!sesionFile) continue;
+    const partidas = sesionFile.datos.partidas || [];
+    for (const p of partidas) {
+      for (const j of (p.jugadores || [])) {
+        if (j.jugador === jugadorId) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Saca a un jugador del roster (accion "eliminar_jugador"). Rechaza el
+// pedido si ya tiene partidas cargadas, y borra su foto si tenía.
+async function eliminarJugador(cfg, jugadorId, autor) {
+  const firma = autor ? ` (por ${autor})` : '';
+  const playersFile = await ghObtenerArchivo(cfg, 'data/players.json');
+  const players = playersFile ? playersFile.datos : [];
+  const jugador = players.find((p) => p.id === jugadorId);
+  if (!jugador) throw new Error('Ese jugador no existe en el roster');
+
+  if (await jugadorTienePartidas(cfg, jugadorId)) {
+    throw new Error('Ese jugador ya tiene partidas cargadas, no se puede eliminar del roster');
+  }
+
+  const restantes = players.filter((p) => p.id !== jugadorId);
+  await ghGuardarArchivo(cfg, 'data/players.json', restantes, playersFile.sha, `Elimina jugador del roster${firma}`);
+
+  if (jugador.imagen) {
+    const shaImagen = await ghShaSiExiste(cfg, jugador.imagen);
+    if (shaImagen) await ghEliminarArchivo(cfg, jugador.imagen, shaImagen, `Borra foto de jugador eliminado${firma}`);
+  }
+
+  return { ok: true };
 }
 
 async function guardarSesion(cfg, payload) {

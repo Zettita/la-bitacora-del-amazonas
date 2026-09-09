@@ -245,7 +245,13 @@ main{
   border-radius:10px;
   padding:1.3rem 1rem 1.1rem;
   text-align:center;
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  cursor:pointer;
+  transition:border-color .15s ease, transform .15s ease;
 }
+.podio-tarjeta:hover{border-color:var(--oro); transform:translateY(-3px);}
 .podio-puesto{
   position:absolute;
   top:.6rem;

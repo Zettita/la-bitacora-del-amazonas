@@ -194,6 +194,11 @@ textarea{resize:vertical; width:100%;}
 }
 .campo-alta-boton:hover{filter:brightness(1.1);}
 .campo-alta-boton:disabled{opacity:.5; cursor:not-allowed;}
+.campo-alta-boton-peligro{
+  background:linear-gradient(180deg, #d97a7a 0%, var(--derrota) 100%);
+  box-shadow:0 0 0 1px #d97a7a inset;
+  color:#fff;
+}
 
 /* ---------- Tabla tipo planilla (Partida) ---------- */
 .tabla-wrap{overflow-x:auto; margin-top:1rem;}
