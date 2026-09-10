@@ -160,6 +160,7 @@ h1,h2,h3,.cinzel{
     linear-gradient(180deg, rgba(12,10,8,.55) 0%, rgba(12,10,8,.7) 55%, rgba(12,10,8,.9) 100%),
     url('../img/portada.webp') center / cover no-repeat;
 }
+.portada-chica{padding:3rem 1.5rem 2.5rem;}
 .portada-orla{
   max-width:780px;
   margin:0 auto;
@@ -709,6 +710,8 @@ main{
   border:1px dashed var(--borde);
   border-radius:8px;
 }
+.vacio-timeline a{color:var(--oro-claro);}
+.vacio-timeline a:hover{color:var(--oro);}
 
 footer{
   text-align:center;
