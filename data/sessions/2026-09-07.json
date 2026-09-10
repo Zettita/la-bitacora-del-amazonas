@@ -166,6 +166,64 @@
         }
       ],
       "numero": 3
+    },
+    {
+      "resultado": "Derrota",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Ezreal",
+          "rol": "ADC",
+          "kda": {
+            "k": 13,
+            "d": 9,
+            "a": 12
+          },
+          "cs": 214,
+          "oro": 16158,
+          "vision": 6,
+          "premios": [
+            "mvp",
+            "killer",
+            "goblin",
+            "granjero"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 7,
+            "d": 11,
+            "a": 15
+          },
+          "cs": 184,
+          "oro": 12749,
+          "vision": 11,
+          "premios": []
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Leona",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 1,
+            "d": 12,
+            "a": 20
+          },
+          "cs": 9,
+          "oro": 8769,
+          "vision": 37,
+          "premios": [
+            "ayudante",
+            "centinela",
+            "ancla",
+            "feeder"
+          ]
+        }
+      ],
+      "numero": 4
     }
   ]
 }
