@@ -3,11 +3,14 @@
 // íconos, e iniciales de respaldo.
 
 const PREMIOS_INFO = {
+  mvp:       { label: 'MVP',       icono: '🏆' },
   killer:    { label: 'Killer',    icono: '🗡️' },
   ayudante:  { label: 'Ayudante',  icono: '🤝' },
   goblin:    { label: 'Goblin',    icono: '💰' },
-  ancla:     { label: 'Ancla',     icono: '⚓' },
   centinela: { label: 'Centinela', icono: '👁️' },
+  granjero:  { label: 'Granjero',  icono: '🌾' },
+  ancla:     { label: 'Ancla',     icono: '⚓' },
+  feeder:    { label: 'Feeder',    icono: '💀' },
 };
 
 // Objeto {killer:0, ayudante:0, ...} listo para acumular conteos — todo lo

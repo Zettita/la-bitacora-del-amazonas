@@ -546,7 +546,7 @@ function agregarBloquePartida(){
     renumerarPartidas();
   });
   bloque.querySelector('.jugadores-tbody').addEventListener('input', (ev) => {
-    if(ev.target.matches('.j-k, .j-d, .j-a, .j-oro, .j-vision')) actualizarPremiosVisualesPartida(bloque);
+    if(ev.target.matches('.j-k, .j-d, .j-a, .j-cs, .j-oro, .j-vision')) actualizarPremiosVisualesPartida(bloque);
   });
 
   // El select de jugador dispara 'change', el campo de campeón dispara
@@ -570,34 +570,62 @@ function renumerarPartidas(){
   contadorPartidas = bloques.length;
 }
 
-// A qué input de la fila mira cada premio para decidir quién se lo lleva.
-const CAMPO_POR_PREMIO = {
-  killer: '.j-k', ayudante: '.j-a', goblin: '.j-oro', ancla: '.j-d', centinela: '.j-vision',
+// Kills + asistencias - muertes de una fila: el "aporte neto" que decide
+// MVP (el más alto) y Ancla (el más bajo) — así alguien que murió mucho
+// pero también carreó (muchos kills/asistencias) no gana Ancla solo por
+// la cantidad de muertes, y alguien que murió mucho sin aportar nada sí.
+function aporteNeto(fila){
+  const k = Number(fila.querySelector('.j-k').value) || 0;
+  const d = Number(fila.querySelector('.j-d').value) || 0;
+  const a = Number(fila.querySelector('.j-a').value) || 0;
+  return k + a - d;
+}
+
+// Cómo se calcula cada premio: `valor` da el número a comparar entre las
+// filas de la partida, `mejor` dice si gana el más alto o el más bajo.
+const CRITERIOS_PREMIO = {
+  mvp:       { valor: aporteNeto, mejor: 'max' },
+  killer:    { valor: fila => Number(fila.querySelector('.j-k').value) || 0, mejor: 'max' },
+  ayudante:  { valor: fila => Number(fila.querySelector('.j-a').value) || 0, mejor: 'max' },
+  goblin:    { valor: fila => Number(fila.querySelector('.j-oro').value) || 0, mejor: 'max' },
+  centinela: { valor: fila => Number(fila.querySelector('.j-vision').value) || 0, mejor: 'max' },
+  granjero:  { valor: fila => Number(fila.querySelector('.j-cs').value) || 0, mejor: 'max' },
+  ancla:     { valor: aporteNeto, mejor: 'min' },
+  feeder:    { valor: fila => Number(fila.querySelector('.j-d').value) || 0, mejor: 'max' },
 };
 
-// Premios 100% automáticos: para cada uno, el/los jugador/es con el valor
-// más alto de su estadística en ESA partida se lo llevan (empate incluido,
-// se lo llevan todos). Si nadie cargó nada para una estadística (máximo en
-// 0), esa partida no otorga ese premio. No dependen de otras partidas ni
-// de otras sesiones — solo de las filas cargadas acá.
+// Premios 100% automáticos: para cada uno, el/los jugador/es con el mejor
+// valor de su criterio en ESA partida se lo llevan (empate incluido, se lo
+// llevan todos). Si nadie cargó nada para un premio de "el más alto gana"
+// (máximo en 0), esa partida no lo otorga. No dependen de otras partidas
+// ni de otras sesiones — solo de las filas cargadas acá.
+//
+// Con un solo jugador cargado no hay con quién comparar, así que esa
+// partida no reparte ningún premio (aunque sus stats sí cuentan para el
+// perfil, como cualquier partida). Hace falta un mínimo de 2.
+const MIN_JUGADORES_PARA_PREMIOS = 2;
+
 function calcularPremiosDePartida(bloque, filas){
   filas = filas || Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
   const premiosPorFila = filas.map(() => []);
 
+  const cantidadJugadores = filas.filter(fila => fila.querySelector('.j-select').value).length;
+  if(cantidadJugadores < MIN_JUGADORES_PARA_PREMIOS) return premiosPorFila;
+
   Object.keys(PREMIOS_INFO).forEach(key => {
-    const campo = CAMPO_POR_PREMIO[key];
-    if(!campo) return;
-    const valores = filas.map(fila => Number(fila.querySelector(campo).value) || 0);
-    const max = Math.max(0, ...valores);
-    if(max <= 0) return;
-    valores.forEach((v, i) => { if(v === max) premiosPorFila[i].push(key); });
+    const criterio = CRITERIOS_PREMIO[key];
+    if(!criterio) return;
+    const valores = filas.map(criterio.valor);
+    const objetivo = criterio.mejor === 'min' ? Math.min(...valores) : Math.max(...valores);
+    if(criterio.mejor === 'max' && objetivo <= 0) return;
+    valores.forEach((v, i) => { if(v === objetivo) premiosPorFila[i].push(key); });
   });
 
   return premiosPorFila;
 }
 
 // Repinta la celda de premios de cada fila de la partida según los datos
-// actuales — se llama en cada tipeo de K/D/A/Oro/Visión y al agregar o
+// actuales — se llama en cada tipeo de K/D/A/CS/Oro/Visión y al agregar o
 // quitar un jugador de la partida.
 function actualizarPremiosVisualesPartida(bloque){
   const filas = Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
@@ -623,6 +651,7 @@ function leerJugadoresDePartida(bloque){
     const k = fila.querySelector('.j-k').value;
     const d = fila.querySelector('.j-d').value;
     const a = fila.querySelector('.j-a').value;
+    const cs = fila.querySelector('.j-cs').value;
     const oro = fila.querySelector('.j-oro').value;
     const vision = fila.querySelector('.j-vision').value;
 
@@ -631,6 +660,7 @@ function leerJugadoresDePartida(bloque){
       campeon: normalizarNombreCampeon(fila.querySelector('.j-campeon').value),
       rol: fila.querySelector('.j-rol').value,
       kda: { k: Number(k)||0, d: Number(d)||0, a: Number(a)||0 },
+      cs: Number(cs)||0,
       oro: Number(oro)||0,
       vision: Number(vision)||0,
       premios: premiosPorFila[i],

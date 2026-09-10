@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/style.css?v=30">
+<link rel="stylesheet" href="../css/style.css?v=32">
 <link rel="stylesheet" href="cargar.css?v=21">
 </head>
 <body class="pagina-carga">
@@ -175,7 +175,7 @@
         <table class="v3-tabla">
           <thead>
             <tr>
-              <th>Jugador</th><th>Campeón</th><th>Rol</th><th>K</th><th>D</th><th>A</th><th>Oro</th><th>Visión</th><th>Premios</th><th>Comentario</th><th></th>
+              <th>Jugador</th><th>Campeón</th><th>Rol</th><th>K</th><th>D</th><th>A</th><th>CS</th><th>Oro</th><th>Visión</th><th>Premios</th><th>Comentario</th><th></th>
             </tr>
           </thead>
           <tbody class="jugadores-tbody"></tbody>
@@ -243,6 +243,7 @@
     <td><input type="number" min="0" class="j-k" placeholder="K"></td>
     <td><input type="number" min="0" class="j-d" placeholder="D"></td>
     <td><input type="number" min="0" class="j-a" placeholder="A"></td>
+    <td><input type="number" min="0" class="j-cs" placeholder="CS"></td>
     <td><input type="number" min="0" class="j-oro" placeholder="Oro"></td>
     <td><input type="number" min="0" class="j-vision" placeholder="Visión"></td>
     <td>
@@ -252,7 +253,7 @@
     <td><button type="button" class="btn-quitar-jugador" title="Quitar">✕</button></td>
   </tr>
   <tr class="v3-fila-editar-foto" hidden>
-    <td colspan="11">
+    <td colspan="12">
       <div class="ef-fila-contenido">
         <div class="ef-foto-actual-wrap">
           <img class="ef-foto-actual" alt="Foto actual" hidden>
@@ -310,9 +311,9 @@
   </div>
 </template>
 
-<script src="../js/comunes.js?v=10"></script>
+<script src="../js/comunes.js?v=12"></script>
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="cargar.js?v=16"></script>
+<script src="cargar.js?v=18"></script>
 </body>
 </html>
