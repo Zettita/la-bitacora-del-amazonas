@@ -22,6 +22,26 @@
         }
       ],
       "numero": 1
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 8,
+            "d": 6,
+            "a": 8
+          },
+          "cs": 170,
+          "oro": 12713,
+          "vision": 7,
+          "premios": []
+        }
+      ],
+      "numero": 2
     }
   ]
 }
