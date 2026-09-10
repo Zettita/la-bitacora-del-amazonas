@@ -62,6 +62,51 @@
         }
       ],
       "numero": 3
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Ezreal",
+          "rol": "ADC",
+          "kda": {
+            "k": 1,
+            "d": 5,
+            "a": 4
+          },
+          "cs": 94,
+          "oro": 10013,
+          "vision": 2,
+          "premios": [
+            "ayudante",
+            "goblin",
+            "ancla",
+            "feeder"
+          ],
+          "comentario": "Jeje"
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 13,
+            "d": 1,
+            "a": 0
+          },
+          "cs": 132,
+          "oro": 5796,
+          "vision": 4,
+          "premios": [
+            "mvp",
+            "killer",
+            "centinela",
+            "granjero"
+          ]
+        }
+      ],
+      "numero": 4
     }
   ]
 }
