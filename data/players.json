@@ -16,5 +16,11 @@
     "nombre": "Tutte",
     "rolPreferido": "JUNGLE",
     "imagen": "img/jugadores/tutte.jpg"
+  },
+  {
+    "id": "el-gordo",
+    "nombre": "El gordo",
+    "rolPreferido": "ADC",
+    "imagen": "img/jugadores/el-gordo.jpg"
   }
 ]
