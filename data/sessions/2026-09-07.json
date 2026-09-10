@@ -224,6 +224,27 @@
         }
       ],
       "numero": 4
+    },
+    {
+      "resultado": "Derrota",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 15,
+            "d": 9,
+            "a": 9
+          },
+          "cs": 246,
+          "oro": 16883,
+          "vision": 26,
+          "premios": [],
+          "comentario": "..."
+        }
+      ],
+      "numero": 5
     }
   ]
 }
