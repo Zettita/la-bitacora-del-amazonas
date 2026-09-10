@@ -225,6 +225,67 @@
         }
       ],
       "numero": 4
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Sona",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 4,
+            "d": 11,
+            "a": 24
+          },
+          "cs": 20,
+          "oro": 12106,
+          "vision": 30,
+          "premios": [
+            "ayudante",
+            "centinela",
+            "feeder"
+          ],
+          "comentario": "La bestia encadenada..."
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 18,
+            "d": 10,
+            "a": 3
+          },
+          "cs": 229,
+          "oro": 17528,
+          "vision": 2,
+          "premios": [
+            "killer",
+            "granjero",
+            "ancla"
+          ]
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Evelynn",
+          "rol": "JUNGLE",
+          "kda": {
+            "k": 18,
+            "d": 4,
+            "a": 12
+          },
+          "cs": 186,
+          "oro": 18797,
+          "vision": 4,
+          "premios": [
+            "mvp",
+            "killer",
+            "goblin"
+          ]
+        }
+      ],
+      "numero": 5
     }
   ]
 }
