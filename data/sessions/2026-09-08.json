@@ -1,0 +1,66 @@
+{
+  "fecha": "2026-09-08",
+  "titulo": "Noche de juego",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Nasus",
+          "rol": "TOP",
+          "kda": {
+            "k": 5,
+            "d": 3,
+            "a": 7
+          },
+          "cs": 241,
+          "oro": 13139,
+          "vision": 2,
+          "premios": [
+            "granjero"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Ryze",
+          "rol": "MID",
+          "kda": {
+            "k": 14,
+            "d": 4,
+            "a": 7
+          },
+          "cs": 169,
+          "oro": 14866,
+          "vision": 5,
+          "premios": [
+            "mvp",
+            "killer",
+            "goblin"
+          ]
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Leona",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 0,
+            "d": 11,
+            "a": 23
+          },
+          "cs": 2,
+          "oro": 8754,
+          "vision": 32,
+          "premios": [
+            "ayudante",
+            "centinela",
+            "ancla",
+            "feeder"
+          ]
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
