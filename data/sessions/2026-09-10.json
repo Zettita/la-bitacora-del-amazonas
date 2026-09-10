@@ -1,0 +1,47 @@
+{
+  "fecha": "2026-09-10",
+  "titulo": "Noche de juego",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Derrota",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 9,
+            "d": 10,
+            "a": 7
+          },
+          "cs": 167,
+          "oro": 11582,
+          "vision": 3,
+          "premios": []
+        }
+      ],
+      "numero": 1
+    },
+    {
+      "resultado": "Derrota",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 11,
+            "d": 14,
+            "a": 7
+          },
+          "cs": 245,
+          "oro": 16502,
+          "vision": 5,
+          "premios": []
+        }
+      ],
+      "numero": 2
+    }
+  ]
+}
