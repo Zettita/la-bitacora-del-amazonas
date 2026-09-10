@@ -16,11 +16,5 @@
     "nombre": "Tutte",
     "rolPreferido": "JUNGLE",
     "imagen": "img/jugadores/tutte.jpg"
-  },
-  {
-    "id": "nikito",
-    "nombre": "Nikito",
-    "rolPreferido": "TOP",
-    "imagen": "img/jugadores/nikito.jpg"
   }
 ]
