@@ -61,6 +61,51 @@
         }
       ],
       "numero": 1
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Pantheon",
+          "rol": "TOP",
+          "kda": {
+            "k": 7,
+            "d": 5,
+            "a": 7
+          },
+          "cs": 108,
+          "oro": 8923,
+          "vision": 3,
+          "premios": [
+            "ayudante",
+            "ancla",
+            "feeder"
+          ],
+          "comentario": "Topee daño chat..."
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 11,
+            "d": 1,
+            "a": 3
+          },
+          "cs": 175,
+          "oro": 11252,
+          "vision": 14,
+          "premios": [
+            "mvp",
+            "killer",
+            "goblin",
+            "centinela",
+            "granjero"
+          ]
+        }
+      ],
+      "numero": 2
     }
   ]
 }
