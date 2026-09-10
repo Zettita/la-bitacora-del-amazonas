@@ -1,0 +1,27 @@
+{
+  "fecha": "2026-09-10",
+  "titulo": "Noche de juego",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Alistar",
+          "rol": "TOP",
+          "kda": {
+            "k": 2,
+            "d": 2,
+            "a": 2
+          },
+          "cs": 2,
+          "oro": 2,
+          "vision": 2,
+          "premios": []
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
