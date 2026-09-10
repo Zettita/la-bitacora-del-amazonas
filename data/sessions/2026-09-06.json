@@ -46,6 +46,66 @@
         }
       ],
       "numero": 1
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Pantheon",
+          "rol": "TOP",
+          "kda": {
+            "k": 5,
+            "d": 1,
+            "a": 1
+          },
+          "cs": 181,
+          "oro": 10291,
+          "vision": 3,
+          "premios": [
+            "killer",
+            "granjero"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 4,
+            "d": 4,
+            "a": 5
+          },
+          "cs": 169,
+          "oro": 10330,
+          "vision": 3,
+          "premios": [
+            "goblin",
+            "ancla",
+            "feeder"
+          ]
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Taric",
+          "rol": "SUPPORT",
+          "kda": {
+            "k": 2,
+            "d": 0,
+            "a": 11
+          },
+          "cs": 8,
+          "oro": 7875,
+          "vision": 34,
+          "premios": [
+            "mvp",
+            "ayudante",
+            "centinela"
+          ],
+          "comentario": "Debuta usando comodín..."
+        }
+      ],
+      "numero": 2
     }
   ]
 }
