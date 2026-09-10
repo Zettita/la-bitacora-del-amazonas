@@ -26,35 +26,53 @@ function premiosEnCero(){
 // clases (.j-select, .j-k, .j-d, .j-a, .j-cs, .j-oro, .j-vision) así que la
 // misma lógica de cálculo sirve para las dos pantallas.
 
-// Kills + asistencias - muertes de una fila: el "aporte neto" que decide
-// MVP (el más alto) y Ancla (el más bajo) — así alguien que murió mucho
-// pero también carreó (muchos kills/asistencias) no gana Ancla solo por
-// la cantidad de muertes, y alguien que murió mucho sin aportar nada sí.
-function aporteNeto(fila){
+// Ratio tipo KDA clásico ((kills+asistencias)/muertes) que decide MVP (el
+// más alto) y Ancla (el más bajo). Terminar sin morir ni una vez es "KDA
+// Perfecto" — como en el cliente de LoL, op.gg, u.gg, etc., donde no se
+// calcula como un número (dividir por cero no da un ratio real) sino que
+// vale más que cualquier partida con muertes. Por eso un 0 en muertes usa
+// una base bien alta (por encima de cualquier ratio real posible) más los
+// kills+asistencias, para poder seguir desempatando entre varias partidas
+// "Perfectas" de la misma noche por quién aportó más.
+const BASE_KDA_PERFECTO = 1000;
+function ratioKda(fila){
   const k = Number(fila.querySelector('.j-k').value) || 0;
   const d = Number(fila.querySelector('.j-d').value) || 0;
   const a = Number(fila.querySelector('.j-a').value) || 0;
-  return k + a - d;
+  return d === 0 ? BASE_KDA_PERFECTO + k + a : (k + a) / d;
+}
+
+// Una fila "cuenta" para MVP/Ancla solo si tiene algo cargado de K/D/A —
+// si está en blanco (nadie tipeó nada) no es una partida "perfecta", es
+// simplemente un dato que falta, y no debería competir por ninguno de los
+// dos premios.
+function tieneStatsDeCombate(fila){
+  const k = Number(fila.querySelector('.j-k').value) || 0;
+  const d = Number(fila.querySelector('.j-d').value) || 0;
+  const a = Number(fila.querySelector('.j-a').value) || 0;
+  return k > 0 || d > 0 || a > 0;
 }
 
 // Cómo se calcula cada premio: `valor` da el número a comparar entre las
-// filas de la partida, `mejor` dice si gana el más alto o el más bajo.
+// filas de la partida, `mejor` dice si gana el más alto o el más bajo, y
+// `elegible` (opcional) filtra qué filas entran en la comparación.
 const CRITERIOS_PREMIO = {
-  mvp:       { valor: aporteNeto, mejor: 'max' },
+  mvp:       { valor: ratioKda, mejor: 'max', elegible: tieneStatsDeCombate },
   killer:    { valor: fila => Number(fila.querySelector('.j-k').value) || 0, mejor: 'max' },
   ayudante:  { valor: fila => Number(fila.querySelector('.j-a').value) || 0, mejor: 'max' },
   goblin:    { valor: fila => Number(fila.querySelector('.j-oro').value) || 0, mejor: 'max' },
   centinela: { valor: fila => Number(fila.querySelector('.j-vision').value) || 0, mejor: 'max' },
   granjero:  { valor: fila => Number(fila.querySelector('.j-cs').value) || 0, mejor: 'max' },
-  ancla:     { valor: aporteNeto, mejor: 'min' },
+  ancla:     { valor: ratioKda, mejor: 'min', elegible: tieneStatsDeCombate },
   feeder:    { valor: fila => Number(fila.querySelector('.j-d').value) || 0, mejor: 'max' },
 };
 
 // Premios 100% automáticos: para cada uno, el/los jugador/es con el mejor
 // valor de su criterio en ESA partida se lo llevan (empate incluido, se lo
 // llevan todos). Si nadie cargó nada para un premio de "el más alto gana"
-// (máximo en 0), esa partida no lo otorga. No dependen de otras partidas
-// ni de otras sesiones — solo de las filas cargadas acá.
+// (máximo en 0), o si ninguna fila es elegible, esa partida no lo otorga.
+// No dependen de otras partidas ni de otras sesiones — solo de las filas
+// cargadas acá.
 //
 // Con un solo jugador cargado no hay con quién comparar, así que esa
 // partida no reparte ningún premio (aunque sus stats sí cuentan para el
@@ -71,10 +89,17 @@ function calcularPremiosDePartida(bloque, filas){
   Object.keys(PREMIOS_INFO).forEach(key => {
     const criterio = CRITERIOS_PREMIO[key];
     if(!criterio) return;
-    const valores = filas.map(criterio.valor);
+
+    const indicesElegibles = filas
+      .map((_, i) => i)
+      .filter(i => !criterio.elegible || criterio.elegible(filas[i]));
+    if(!indicesElegibles.length) return;
+
+    const valores = indicesElegibles.map(i => criterio.valor(filas[i]));
     const objetivo = criterio.mejor === 'min' ? Math.min(...valores) : Math.max(...valores);
     if(criterio.mejor === 'max' && objetivo <= 0) return;
-    valores.forEach((v, i) => { if(v === objetivo) premiosPorFila[i].push(key); });
+
+    indicesElegibles.forEach((i, idx) => { if(valores[idx] === objetivo) premiosPorFila[i].push(key); });
   });
 
   return premiosPorFila;
