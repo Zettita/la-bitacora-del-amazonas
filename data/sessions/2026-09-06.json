@@ -286,6 +286,27 @@
         }
       ],
       "numero": 5
+    },
+    {
+      "resultado": "Derrota",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Ryze",
+          "rol": "TOP",
+          "kda": {
+            "k": 18,
+            "d": 15,
+            "a": 10
+          },
+          "cs": 233,
+          "oro": 23033,
+          "vision": 26,
+          "premios": [],
+          "comentario": "Mamita..."
+        }
+      ],
+      "numero": 6
     }
   ]
 }
