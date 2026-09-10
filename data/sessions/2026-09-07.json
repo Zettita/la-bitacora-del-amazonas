@@ -106,6 +106,66 @@
         }
       ],
       "numero": 2
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Nasus",
+          "rol": "TOP",
+          "kda": {
+            "k": 1,
+            "d": 1,
+            "a": 4
+          },
+          "cs": 196,
+          "oro": 10737,
+          "vision": 4,
+          "premios": [
+            "granjero"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 5,
+            "d": 3,
+            "a": 7
+          },
+          "cs": 182,
+          "oro": 14356,
+          "vision": 4,
+          "premios": [
+            "ayudante",
+            "goblin",
+            "ancla"
+          ]
+        },
+        {
+          "jugador": "tutte",
+          "campeon": "Jax",
+          "rol": "JUNGLE",
+          "kda": {
+            "k": 16,
+            "d": 4,
+            "a": 7
+          },
+          "cs": 135,
+          "oro": 11447,
+          "vision": 9,
+          "premios": [
+            "mvp",
+            "killer",
+            "ayudante",
+            "centinela",
+            "feeder"
+          ]
+        }
+      ],
+      "numero": 3
     }
   ]
 }
