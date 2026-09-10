@@ -41,7 +41,7 @@ function calcularEstadisticasJugador(sesiones, jugadorId){
   let partidas = 0, victorias = 0;
   let k = 0, d = 0, a = 0;
   const campeones = {};
-  const premios = { mvp: 0, carry: 0, troll: 0, ancla: 0 };
+  const premios = premiosEnCero();
   const historial = [];
 
   sesiones.forEach(s => (s.partidas || []).forEach(p => {

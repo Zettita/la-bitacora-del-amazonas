@@ -3,11 +3,19 @@
 // íconos, e iniciales de respaldo.
 
 const PREMIOS_INFO = {
-  mvp:   { label: 'MVP',              icono: '🏆' },
-  carry: { label: 'Se la cargó',      icono: '💪' },
-  troll: { label: 'Trolleo',          icono: '🤡' },
-  ancla: { label: 'Ancla',            icono: '⚓' },
+  killer:    { label: 'Killer',    icono: '🗡️' },
+  ayudante:  { label: 'Ayudante',  icono: '🤝' },
+  goblin:    { label: 'Goblin',    icono: '💰' },
+  ancla:     { label: 'Ancla',     icono: '⚓' },
+  centinela: { label: 'Centinela', icono: '👁️' },
 };
+
+// Objeto {killer:0, ayudante:0, ...} listo para acumular conteos — todo lo
+// que arranca un contador de premios en cero parte de acá, así al agregar o
+// sacar un premio del catálogo no hay que tocar cada lugar que lo usa.
+function premiosEnCero(){
+  return Object.fromEntries(Object.keys(PREMIOS_INFO).map(k => [k, 0]));
+}
 
 const CAMPEON_ESPECIALES = {
   "wukong": "MonkeyKing", "kaisa": "Kaisa", "kai'sa": "Kaisa",

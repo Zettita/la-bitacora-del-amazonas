@@ -40,7 +40,7 @@ function calcularEstadisticas(sesiones, jugadores){
     if(!stats[id]) stats[id] = {
       id, nombre: jugadores[id]?.nombre || id,
       partidas:0, victorias:0, derrotas:0,
-      premios: { mvp:0, carry:0, troll:0, ancla:0 },
+      premios: premiosEnCero(),
     };
     return stats[id];
   };
@@ -88,7 +88,7 @@ function renderSalonDeLaFama(stats, totalPartidas, totalSesiones){
     return;
   }
 
-  ['mvp','carry','troll','ancla'].forEach(key => {
+  Object.keys(PREMIOS_INFO).forEach(key => {
     const info = PREMIOS_INFO[key];
     const top = topPor(stats, key);
     const card = document.createElement('div');
@@ -149,7 +149,7 @@ function renderPodio(stats, jugadores, jugadoresArr){
   stats.forEach(s => { statsPorId[s.id] = s; });
   const lista = jugadoresArr.map(j => statsPorId[j.id] || {
     id: j.id, nombre: j.nombre, partidas: 0, victorias: 0, derrotas: 0,
-    premios: { mvp:0, carry:0, troll:0, ancla:0 },
+    premios: premiosEnCero(),
   });
 
   const hayPartidas = lista.some(s => s.partidas > 0);

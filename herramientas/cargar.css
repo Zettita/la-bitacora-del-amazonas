@@ -216,13 +216,12 @@ textarea{resize:vertical; width:100%;}
 .v3-tabla .j-comentario{width:100%; min-width:130px;}
 .v3-tabla .campeon-picker input{min-width:120px;}
 
-.v3-premios-cell{display:flex; gap:.2rem;}
-.mini-premio{
+.v3-premios-cell{display:flex; flex-wrap:wrap; gap:.2rem; min-width:64px;}
+.mini-premio-auto{
   width:26px; height:26px; border-radius:5px; display:flex; align-items:center; justify-content:center;
-  border:1px solid var(--borde); font-size:.85rem; cursor:pointer; background:var(--noche); padding:0;
+  border:1px solid var(--oro); font-size:.85rem; background:rgba(201,162,39,.22); padding:0;
 }
-.mini-premio:hover{border-color:var(--oro);}
-.mini-premio.on{border-color:var(--oro); background:rgba(201,162,39,.22);}
+.mini-premio-vacio{color:var(--pergamino-osc); opacity:.5; font-size:.85rem; padding:.4rem 0;}
 
 .btn-editar-foto{
   background:none;

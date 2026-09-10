@@ -296,15 +296,12 @@ function crearFilaJugador(bloque){
     refrescarSelectsDePartida(bloque);
   });
 
-  fila.querySelectorAll('.mini-premio').forEach(btn => {
-    btn.addEventListener('click', () => btn.classList.toggle('on'));
-  });
-
   fila.querySelector('.btn-quitar-jugador').addEventListener('click', () => {
     fila.remove();
     filaEditar.remove();
     refrescarSelectsDePartida(bloque);
     actualizarBotonAgregar(bloque);
+    actualizarPremiosVisualesPartida(bloque);
   });
 
   const frag = document.createDocumentFragment();
@@ -318,6 +315,7 @@ function agregarFilaJugador(bloque){
   if(tbody.querySelectorAll('.v3-fila-jugador').length >= MAX_JUGADORES_POR_PARTIDA) return;
   tbody.appendChild(crearFilaJugador(bloque));
   actualizarBotonAgregar(bloque);
+  actualizarPremiosVisualesPartida(bloque);
 }
 
 // ---------- Alta rápida de jugador (form aparte, no forma parte de la sesión) ----------
@@ -525,6 +523,9 @@ function agregarBloquePartida(){
     bloque.remove();
     renumerarPartidas();
   });
+  bloque.querySelector('.jugadores-tbody').addEventListener('input', (ev) => {
+    if(ev.target.matches('.j-k, .j-d, .j-a, .j-oro, .j-vision')) actualizarPremiosVisualesPartida(bloque);
+  });
 
   contenedorPartidas.appendChild(bloque);
   actualizarBotonAgregar(bloque);
@@ -536,24 +537,70 @@ function renumerarPartidas(){
   contadorPartidas = bloques.length;
 }
 
+// A qué input de la fila mira cada premio para decidir quién se lo lleva.
+const CAMPO_POR_PREMIO = {
+  killer: '.j-k', ayudante: '.j-a', goblin: '.j-oro', ancla: '.j-d', centinela: '.j-vision',
+};
+
+// Premios 100% automáticos: para cada uno, el/los jugador/es con el valor
+// más alto de su estadística en ESA partida se lo llevan (empate incluido,
+// se lo llevan todos). Si nadie cargó nada para una estadística (máximo en
+// 0), esa partida no otorga ese premio. No dependen de otras partidas ni
+// de otras sesiones — solo de las filas cargadas acá.
+function calcularPremiosDePartida(bloque, filas){
+  filas = filas || Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
+  const premiosPorFila = filas.map(() => []);
+
+  Object.keys(PREMIOS_INFO).forEach(key => {
+    const campo = CAMPO_POR_PREMIO[key];
+    if(!campo) return;
+    const valores = filas.map(fila => Number(fila.querySelector(campo).value) || 0);
+    const max = Math.max(0, ...valores);
+    if(max <= 0) return;
+    valores.forEach((v, i) => { if(v === max) premiosPorFila[i].push(key); });
+  });
+
+  return premiosPorFila;
+}
+
+// Repinta la celda de premios de cada fila de la partida según los datos
+// actuales — se llama en cada tipeo de K/D/A/Oro/Visión y al agregar o
+// quitar un jugador de la partida.
+function actualizarPremiosVisualesPartida(bloque){
+  const filas = Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
+  const premiosPorFila = calcularPremiosDePartida(bloque, filas);
+
+  filas.forEach((fila, i) => {
+    const celda = fila.querySelector('.v3-premios-cell');
+    celda.innerHTML = premiosPorFila[i].length
+      ? premiosPorFila[i].map(key => `<span class="mini-premio-auto" title="${PREMIOS_INFO[key].label}">${PREMIOS_INFO[key].icono}</span>`).join('')
+      : '<span class="mini-premio-vacio">—</span>';
+  });
+}
+
 function leerJugadoresDePartida(bloque){
+  const filas = Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
+  const premiosPorFila = calcularPremiosDePartida(bloque, filas);
   const jugadores = [];
 
-  bloque.querySelectorAll('.v3-fila-jugador').forEach(fila => {
+  filas.forEach((fila, i) => {
     const jugadorId = fila.querySelector('.j-select').value;
     if(!jugadorId) return;
 
-    const premios = Array.from(fila.querySelectorAll('.mini-premio.on')).map(el => el.dataset.premio);
     const k = fila.querySelector('.j-k').value;
     const d = fila.querySelector('.j-d').value;
     const a = fila.querySelector('.j-a').value;
+    const oro = fila.querySelector('.j-oro').value;
+    const vision = fila.querySelector('.j-vision').value;
 
     const jugador = {
       jugador: jugadorId,
       campeon: normalizarNombreCampeon(fila.querySelector('.j-campeon').value),
       rol: fila.querySelector('.j-rol').value,
       kda: { k: Number(k)||0, d: Number(d)||0, a: Number(a)||0 },
-      premios,
+      oro: Number(oro)||0,
+      vision: Number(vision)||0,
+      premios: premiosPorFila[i],
     };
     const comentario = fila.querySelector('.j-comentario').value.trim();
     if(comentario) jugador.comentario = comentario;
@@ -606,7 +653,6 @@ function leerPartidas(){
   return Array.from(contenedorPartidas.querySelectorAll('.bloque-partida')).map(bloque => {
     const partida = {
       resultado: bloque.querySelector('.p-resultado').value,
-      duracion: bloque.querySelector('.p-duracion').value.trim(),
       jugadores: leerJugadoresDePartida(bloque),
     };
     const destacados = leerDestacadosDePartida(bloque);
