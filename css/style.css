@@ -904,6 +904,68 @@ footer{
   color:#f0e6d0;
 }
 
+/* ---------- Torneos: listado, cuadro de eliminación y podio "escenario" ---------- */
+.torneo-card{display:block; text-decoration:none; color:inherit; transition:transform .15s, border-color .15s;}
+.torneo-card:hover{transform:translateY(-3px); border-color:var(--oro);}
+.torneo-card-meta{margin:0; font-size:.85rem; color:var(--pergamino-osc); line-height:1.6;}
+
+.mini-avatar{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:22px; height:22px; border-radius:50%; overflow:hidden;
+  background:var(--noche-panel); border:1px solid var(--borde);
+  font-size:.6rem; color:var(--pergamino-osc); margin-right:-6px;
+  vertical-align:middle;
+}
+.mini-avatar:last-child{margin-right:0;}
+.mini-avatar img{width:100%; height:100%; object-fit:cover;}
+
+.tny-bracket{display:flex; gap:1.5rem; overflow-x:auto; padding:.5rem .2rem 1rem;}
+.tny-ronda{display:flex; flex-direction:column; min-width:190px;}
+.tny-ronda-titulo{
+  font-family:'Marcellus', serif; font-size:.8rem; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--oro-claro); text-align:center; margin-bottom:.6rem;
+}
+.tny-ronda-tercer{margin-left:1rem; border-left:1px dashed var(--borde); padding-left:1.5rem;}
+.tny-partidos{display:flex; flex-direction:column; justify-content:space-around; gap:1rem; flex:1;}
+.tny-partido{
+  display:flex; flex-direction:column; gap:2px;
+  border:1px solid var(--borde); border-radius:6px; overflow:hidden;
+  background:var(--noche-panel);
+}
+.tny-lado{
+  display:flex; align-items:center; gap:.5rem; padding:.5rem .6rem;
+  font-size:.85rem; color:var(--pergamino-osc);
+  border:none; background:transparent; width:100%; text-align:left; cursor:default;
+  font-family:'EB Garamond', serif;
+}
+.tny-lado + .tny-lado{border-top:1px solid rgba(90,74,42,.4);}
+.tny-lado.tny-vacio{color:var(--tinta-suave); justify-content:center; font-style:italic;}
+.tny-lado.tny-ganador{background:rgba(201,162,39,.12); color:var(--pergamino); font-weight:600;}
+.tny-lado.tny-ganador .tny-nombre::after{content:' ✓'; color:var(--oro);}
+.tny-lado.tny-clickeable{cursor:pointer;}
+.tny-lado.tny-clickeable:hover{background:rgba(201,162,39,.2);}
+.tny-avatares{display:flex; flex-shrink:0;}
+.tny-nombre{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+.podio-torneo{display:flex; align-items:flex-end; justify-content:center; gap:1rem; margin:1.5rem 0;}
+.podio-torneo-puesto{display:flex; flex-direction:column; align-items:center; gap:.4rem; width:120px;}
+.podio-torneo-avatares{display:flex;}
+.podio-torneo-nombre{
+  font-family:'Marcellus', serif; font-size:.9rem; color:var(--pergamino);
+  text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
+}
+.podio-torneo-escalon{
+  width:100%; border-radius:8px 8px 0 0;
+  display:flex; align-items:flex-start; justify-content:center; padding-top:.5rem;
+  font-size:1.6rem;
+  background:linear-gradient(180deg, rgba(201,162,39,.18) 0%, rgba(201,162,39,.05) 100%);
+  border:1px solid var(--oro); border-bottom:none;
+}
+.podio-torneo-p1 .podio-torneo-escalon{height:120px; font-size:2rem;}
+.podio-torneo-p1 .podio-torneo-nombre{font-size:1.05rem; color:var(--oro-claro);}
+.podio-torneo-p2 .podio-torneo-escalon{height:85px;}
+.podio-torneo-p3 .podio-torneo-escalon{height:60px;}
+
 @media (max-width:600px){
   body{font-size:16px;}
   .jugador-fila{grid-template-columns:auto 1fr; grid-template-areas:"avatar info" "kda kda" "premios premios";}
@@ -917,4 +979,6 @@ footer{
   .partida-mini .kda{grid-area:kda;}
   .partida-mini .fecha{grid-area:fecha; text-align:right;}
   .podio-flecha{display:none;}
+  .tny-ronda{min-width:160px;}
+  .podio-torneo-puesto{width:92px;}
 }

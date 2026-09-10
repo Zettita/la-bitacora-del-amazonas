@@ -94,35 +94,6 @@ function initCampeonPicker(raiz, claseInput = 'j-campeon'){
   });
 }
 
-// Redimensiona/comprime una foto elegida del disco a un JPEG chico (lado
-// mayor = maxDim) antes de mandarla, para no pesar el repo aunque suban una
-// foto de varios MB de un celular.
-function comprimirImagen(archivo, maxDim = 200, calidad = 0.82){
-  return new Promise((resolve, reject) => {
-    const lector = new FileReader();
-    lector.onerror = () => reject(new Error('No se pudo leer el archivo'));
-    lector.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error('No se pudo procesar la imagen'));
-      img.onload = () => {
-        let { width, height } = img;
-        if(width >= height){
-          if(width > maxDim){ height = Math.round(height * maxDim / width); width = maxDim; }
-        }else{
-          if(height > maxDim){ width = Math.round(width * maxDim / height); height = maxDim; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', calidad));
-      };
-      img.src = lector.result;
-    };
-    lector.readAsDataURL(archivo);
-  });
-}
-
 async function cargarRoster(){
   try{
     jugadoresRoster = await fetch('../data/players.json', { cache: 'no-store' }).then(r => r.json());
@@ -177,6 +148,51 @@ function refrescarSelectsDePartida(bloque){
 function refrescarTodosLosSelects(){
   contenedorPartidas.querySelectorAll('.bloque-partida').forEach(bloque => refrescarSelectsDePartida(bloque));
   poblarSelectEliminar();
+}
+
+const ROLES_MAPA = ['TOP', 'JUNGLE', 'MID', 'ADC', 'SUPPORT'];
+
+// Recorre las filas de jugadores de una partida y ubica en el mapita de la
+// Grieta, sobre la línea que cada uno eligió, su ícono de campeón (o sus
+// iniciales si todavía no tipeó un campeón) y su nombre. Se llama cada vez
+// que cambia algún select/input de una fila.
+function actualizarMapaPartida(bloque){
+  const wrap = bloque.querySelector('.mapa-lol-wrap');
+  if(!wrap) return;
+
+  const porRol = {};
+  bloque.querySelectorAll('.v3-fila-jugador').forEach(fila => {
+    const rol = fila.querySelector('.j-rol').value;
+    if(!ROLES_MAPA.includes(rol)) return;
+    const jugadorId = fila.querySelector('.j-select').value;
+    if(!jugadorId) return;
+    const jugador = jugadoresRoster.find(j => j.id === jugadorId);
+    porRol[rol] = {
+      nombre: jugador ? jugador.nombre : '',
+      campeon: fila.querySelector('.j-campeon').value.trim(),
+    };
+  });
+
+  ROLES_MAPA.forEach(rol => {
+    const marcador = wrap.querySelector(`.mapa-marcador[data-rol="${rol}"]`);
+    if(!marcador) return;
+    const avatar = marcador.querySelector('.mapa-marcador-avatar');
+    const nombreEl = marcador.querySelector('.mapa-marcador-nombre');
+    const datos = porRol[rol];
+
+    if(datos && datos.nombre){
+      marcador.classList.add('asignado');
+      nombreEl.textContent = datos.nombre;
+      const tile = classicTileUrl(datos.campeon);
+      avatar.innerHTML = tile
+        ? `<img src="${tile}" alt="${datos.campeon || ''}">`
+        : `<span class="mapa-marcador-inicial">${iniciales(datos.nombre)}</span>`;
+    }else{
+      marcador.classList.remove('asignado');
+      nombreEl.textContent = rol;
+      avatar.innerHTML = '';
+    }
+  });
 }
 
 function actualizarBotonAgregar(bloque){
@@ -302,6 +318,7 @@ function crearFilaJugador(bloque){
     refrescarSelectsDePartida(bloque);
     actualizarBotonAgregar(bloque);
     actualizarPremiosVisualesPartida(bloque);
+    actualizarMapaPartida(bloque);
   });
 
   const frag = document.createDocumentFragment();
@@ -316,6 +333,7 @@ function agregarFilaJugador(bloque){
   tbody.appendChild(crearFilaJugador(bloque));
   actualizarBotonAgregar(bloque);
   actualizarPremiosVisualesPartida(bloque);
+  actualizarMapaPartida(bloque);
 }
 
 // ---------- Alta rápida de jugador (form aparte, no forma parte de la sesión) ----------
@@ -517,6 +535,10 @@ function agregarBloquePartida(){
   const bloque = nodo.querySelector('.bloque-partida');
   bloque.querySelector('.num-partida').textContent = contadorPartidas;
 
+  // La versión se resuelve recién en runtime (comunes.js la trae de Data
+  // Dragon), así que la URL del mapa se arma acá y no queda pegada en el HTML.
+  bloque.querySelector('.mapa-lol').src = `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION_ACTUAL}/img/map/map11.png`;
+
   bloque.querySelector('.btn-agregar-jugador').addEventListener('click', () => agregarFilaJugador(bloque));
   bloque.querySelector('.btn-agregar-destacado').addEventListener('click', () => agregarTarjetaDestacado(bloque));
   bloque.querySelector('.btn-quitar-partida').addEventListener('click', () => {
@@ -527,8 +549,19 @@ function agregarBloquePartida(){
     if(ev.target.matches('.j-k, .j-d, .j-a, .j-oro, .j-vision')) actualizarPremiosVisualesPartida(bloque);
   });
 
+  // El select de jugador dispara 'change', el campo de campeón dispara
+  // 'input' al tipear: con esto alcanza para mantener el mapita al día ante
+  // cualquier cambio en cualquier fila, incluso en las que se agreguen después.
+  bloque.addEventListener('change', (ev) => {
+    if(ev.target.matches('.j-select, .j-rol')) actualizarMapaPartida(bloque);
+  });
+  bloque.addEventListener('input', (ev) => {
+    if(ev.target.matches('.j-campeon')) actualizarMapaPartida(bloque);
+  });
+
   contenedorPartidas.appendChild(bloque);
   actualizarBotonAgregar(bloque);
+  actualizarMapaPartida(bloque);
 }
 
 function renumerarPartidas(){

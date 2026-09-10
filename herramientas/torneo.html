@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armar torneo — La Bitácora del Amazonas</title>
+<meta name="description" content="Crónica de las partidas de LoL de la banda: quién sale mejor, quién se la carga al equipo, quién trollea y quién es medio ancla.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="La Bitácora del Amazonas">
+<meta property="og:title" content="La Bitácora del Amazonas">
+<meta property="og:description" content="Crónica de las partidas de LoL de la banda: quién sale mejor, quién se la carga al equipo, quién trollea y quién es medio ancla.">
+<meta property="og:image" content="https://zettita.github.io/la-bitacora-del-amazonas/img/portada.webp">
+<meta property="og:url" content="https://zettita.github.io/la-bitacora-del-amazonas/herramientas/torneo.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css?v=30">
+<link rel="stylesheet" href="cargar.css?v=20">
+<link rel="stylesheet" href="torneo.css?v=2">
+</head>
+<body class="pagina-carga">
+
+<nav class="nav-fija">
+  <a href="../index.html" class="nav-logo">
+    <!-- Temporal: placeholder de logo (Quintaesencia de daño de ataque, sistema de runas viejo) hasta tener uno propio -->
+    <img src="https://ddragon.leagueoflegends.com/cdn/7.23.1/img/rune/bl_1_2.png" alt="La Bitácora del Amazonas">
+  </a>
+  <button type="button" class="nav-burger" aria-label="Abrir menú" aria-expanded="false">☰</button>
+  <div class="nav-links">
+    <a href="../index.html#podio-seccion">Podio</a>
+    <a href="../index.html#salon-fama">Salón de la Fama</a>
+    <a href="../index.html#timeline-seccion">Crónica</a>
+    <a href="../torneos.html">Torneos</a>
+    <span class="nav-sep"></span>
+    <a href="torneo.html" class="nav-tool">+ Armar torneo</a>
+  </div>
+</nav>
+
+<header class="portada portada-chica">
+  <div class="portada-orla">
+    <p class="portada-eyebrow">La Bitácora del Amazonas</p>
+    <h1>Armar torneo</h1>
+    <p class="portada-sub">Armá el cuadro, y después volvé acá cada vez que se juegue un cruce para anotar quién ganó.</p>
+    <a class="volver-link" href="../torneos.html">🏆 Ver torneos</a>
+    <a class="volver-link" href="cargar.html">← Volver a cargar sesión</a>
+  </div>
+</header>
+
+<main class="form-main">
+
+  <details class="bloque bloque-config" id="config-github">
+    <summary>⚙️ Conexión para guardar <span id="modo-actual" class="modo-actual"></span></summary>
+    <div class="config-cuerpo">
+      <p class="config-ayuda">
+        Misma conexión que en "Cargar una sesión". Si ya la configuraste ahí en este navegador, acá ya
+        debería estar lista sola.
+      </p>
+      <div class="fila-campos">
+        <label class="campo campo-grande">
+          <span>URL del servidor</span>
+          <input type="text" id="proxy-url" placeholder="https://tu-worker.tu-cuenta.workers.dev">
+        </label>
+        <label class="campo">
+          <span>Clave del grupo</span>
+          <input type="password" id="proxy-clave" placeholder="••••••••">
+        </label>
+      </div>
+      <label class="campo campo-ancho">
+        <span>Tu nombre (queda en el mensaje del commit, opcional)</span>
+        <input type="text" id="proxy-autor" placeholder="Ej: Xero">
+      </label>
+      <div class="acciones-finales">
+        <button type="button" id="btn-guardar-config" class="btn btn-secundario">Guardar conexión</button>
+        <button type="button" id="btn-borrar-config" class="btn btn-secundario">Borrar clave guardada</button>
+        <span id="config-estado" class="estado-guardado"></span>
+      </div>
+    </div>
+  </details>
+
+  <div id="mensaje-crear" class="mensaje" hidden></div>
+
+  <div class="bloque bloque-alta-jugador">
+    <p class="alta-jugador-titulo">👤 Alta rápida de jugador <span class="alta-jugador-ayuda">¿Alguien viene solo para este torneo? Sumalo al roster acá mismo, sin ir a Cargar sesión.</span></p>
+    <form id="form-alta-jugador" class="roster-form-fila">
+      <div class="campo-alta-foto">
+        <span class="campo-lbl">Ícono</span>
+        <label class="avatar-upload-cuadro" for="nj-imagen-rapida" title="Elegir imagen de perfil">
+          <img id="nj-preview-rapida" alt="Vista previa" hidden>
+          <span class="avatar-upload-texto">Seleccionar imagen</span>
+        </label>
+        <input type="file" id="nj-imagen-rapida" accept="image/*" hidden>
+      </div>
+      <label class="campo-alta-nombre">
+        <span class="campo-lbl">Nombre</span>
+        <input type="text" id="nj-nombre-rapida" placeholder="Nombre del jugador" maxlength="30" required>
+      </label>
+      <label class="campo-alta-lane">
+        <span class="campo-lbl">Rol</span>
+        <select id="nj-rol-rapida" required>
+          <option value="" disabled selected>Seleccionar rol</option>
+          <option value="TOP">TOP</option>
+          <option value="JUNGLE">JUNGLE</option>
+          <option value="MID">MID</option>
+          <option value="ADC">ADC</option>
+          <option value="SUPPORT">SUPPORT</option>
+        </select>
+      </label>
+      <button type="submit" id="btn-alta-jugador" class="campo-alta-boton">Agregar</button>
+      <span id="alta-jugador-estado" class="estado-guardado"></span>
+    </form>
+  </div>
+
+  <form id="form-crear-torneo" class="bloque">
+    <legend class="alta-jugador-titulo">🆕 Torneo nuevo</legend>
+
+    <div class="fila-campos">
+      <label class="campo campo-grande">
+        <span>Nombre del torneo *</span>
+        <input type="text" id="tn-nombre" placeholder="Ej: Copa de Verano" maxlength="60" required>
+      </label>
+      <label class="campo">
+        <span>Fecha *</span>
+        <input type="date" id="tn-fecha" required>
+      </label>
+    </div>
+
+    <div class="fila-campos">
+      <label class="campo">
+        <span>Modo *</span>
+        <select id="tn-modo" required>
+          <option value="individual">Individual</option>
+          <option value="equipos">Por equipos</option>
+        </select>
+      </label>
+      <label class="campo">
+        <span>Participantes *</span>
+        <select id="tn-cantidad" required>
+          <option value="4">4</option>
+          <option value="8">8</option>
+          <option value="16">16</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="tn-participantes"></div>
+
+    <div class="acciones-finales">
+      <button type="submit" class="btn btn-principal">Crear torneo</button>
+      <span id="tn-estado" class="estado-guardado"></span>
+    </div>
+  </form>
+
+  <div class="bloque">
+    <legend class="alta-jugador-titulo">📋 Cargar resultados</legend>
+    <label class="campo campo-ancho">
+      <span>Elegí un torneo</span>
+      <select id="te-select">
+        <option value="">Cargando torneos...</option>
+      </select>
+    </label>
+
+    <div id="te-zona" hidden>
+      <p class="capitulo-fecha" id="te-meta"></p>
+      <div id="mensaje-editar" class="mensaje" hidden></div>
+      <div id="te-podio-wrap" hidden>
+        <div class="destacados-titulo-form">🏅 Podio</div>
+        <div id="te-podio"></div>
+        <button type="button" id="btn-finalizar-torneo" class="btn btn-principal te-finalizado-btn" hidden>🏁 Finalizar torneo</button>
+        <p id="te-cerrado-aviso" class="config-ayuda te-finalizado-btn" hidden>🔒 Este torneo está cerrado, no se puede modificar. <a id="te-cerrado-link" href="../torneos.html">Verlo en Torneos →</a></p>
+      </div>
+      <div id="te-bracket"></div>
+      <button type="button" id="btn-eliminar-torneo" class="btn campo-alta-boton-peligro">🗑️ Eliminar este torneo</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="../js/comunes.js?v=10"></script>
+<script src="proxy-remoto.js?v=3"></script>
+<script src="conexion.js?v=1"></script>
+<script src="torneo.js?v=6"></script>
+</body>
+</html>

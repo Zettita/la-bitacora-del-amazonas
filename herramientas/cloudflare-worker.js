@@ -93,6 +93,28 @@ export default {
       }
     }
 
+    if (body.accion === 'crear_torneo') {
+      const torneo = body.torneo || {};
+      if (!torneo.id || !torneo.nombre) return jsonResp({ error: 'Falta el id o el nombre del torneo' }, 400, cors);
+      try {
+        const resultado = await crearTorneo(cfg, torneo, autor);
+        return jsonResp(resultado, 200, cors);
+      } catch (err) {
+        return jsonResp({ error: err.message }, 500, cors);
+      }
+    }
+
+    if (body.accion === 'eliminar_torneo') {
+      const id = String(body.id || '').trim();
+      if (!id) return jsonResp({ error: 'Falta el id del torneo' }, 400, cors);
+      try {
+        const resultado = await eliminarTorneo(cfg, id, autor);
+        return jsonResp(resultado, 200, cors);
+      } catch (err) {
+        return jsonResp({ error: err.message }, 500, cors);
+      }
+    }
+
     const fecha = String(body.fecha || '').trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       return jsonResp({ error: 'Fecha invalida, se espera AAAA-MM-DD' }, 400, cors);
@@ -436,4 +458,50 @@ async function guardarSesion(cfg, payload) {
   }
 
   return { ok: true, archivo, partidas_en_la_sesion: sesion.partidas.length };
+}
+
+// El bracket completo (rondas, participantes, ganadores) se arma del lado
+// del cliente (torneo.js) y estas tres funciones solo lo persisten — igual
+// que un torneo en papel: quien carga la web sabe mejor que el servidor
+// cómo se arma un cuadro de eliminación, acá solo se guarda el resultado.
+
+async function crearTorneo(cfg, torneo, autor) {
+  const firma = autor ? ` (por ${autor})` : '';
+  const ruta = `data/torneos/${torneo.id}.json`;
+
+  const existente = await ghObtenerArchivo(cfg, ruta);
+  if (existente) throw new Error('Ya existe un torneo con ese id');
+
+  await ghGuardarArchivo(cfg, ruta, torneo, undefined, `Crea torneo "${torneo.nombre}"${firma}`);
+
+  const manifestFile = await ghObtenerArchivo(cfg, 'data/torneos-manifest.json');
+  const manifest = manifestFile ? manifestFile.datos : [];
+  const archivo = `${torneo.id}.json`;
+  if (!manifest.includes(archivo)) {
+    manifest.push(archivo);
+    await ghGuardarArchivo(cfg, 'data/torneos-manifest.json', manifest, manifestFile ? manifestFile.sha : undefined, `Registra torneo ${archivo} en el manifest${firma}`);
+  }
+
+  return { ok: true, torneo };
+}
+
+async function eliminarTorneo(cfg, torneoId, autor) {
+  const firma = autor ? ` (por ${autor})` : '';
+  const archivo = `${torneoId}.json`;
+  const ruta = `data/torneos/${archivo}`;
+
+  const existente = await ghObtenerArchivo(cfg, ruta);
+  if (existente) {
+    await ghEliminarArchivo(cfg, ruta, existente.sha, `Elimina torneo ${torneoId}${firma}`);
+  }
+
+  const manifestFile = await ghObtenerArchivo(cfg, 'data/torneos-manifest.json');
+  const manifest = manifestFile ? manifestFile.datos : [];
+  const idx = manifest.indexOf(archivo);
+  if (idx !== -1) {
+    manifest.splice(idx, 1);
+    await ghGuardarArchivo(cfg, 'data/torneos-manifest.json', manifest, manifestFile.sha, `Quita ${archivo} del manifest de torneos${firma}`);
+  }
+
+  return { ok: true };
 }

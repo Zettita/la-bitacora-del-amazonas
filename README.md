@@ -154,6 +154,37 @@ A veces se cruzan rivales o randoms memorables — un troll ajeno, alguien muy m
 
 Viven en `data/destacados.json` (mismo esquema chico que `players.json`: `{id, nombre}`), separado del roster del grupo — no cuentan para el Salón de la Fama ni el winrate de nadie, es puramente registro/anecdotario. Se ven en la crónica como un bloque aparte (borde punteado violeta) dentro de la partida, para diferenciarlos claramente del equipo. La idea a futuro es armarles su propio "salón de la fama" de villanos.
 
+## Torneos
+
+Desde `herramientas/torneo.html` se arma un cuadro de eliminación directa entre amigos: elegís nombre, fecha, modo (**individual** o **por equipos** — en equipos armás cada uno con jugadores ya existentes del roster) y cantidad de participantes (4, 8 o 16 — siempre potencia de 2, no hace falta contemplar "byes"). Al crearlo se genera el cuadro completo (todas las rondas, con las siguientes vacías hasta la final) más un partido aparte por el 3er puesto entre los perdedores de semifinal.
+
+**Mientras el torneo se está jugando, no toca el repo para nada.** Ni crearlo ni anotar cada resultado hacen un commit — el torneo vive solo en el `localStorage` de ese navegador (clave `bitacora_torneos_borrador`), y en la página se ve agrupado como "En curso (sin publicar todavía)" en el desplegable de "Cargar resultados". Vas tocando quién ganó cada cruce y el ganador avanza solo a la siguiente ronda; podés volver a tocar cualquier partido ya definido para corregirlo (el cambio se propaga y deshace en cascada lo que ya había avanzado a partir de ahí), todo instantáneo porque no hay red de por medio. Esto es a propósito: tocar el Worker en cada click dispara un commit a GitHub por click, y si corregís resultados rápido uno atrás del otro los commits en paralelo chocan entre sí (GitHub rechaza el segundo por conflicto de versión). Al no tocar la red mientras se juega, ese problema no puede pasar.
+
+Cuando la final tiene ganador aparece el podio (2do a la izquierda, 1ro al centro y más alto, 3ro a la derecha). Una vez que **todos** los puestos están decididos (final + 3er puesto) aparece el botón **"🏁 Finalizar torneo"** — es el único momento en que el torneo toca el Worker: se manda completo y ya cerrado en un único pedido/commit, se borra del `localStorage` y pasa a la lista de "Publicados" (y recién ahí aparece en el historial público de `torneos.html`). Una vez publicado queda de solo lectura para siempre — ya no se puede volver a editar, ni siquiera desde acá.
+
+Contrapartida de este diseño: un torneo "en curso" solo existe en el navegador donde se está cargando — si lo seguís desde otra compu (o borrás los datos de ese navegador) antes de finalizarlo, se pierde el progreso. Para este proyecto (un solo admin anotando resultados en su propio celu/compu durante la noche de juego) el trade-off vale la pena a cambio de no generar un commit por cada click.
+
+Viven en `data/torneos/<id>.json` (uno por torneo) + `data/torneos-manifest.json` (lista de archivos, mismo patrón que `data/manifest.json`) — y como recién llegan ahí al finalizar, todo lo que hay en el repo está siempre `cerrado: true`. Esquema resumido:
+
+```jsonc
+{
+  "id": "copa-de-verano",
+  "nombre": "Copa de Verano", "fecha": "2026-09-15", "modo": "individual", // o "equipos"
+  "cerrado": false, // true recién cuando se toca "Finalizar torneo"
+  "participantes": [
+    { "id": "p0", "nombre": "Zetta", "jugadores": ["zetta"] },       // individual: 1 solo id
+    { "id": "p1", "nombre": "Equipo Rojo", "jugadores": ["xero","tutte"] } // equipos: 2 o más
+  ],
+  "rondas": [
+    [ { "a": "p0", "b": "p1", "ganador": "p0" }, /* ...resto de la primera ronda... */ ],
+    [ /* siguiente ronda, con "a"/"b" null hasta que avancen los ganadores */ ]
+  ],
+  "tercerPuesto": { "a": null, "b": null, "ganador": null }
+}
+```
+
+El armado del bracket (`armarBracketInicial`), el avance de ganadores (`elegirGanadorTorneo`) y el render del cuadro/podio (`renderBracketTorneoHtml`, `renderPodioTorneoHtml`) están en `js/comunes.js`, compartidos entre `herramientas/torneo.js` (armar/editar) y `js/torneos.js` (`torneos.html`, la página pública de solo lectura).
+
 ### Nombres de campeón
 
 Escribilos como en el juego ("Kai'Sa", "Dr. Mundo", "Wukong", etc.) — la web se encarga de mapearlos al ícono correcto.
@@ -190,6 +221,13 @@ js/app.js                        carga los datos y arma el salón de la fama + l
 data/players.json               roster de jugadores
 data/manifest.json              lista de sesiones a cargar
 data/sessions/*.json            una sesión (día de juego) por archivo
+data/torneos-manifest.json      lista de torneos a cargar
+data/torneos/*.json             un torneo (cuadro + participantes) por archivo
+torneos.html                     listado de torneos y, con ?id=, el cuadro + podio
+js/torneos.js                    lógica de torneos.html
+herramientas/torneo.html        armar un torneo nuevo y cargar sus resultados
+herramientas/torneo.js           lógica propia de torneo.html
+herramientas/torneo.css          estilos propios de torneo.html
 herramientas/cargar.html        formulario para cargar una sesión
 herramientas/cargar.js           lógica propia del formulario de carga
 herramientas/eliminar.html      elegir una sesión y borrar una partida (o el día entero)
