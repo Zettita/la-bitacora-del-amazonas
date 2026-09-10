@@ -1,0 +1,51 @@
+{
+  "fecha": "2026-09-06",
+  "titulo": "Noche de juego",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Ezreal",
+          "rol": "ADC",
+          "kda": {
+            "k": 2,
+            "d": 1,
+            "a": 17
+          },
+          "cs": 217,
+          "oro": 14025,
+          "vision": 9,
+          "premios": [
+            "mvp",
+            "ayudante",
+            "goblin",
+            "centinela"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 15,
+            "d": 8,
+            "a": 4
+          },
+          "cs": 224,
+          "oro": 6565,
+          "vision": 4,
+          "premios": [
+            "killer",
+            "granjero",
+            "ancla",
+            "feeder"
+          ]
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
