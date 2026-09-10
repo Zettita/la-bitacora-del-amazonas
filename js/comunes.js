@@ -20,6 +20,81 @@ function premiosEnCero(){
   return Object.fromEntries(Object.keys(PREMIOS_INFO).map(k => [k, 0]));
 }
 
+// ---------- Cálculo de premios de una partida ----------
+// Compartido entre herramientas/cargar.js (carga) y herramientas/eliminar.js
+// (edición de una partida ya guardada) — ambos arman filas con las mismas
+// clases (.j-select, .j-k, .j-d, .j-a, .j-cs, .j-oro, .j-vision) así que la
+// misma lógica de cálculo sirve para las dos pantallas.
+
+// Kills + asistencias - muertes de una fila: el "aporte neto" que decide
+// MVP (el más alto) y Ancla (el más bajo) — así alguien que murió mucho
+// pero también carreó (muchos kills/asistencias) no gana Ancla solo por
+// la cantidad de muertes, y alguien que murió mucho sin aportar nada sí.
+function aporteNeto(fila){
+  const k = Number(fila.querySelector('.j-k').value) || 0;
+  const d = Number(fila.querySelector('.j-d').value) || 0;
+  const a = Number(fila.querySelector('.j-a').value) || 0;
+  return k + a - d;
+}
+
+// Cómo se calcula cada premio: `valor` da el número a comparar entre las
+// filas de la partida, `mejor` dice si gana el más alto o el más bajo.
+const CRITERIOS_PREMIO = {
+  mvp:       { valor: aporteNeto, mejor: 'max' },
+  killer:    { valor: fila => Number(fila.querySelector('.j-k').value) || 0, mejor: 'max' },
+  ayudante:  { valor: fila => Number(fila.querySelector('.j-a').value) || 0, mejor: 'max' },
+  goblin:    { valor: fila => Number(fila.querySelector('.j-oro').value) || 0, mejor: 'max' },
+  centinela: { valor: fila => Number(fila.querySelector('.j-vision').value) || 0, mejor: 'max' },
+  granjero:  { valor: fila => Number(fila.querySelector('.j-cs').value) || 0, mejor: 'max' },
+  ancla:     { valor: aporteNeto, mejor: 'min' },
+  feeder:    { valor: fila => Number(fila.querySelector('.j-d').value) || 0, mejor: 'max' },
+};
+
+// Premios 100% automáticos: para cada uno, el/los jugador/es con el mejor
+// valor de su criterio en ESA partida se lo llevan (empate incluido, se lo
+// llevan todos). Si nadie cargó nada para un premio de "el más alto gana"
+// (máximo en 0), esa partida no lo otorga. No dependen de otras partidas
+// ni de otras sesiones — solo de las filas cargadas acá.
+//
+// Con un solo jugador cargado no hay con quién comparar, así que esa
+// partida no reparte ningún premio (aunque sus stats sí cuentan para el
+// perfil, como cualquier partida). Hace falta un mínimo de 2.
+const MIN_JUGADORES_PARA_PREMIOS = 2;
+
+function calcularPremiosDePartida(bloque, filas){
+  filas = filas || Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
+  const premiosPorFila = filas.map(() => []);
+
+  const cantidadJugadores = filas.filter(fila => fila.querySelector('.j-select').value).length;
+  if(cantidadJugadores < MIN_JUGADORES_PARA_PREMIOS) return premiosPorFila;
+
+  Object.keys(PREMIOS_INFO).forEach(key => {
+    const criterio = CRITERIOS_PREMIO[key];
+    if(!criterio) return;
+    const valores = filas.map(criterio.valor);
+    const objetivo = criterio.mejor === 'min' ? Math.min(...valores) : Math.max(...valores);
+    if(criterio.mejor === 'max' && objetivo <= 0) return;
+    valores.forEach((v, i) => { if(v === objetivo) premiosPorFila[i].push(key); });
+  });
+
+  return premiosPorFila;
+}
+
+// Repinta la celda de premios de cada fila de la partida según los datos
+// actuales — se llama en cada tipeo de K/D/A/CS/Oro/Visión y al agregar o
+// quitar un jugador de la partida.
+function actualizarPremiosVisualesPartida(bloque){
+  const filas = Array.from(bloque.querySelectorAll('.v3-fila-jugador'));
+  const premiosPorFila = calcularPremiosDePartida(bloque, filas);
+
+  filas.forEach((fila, i) => {
+    const celda = fila.querySelector('.v3-premios-cell');
+    celda.innerHTML = premiosPorFila[i].length
+      ? premiosPorFila[i].map(key => `<span class="mini-premio-auto" title="${PREMIOS_INFO[key].label}">${PREMIOS_INFO[key].icono}</span>`).join('')
+      : '<span class="mini-premio-vacio">—</span>';
+  });
+}
+
 const CAMPEON_ESPECIALES = {
   "wukong": "MonkeyKing", "kaisa": "Kaisa", "kai'sa": "Kaisa",
   "khazix": "Khazix", "kha'zix": "Khazix",
@@ -82,6 +157,92 @@ const CAMPEONES_CLASICOS = [
   'Skarner', 'Sona', 'Soraka', 'Taric', 'Teemo', 'Tristana', 'Tryndamere',
   'Twisted Fate', 'Twitch', 'Vayne', 'Veigar', 'Warwick', 'Wukong', 'Zilean',
 ];
+
+function normalizarTexto(s){
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/gi, '').toLowerCase();
+}
+
+// El campo de campeón es de texto libre (para poder tipear campeones que
+// todavía no están en LoL Classic), así que dos cargas del mismo campeón
+// pueden quedar con distinta mayúscula/tilde ("Garen" vs "GAREN") y
+// contarse como campeones distintos en las estadísticas. Si lo tipeado
+// coincide (sin importar mayúsculas/tildes) con uno de la lista clásica,
+// se guarda siempre con esa misma grafía oficial.
+function normalizarNombreCampeon(texto){
+  const valor = (texto || '').trim();
+  if(!valor) return '';
+  const norm = normalizarTexto(valor);
+  const oficial = CAMPEONES_CLASICOS.find(c => normalizarTexto(c) === norm);
+  return oficial || valor;
+}
+
+// Buscador de campeón: al enfocar o escribir muestra los 60 campeones de
+// LoL Classic (con su ícono) filtrados por lo tipeado; un click en una
+// opción completa el campo. Usado en herramientas/cargar.js (carga) y
+// herramientas/eliminar.js (edición de una partida ya guardada).
+function initCampeonPicker(raiz, claseInput = 'j-campeon'){
+  const input = raiz.querySelector(`.${claseInput}`);
+  const picker = input.closest('.campeon-picker');
+  const opciones = picker.querySelector('.campeon-opciones');
+  let resaltado = -1;
+
+  function pintar(filtro){
+    const norm = normalizarTexto(filtro);
+    const coincidencias = CAMPEONES_CLASICOS.filter(c => normalizarTexto(c).includes(norm));
+    resaltado = coincidencias.length ? 0 : -1;
+    opciones.innerHTML = coincidencias.length
+      ? coincidencias.map((c, i) => `
+          <div class="campeon-opcion${i === 0 ? ' resaltada' : ''}" data-nombre="${c}">
+            <img src="${classicTileUrl(c) || ''}" alt="" loading="lazy">
+            <span>${c}</span>
+          </div>
+        `).join('')
+      : '<div class="campeon-sin-resultados">Sin resultados</div>';
+  }
+
+  function abrir(){
+    pintar(input.value);
+    opciones.hidden = false;
+  }
+  function cerrar(){
+    opciones.hidden = true;
+  }
+  function marcarResaltado(nuevoIndice){
+    const items = opciones.querySelectorAll('.campeon-opcion');
+    if(!items.length) return;
+    resaltado = (nuevoIndice + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle('resaltada', i === resaltado));
+    items[resaltado].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('focus', abrir);
+  input.addEventListener('input', abrir);
+  input.addEventListener('blur', () => setTimeout(cerrar, 150));
+
+  input.addEventListener('keydown', (ev) => {
+    if(opciones.hidden && (ev.key === 'ArrowDown' || ev.key === 'ArrowUp')){
+      abrir();
+      return;
+    }
+    if(ev.key === 'ArrowDown'){ ev.preventDefault(); marcarResaltado(resaltado + 1); }
+    else if(ev.key === 'ArrowUp'){ ev.preventDefault(); marcarResaltado(resaltado - 1); }
+    else if(ev.key === 'Enter'){
+      const item = opciones.querySelectorAll('.campeon-opcion')[resaltado];
+      if(item){ ev.preventDefault(); input.value = item.dataset.nombre; cerrar(); }
+    }else if(ev.key === 'Escape'){
+      cerrar();
+    }
+  });
+
+  opciones.addEventListener('mousedown', (ev) => {
+    const opt = ev.target.closest('.campeon-opcion');
+    if(!opt) return;
+    input.value = opt.dataset.nombre;
+    cerrar();
+    input.focus();
+  });
+}
 
 let DDRAGON_VERSION_ACTUAL = '14.23.1';
 fetch('https://ddragon.leagueoflegends.com/api/versions.json')

@@ -41,17 +41,19 @@
   color:var(--tinta-suave);
   margin-left:auto;
 }
-.btn-quitar-partida-mostrada{
+.btn-quitar-partida-mostrada, .btn-editar-partida-mostrada{
   background:none;
-  border:1px solid var(--derrota);
-  color:#8c3a3a;
   border-radius:5px;
   cursor:pointer;
   padding:.3rem .7rem;
   font-family:'Marcellus', serif;
   font-size:.8rem;
 }
+.btn-quitar-partida-mostrada{border:1px solid var(--derrota); color:#8c3a3a;}
 .btn-quitar-partida-mostrada:hover{background:rgba(140,58,58,.12);}
+.btn-editar-partida-mostrada{border:1px solid var(--oro); color:#8a6d1a;}
+.btn-editar-partida-mostrada:hover{background:rgba(201,162,39,.15);}
+.btn-quitar-partida-mostrada:disabled, .btn-editar-partida-mostrada:disabled{opacity:.4; cursor:not-allowed;}
 
 .vacio-selector{
   color:var(--pergamino-osc);

@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css?v=32">
 <link rel="stylesheet" href="cargar.css?v=21">
-<link rel="stylesheet" href="eliminar.css?v=2">
+<link rel="stylesheet" href="eliminar.css?v=3">
 </head>
 <body class="pagina-carga">
 
@@ -101,9 +101,79 @@
 
 </main>
 
+<template id="tpl-partida-editar">
+  <fieldset class="bloque bloque-partida">
+    <legend>✏️ Editando partida <span class="pe-numero"></span></legend>
+    <div class="fila-campos">
+      <label class="campo">
+        <span>Resultado *</span>
+        <select class="p-resultado" required>
+          <option value="Victoria">Victoria</option>
+          <option value="Derrota">Derrota</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="tabla-wrap">
+      <table class="v3-tabla">
+        <thead>
+          <tr>
+            <th>Jugador</th><th>Campeón</th><th>Rol</th><th>K</th><th>D</th><th>A</th><th>CS</th><th>Oro</th><th>Visión</th><th>Premios</th><th>Comentario</th><th></th>
+          </tr>
+        </thead>
+        <tbody class="jugadores-tbody"></tbody>
+      </table>
+    </div>
+    <button type="button" class="btn-agregar-jugador btn btn-secundario">+ Agregar jugador</button>
+
+    <div class="acciones-finales">
+      <button type="button" class="btn-guardar-edicion btn btn-principal">Guardar cambios</button>
+      <button type="button" class="btn-cancelar-edicion btn btn-secundario">Cancelar</button>
+      <span class="pe-estado estado-guardado"></span>
+    </div>
+  </fieldset>
+</template>
+
+<template id="tpl-fila-jugador-editar">
+  <tr class="v3-fila-jugador">
+    <td>
+      <select class="j-select" required>
+        <option value="">Elegí...</option>
+      </select>
+    </td>
+    <td>
+      <div class="campeon-picker">
+        <input type="text" class="j-campeon" placeholder="Campeón" autocomplete="off">
+        <div class="campeon-opciones" hidden></div>
+      </div>
+    </td>
+    <td>
+      <select class="j-rol">
+        <option value="">Rol</option>
+        <option value="TOP">TOP</option>
+        <option value="JUNGLE">JUNGLE</option>
+        <option value="MID">MID</option>
+        <option value="ADC">ADC</option>
+        <option value="SUPPORT">SUPPORT</option>
+      </select>
+    </td>
+    <td><input type="number" min="0" class="j-k" placeholder="K"></td>
+    <td><input type="number" min="0" class="j-d" placeholder="D"></td>
+    <td><input type="number" min="0" class="j-a" placeholder="A"></td>
+    <td><input type="number" min="0" class="j-cs" placeholder="CS"></td>
+    <td><input type="number" min="0" class="j-oro" placeholder="Oro"></td>
+    <td><input type="number" min="0" class="j-vision" placeholder="Visión"></td>
+    <td>
+      <div class="v3-premios-cell" title="Se calculan solos según los datos de la partida"></div>
+    </td>
+    <td><input type="text" class="j-comentario" placeholder="Comentario"></td>
+    <td><button type="button" class="btn-quitar-jugador" title="Quitar">✕</button></td>
+  </tr>
+</template>
+
 <script src="proxy-remoto.js?v=3"></script>
 <script src="conexion.js?v=1"></script>
-<script src="../js/comunes.js?v=12"></script>
-<script src="eliminar.js?v=4"></script>
+<script src="../js/comunes.js?v=13"></script>
+<script src="eliminar.js?v=5"></script>
 </body>
 </html>
