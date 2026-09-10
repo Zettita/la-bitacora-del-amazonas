@@ -107,6 +107,50 @@
         }
       ],
       "numero": 4
+    },
+    {
+      "resultado": "Victoria",
+      "jugadores": [
+        {
+          "jugador": "xero",
+          "campeon": "Ashe",
+          "rol": "ADC",
+          "kda": {
+            "k": 3,
+            "d": 4,
+            "a": 9
+          },
+          "cs": 182,
+          "oro": 13238,
+          "vision": 3,
+          "premios": [
+            "mvp",
+            "ayudante",
+            "granjero"
+          ]
+        },
+        {
+          "jugador": "zetta",
+          "campeon": "Katarina",
+          "rol": "MID",
+          "kda": {
+            "k": 9,
+            "d": 6,
+            "a": 7
+          },
+          "cs": 174,
+          "oro": 13481,
+          "vision": 16,
+          "premios": [
+            "killer",
+            "goblin",
+            "centinela",
+            "ancla",
+            "feeder"
+          ]
+        }
+      ],
+      "numero": 5
     }
   ]
 }
