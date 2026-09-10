@@ -1,0 +1,27 @@
+{
+  "fecha": "2026-09-09",
+  "titulo": "Noche de juego",
+  "notas": "",
+  "partidas": [
+    {
+      "resultado": "Derrota",
+      "jugadores": [
+        {
+          "jugador": "zetta",
+          "campeon": "Ryze",
+          "rol": "MID",
+          "kda": {
+            "k": 12,
+            "d": 9,
+            "a": 7
+          },
+          "cs": 233,
+          "oro": 17403,
+          "vision": 14,
+          "premios": []
+        }
+      ],
+      "numero": 1
+    }
+  ]
+}
